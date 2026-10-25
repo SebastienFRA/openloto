@@ -1,0 +1,42 @@
+[Unit]
+Description=OpenLoto - diffusion de l'ecran public vers les telephones
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=loto
+Group=loto
+WorkingDirectory=/opt/loto
+Environment=PORT=8123
+Environment=HOST=0.0.0.0
+Environment=LOTO_FILE=/opt/loto/Loto.html
+EnvironmentFile=/opt/loto/loto.env
+ExecStart=/usr/bin/node /opt/loto/loto-server.js
+Restart=on-failure
+RestartSec=2
+
+# Durcissement
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/opt/loto
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+ProtectProc=invisible
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+LockPersonality=true
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+MemoryMax=256M
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
