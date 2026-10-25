@@ -102,6 +102,20 @@ sudo systemctl enable --now loto
 
 Le service écoute sur le port **8123**. Après chaque modification de la clé : `sudo systemctl restart loto`.
 
+### Changer le port d'écoute
+
+Le port se règle dans le fichier du service, à la ligne `Environment=PORT=8123` :
+
+```bash
+sudo nano /etc/systemd/system/loto.service
+# remplacez 8123 par le port voulu, par exemple : Environment=PORT=8080
+
+sudo systemctl daemon-reload
+sudo systemctl restart loto
+```
+
+Pensez ensuite à reporter le nouveau port dans l'adresse du serveur côté organisateur (`http://192.168.1.50:8080`), dans le lien donné aux joueurs et, le cas échéant, dans la redirection de port de votre box.
+
 ### Côté organisateur
 
 Dans OpenLoto : **Réglages → Config réseau (téléphones)**.
