@@ -71,8 +71,10 @@ Pratique pour répartir la saisie entre plusieurs bénévoles : chacun saisit un
 
 ![Écran public pendant le contrôle d'un carton](docs/captures/ecran-public-controle.png)
 
-### Sur les téléphones (option Raspberry Pi)
+### Sur les téléphones (Raspberry Pi ou serveur local)
 - Les joueurs suivent le tirage sur leur téléphone via un lien, sans application.
+- Le lien s'obtient au choix par un **Raspberry Pi** (ou tout serveur Node.js) ou par le **serveur local** lancé sur le PC de l'organisateur, sur le wifi de la salle.
+- **QR code des joueurs** : affiche A4 à imprimer, image PNG, ou affichage à la demande par-dessus l'écran public (retiré automatiquement au démarrage du loto et à la boule suivante).
 - Grille complète ou dernières boules, plein écran, écran maintenu allumé.
 - Nombre de téléphones connectés affiché chez l'organisateur, avec reconnexion automatique.
 - Données légères : environ 0,6 Mo par heure et par téléphone.
@@ -122,6 +124,29 @@ Tout est enregistré dans le navigateur de l'ordinateur. Pensez à **exporter la
 > Pour placer automatiquement l'écran public sur un second écran, utilisez Chrome ou Edge.
 
 ---
+
+## Diffusion sur les téléphones : deux solutions
+
+| | Raspberry Pi (ou serveur) | Serveur local sur le PC |
+|---|---|---|
+| Matériel | un Raspberry Pi ou un serveur Node.js | rien de plus que le PC de l'organisateur |
+| Connexion des joueurs | 4G/5G (ou wifi) via internet | **le même wifi** que le PC |
+| Adresse | stable (celle de votre box ou du serveur) | celle du PC sur le wifi, qui peut changer d'un loto à l'autre |
+| Dépend du wifi de la salle | non | **oui** (voir ci-dessous) |
+
+## Serveur local (sans Raspberry)
+
+Le PC de l'organisateur sert lui-même la page aux téléphones, sans internet.
+
+1. Connectez le PC au wifi de la salle, ou à votre propre routeur wifi.
+2. Lancez **`OpenLoto-serveur.exe`** (Windows), à télécharger dans les [Releases](../../releases/latest) du dépôt. Placez-le dans le dossier de `Loto.html`, ou dans un sous-dossier : il diffuse le fichier `Loto….html` le plus récent qu'il y trouve.
+   - Windows peut afficher « Windows a protégé votre ordinateur » (programme non signé) : *Informations complémentaires* → *Exécuter quand même*.
+   - Le pare-feu demande une autorisation au premier lancement : acceptez au moins les réseaux privés.
+   - Sur Mac ou Linux, ou si l'exécutable est bloqué : installez [Node.js](https://nodejs.org), puis lancez `node serveur-local/openloto-serveur.js`.
+3. Dans OpenLoto, sur ce PC : **Réglages → Config réseau → Utiliser le serveur local de ce PC**. L'adresse et la clé se remplissent seules (une nouvelle clé est créée à chaque lancement et récupérée automatiquement).
+4. Donnez le lien aux joueurs : QR code, affiche à imprimer ou affichage sur l'écran public.
+
+**Cela dépend des réglages du wifi de la salle.** Beaucoup de wifi publics ou « invités » empêchent les appareils connectés de communiquer entre eux (isolation des clients) : le serveur local ne peut alors pas fonctionner. Testez sur place, ou apportez votre propre routeur wifi : il fonctionne très bien sans internet, et vous pouvez y réserver l'adresse du PC pour qu'elle ne change plus. Sur un wifi sans internet, les téléphones affichent « Pas d'accès à internet » : les joueurs doivent rester connectés à ce wifi.
 
 ## Diffusion sur les téléphones (Raspberry Pi)
 
@@ -177,7 +202,7 @@ Dans OpenLoto : **Réglages → Config réseau (téléphones)**.
 - **Adresse du serveur** : par exemple `http://192.168.1.50:8123`.
 - **Clé de diffusion** : la même que dans `loto.env`.
 
-Cliquez sur **Tester la connexion**. Le lien affiché est celui à communiquer aux joueurs, par exemple avec un QR code.
+Cliquez sur **Tester la connexion**. Le lien à communiquer aux joueurs s'affiche avec son QR code : affiche à imprimer, image PNG, ou affichage sur l'écran public.
 
 > Pour que les joueurs se connectent depuis la 4G/5G plutôt que le wifi de la salle, le port 8123 doit être redirigé vers le Pi sur votre box. Ne publiez jamais votre clé de diffusion.
 
@@ -190,6 +215,10 @@ OpenLoto/
 ├── Loto.html                  Le programme (organisateur + écran public)
 ├── outils/
 │   └── saisie-cartons.html    Saisie des cartons (export .txt pour OpenLoto)
+├── serveur-local/
+│   ├── openloto-serveur.js    Serveur local (sur le PC de l'organisateur)
+│   ├── LISEZMOI.txt           Mode d'emploi
+│   └── CONSTRUIRE.md          Fabriquer OpenLoto-serveur.exe à partir du script
 ├── raspberry/
 │   ├── loto-server.js         Serveur de diffusion (Node.js, sans dépendance)
 │   ├── loto.service           Service systemd

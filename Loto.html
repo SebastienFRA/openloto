@@ -908,6 +908,25 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
 /* ===== v21 : logo OpenLoto à gauche du bandeau ===== */
 .top .ol-mark{height:34px;width:34px;flex:0 0 auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
 .top .ol-mark + #appLogo:not([hidden]){margin-left:2px;padding-left:2px}
+/* ===== v23 : serveur local (même wifi) et QR code du lien joueurs ===== */
+.net-local{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:10px;background:var(--teal-soft)}
+.net-local .btn{align-self:flex-start}
+.net-qr{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.net-qr .qr{width:170px;height:170px;flex:0 0 auto;border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.net-qr .qr svg{width:100%;height:100%;display:block}
+.net-qr > div:last-child{flex:1 1 220px;min-width:0}
+.net-qr .lnk{font:700 1.15rem var(--num);word-break:break-all;color:var(--ink)}
+.net-qr.big{flex-direction:column;align-items:center;text-align:center}
+.net-qr.big .qr{width:min(58vh,440px);height:min(58vh,440px)}
+/* ===== v24 : QR code des joueurs — affiche à imprimer, image, écran public ===== */
+.net-qr-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pub-qr{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(5,25,28,.82)}
+.pub-qr-card{background:#fff;color:#14213d;border-radius:3vh;padding:3.5vh 4vh;display:flex;flex-direction:column;align-items:center;gap:1.6vh;box-shadow:0 2vh 6vh rgba(0,0,0,.45);max-width:92vw}
+.pub-qr-card h2{font:800 clamp(1.3rem,4.6vh,3rem)/1.15 var(--body);margin:0;text-align:center}
+.pub-qr-card .q{width:min(58vh,78vw);height:min(58vh,78vw)}
+.pub-qr-card .q svg{width:100%;height:100%;display:block}
+.pub-qr-card .u{font:800 clamp(1.1rem,4vh,2.6rem) var(--num);color:#0f5c63;text-align:center;word-break:break-all}
+.pub-qr-card .w{font-size:clamp(.95rem,2.8vh,1.7rem);color:#5d6b82;text-align:center}
 </style>
 </head>
 <body>
@@ -1012,6 +1031,7 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
       <button class="btn settings-btn" data-act="settings" title="Réseau, voix et raccourcis, paliers, fichiers, simulation, remise à zéro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.1 12.9a7 7 0 0 0 0-1.8l2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.5-.9L14.8 3h-4l-.4 2.2a7 7 0 0 0-1.5.9l-2.4-1-2 3.4 2 1.6a7 7 0 0 0 0 1.8l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 1.5.9l.4 2.2h4l.4-2.2a7 7 0 0 0 1.5-.9l2.4 1 2-3.4-2-1.6zM12.8 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>Réglages <span class="net-dot wait" data-net-dot aria-hidden="true"></span></button>
       <hr>
       <button class="btn" data-act="openPublic">Ouvrir l’écran public</button>
+      <button class="btn qr-pub-btn" data-act="qrPub" title="Afficher par-dessus l’écran public le QR code qui permet aux joueurs de suivre le tirage sur leur téléphone">Afficher le QR code joueurs</button>
       <input class="loader" id="cfgLoader" type="file" accept=".json,application/json" hidden>
       <span class="grow"></span>
       <div class="muted small" id="sourceInfo"></div>
@@ -1025,6 +1045,7 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
       <button class="btn primary" data-act="next" title="Étape suivante"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
       <button class="btn" data-act="openCheck" title="Contrôler un carton"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg></button>
       <button class="btn" data-act="openPublic" title="Ouvrir l’écran public"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg></button>
+      <button class="btn qr-pub-btn icon" data-act="qrPub" title="Afficher le QR code joueurs sur l’écran public"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm8-2h2v2h-2v-2zm4 0h4v2h-2v2h-2v-4zm-2 4h2v2h-2v-2zm4 2h2v2h-4v-2h2zm-6 2h2v2h-2v-2z"/></svg></button>
       <button class="btn" data-act="settings" title="Réglages"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.1 12.9a7 7 0 0 0 0-1.8l2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.5-.9L14.8 3h-4l-.4 2.2a7 7 0 0 0-1.5.9l-2.4-1-2 3.4 2 1.6a7 7 0 0 0 0 1.8l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 1.5.9l.4 2.2h4l.4-2.2a7 7 0 0 0 1.5-.9l2.4 1 2-3.4-2-1.6zM12.8 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></button>
     </aside>
   </div>
@@ -1182,6 +1203,7 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
     <aside class="cfg-side cfg-block" id="cfg-block-notice">
       <div class="cfg-head" style="margin-bottom:0"><h2>Écran public</h2></div>
       <button class="btn primary" data-act="openPublic">Ouvrir l’écran public</button>
+      <button class="btn qr-pub-btn" data-act="qrPub" title="Afficher par-dessus l’écran public le QR code qui permet aux joueurs de suivre le tirage sur leur téléphone">Afficher le QR code joueurs</button>
       <button class="btn" data-act="noticeConfig">Configurer le message d’accueil</button>
       <button class="btn" data-act="pubMsgConfig">Configurer les messages et le mode démo</button>
       <div class="muted small" id="noticeSummary"></div>
@@ -1905,6 +1927,7 @@ async function addBall(n) {
     }
   }
   if (D.live.draws.includes(n)) return;
+  if (pubQrOn) { pubQrOn = false; syncQrBtns(); }
   D.live.draws.push(n); clearVerify(); rearmTempo(); logEvent('ball', { n, rank: D.live.draws.length }); armReveal(); commit();
   speakBall(n);
 }
@@ -2136,9 +2159,10 @@ function startLoto() {
   if (!D.steps.length || D.live.started) return;
   D.live.started = true;
   if (D.live.ended) D.live.ended = false;
+  const hadQr = pubQrOn; pubQrOn = false; syncQrBtns();   /* le QR code des joueurs laisse la place au tirage */
   logEvent('start', {});
   commit();
-  toast('Diffusion lancée : l’écran public affiche le loto.');
+  toast('Diffusion lancée : l’écran public affiche le loto.' + (hadQr ? ' QR code retiré de l’écran public.' : ''));
 }
 async function validateWinner(code, manual, opts = {}) {
   const st = curStep(), L = D.live;
@@ -2426,7 +2450,8 @@ function buildPublic() {
   const base = { loto:'state', t:Date.now(), titre:D.titre, logo:D.logo, logoPos:D.logoPos, colors:D.colors,
     notice:{ on:NOTICE.on, title:NOTICE.title, text:NOTICE.text },
     pubmsg:{ start:PUBMSG.start, wait:PUBMSG.wait, end:PUBMSG.end, endTitle:PUBMSG.endTitle, demo:PUBMSG.demoText, anim:PUBMSG.anim !== false },
-    demo:{ on:PUBMSG.demoOn === true, speed:PUBMSG.demoSpeed }, ...(simOn() ? { sim:true } : {}) };
+    demo:{ on:PUBMSG.demoOn === true, speed:PUBMSG.demoSpeed }, ...(simOn() ? { sim:true } : {}),
+    ...(pubQrOn && playerUrl() ? { qr:{ url:playerUrl(), wifi:(NET.wifi || '').trim() } } : {}) };
   if (!D.steps.length) return Object.assign(base, { empty:true });
   const st = curStep(), L = D.live;
   if (L.ended) return Object.assign(base, { ended:true });
@@ -2462,6 +2487,194 @@ function setNetStatus(state, txt) {
   $$('[data-net-dot]').forEach(dot => dot.className = 'net-dot ' + state);
   $$('[data-net-status]').forEach(el => { el.className = 'net-status ' + state; el.textContent = t; });
 }
+/* ---------- QR code (sans bibliothèque) : mode octets, correction M, versions 1 à 10 ----------
+   D'après l'algorithme de référence de la norme ; suffit largement pour une adresse web. */
+const QR = (() => {
+  const ECC_PER_BLOCK = [0, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26];
+  const NUM_BLOCKS = [0, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5];
+  const rawModules = v => { let r = (16 * v + 128) * v + 64; if (v >= 2) { const n = Math.floor(v / 7) + 2; r -= (25 * n - 10) * n - 55; if (v >= 7) r -= 36; } return r; };
+  const dataCodewords = v => Math.floor(rawModules(v) / 8) - ECC_PER_BLOCK[v] * NUM_BLOCKS[v];
+  const mul = (x, y) => { let z = 0; for (let i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11D); z ^= ((y >>> i) & 1) * x; } return z & 0xFF; };
+  function rsDivisor(deg) {
+    const r = new Array(deg).fill(0); r[deg - 1] = 1; let root = 1;
+    for (let i = 0; i < deg; i++) { for (let j = 0; j < r.length; j++) { r[j] = mul(r[j], root); if (j + 1 < r.length) r[j] ^= r[j + 1]; } root = mul(root, 2); }
+    return r;
+  }
+  function rsRemainder(data, div) {
+    const r = div.map(() => 0);
+    for (const b of data) { const f = b ^ r.shift(); r.push(0); div.forEach((c, i) => r[i] ^= mul(c, f)); }
+    return r;
+  }
+  function encode(text) {
+    const bytes = [...new TextEncoder().encode(text)];
+    let ver = 1;
+    for (; ver <= 10; ver++) if (4 + (ver < 10 ? 8 : 16) + bytes.length * 8 <= dataCodewords(ver) * 8) break;
+    if (ver > 10) throw new Error('texte trop long pour le QR code');
+    /* bits de données */
+    const bits = [], put = (v, n) => { for (let i = n - 1; i >= 0; i--) bits.push((v >>> i) & 1); };
+    put(4, 4); put(bytes.length, ver < 10 ? 8 : 16); bytes.forEach(b => put(b, 8));
+    const cap = dataCodewords(ver) * 8;
+    put(0, Math.min(4, cap - bits.length)); put(0, (8 - bits.length % 8) % 8);
+    for (let p = 0xEC; bits.length < cap; p ^= 0xEC ^ 0x11) put(p, 8);
+    const data = []; for (let i = 0; i < bits.length; i += 8) data.push(parseInt(bits.slice(i, i + 8).join(''), 2));
+    /* blocs + correction d'erreurs, entrelacés */
+    const nb = NUM_BLOCKS[ver], eccLen = ECC_PER_BLOCK[ver], raw = Math.floor(rawModules(ver) / 8);
+    const nShort = nb - raw % nb, shortLen = Math.floor(raw / nb), div = rsDivisor(eccLen), blocks = [];
+    for (let i = 0, k = 0; i < nb; i++) {
+      const len = shortLen - eccLen + (i < nShort ? 0 : 1), dat = data.slice(k, k + len); k += len;
+      const ecc = rsRemainder(dat, div); if (i < nShort) dat.push(0); blocks.push(dat.concat(ecc));
+    }
+    const cw = [];
+    for (let i = 0; i < blocks[0].length; i++) blocks.forEach((b, j) => { if (i !== shortLen - eccLen || j >= nShort) cw.push(b[i]); });
+    /* matrice */
+    const size = ver * 4 + 17, M = [...Array(size)].map(() => Array(size).fill(false)), F = [...Array(size)].map(() => Array(size).fill(false));
+    const set = (x, y, d) => { M[y][x] = d; F[y][x] = true; };
+    for (let i = 0; i < size; i++) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
+    const finder = (cx, cy) => { for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) { const x = cx + dx, y = cy + dy, d = Math.max(Math.abs(dx), Math.abs(dy)); if (x >= 0 && x < size && y >= 0 && y < size) set(x, y, d !== 2 && d !== 4); } };
+    finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+    if (ver > 1) {
+      const n = Math.floor(ver / 7) + 2, step = Math.ceil((ver * 4 + 4) / (n * 2 - 2)) * 2, pos = [6];
+      for (let p = size - 7; pos.length < n; p -= step) pos.splice(1, 0, p);
+      pos.forEach((a, i) => pos.forEach((b, j) => {
+        if ((i === 0 && j === 0) || (i === 0 && j === n - 1) || (i === n - 1 && j === 0)) return;
+        for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) set(a + dx, b + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);
+      }));
+    }
+    const format = mask => {
+      const d = (0 << 3) | mask; let r = d; for (let i = 0; i < 10; i++) r = (r << 1) ^ ((r >>> 9) * 0x537);
+      const b = ((d << 10) | r) ^ 0x5412, bit = i => ((b >>> i) & 1) === 1;
+      for (let i = 0; i <= 5; i++) set(8, i, bit(i));
+      set(8, 7, bit(6)); set(8, 8, bit(7)); set(7, 8, bit(8));
+      for (let i = 9; i < 15; i++) set(14 - i, 8, bit(i));
+      for (let i = 0; i < 8; i++) set(size - 1 - i, 8, bit(i));
+      for (let i = 8; i < 15; i++) set(8, size - 15 + i, bit(i));
+      set(8, size - 8, true);
+    };
+    format(0);
+    if (ver >= 7) {
+      let r = ver; for (let i = 0; i < 12; i++) r = (r << 1) ^ ((r >>> 11) * 0x1F25);
+      const b = (ver << 12) | r;
+      for (let i = 0; i < 18; i++) { const d = ((b >>> i) & 1) === 1, a = size - 11 + i % 3, c = Math.floor(i / 3); set(a, c, d); set(c, a, d); }
+    }
+    let i = 0;
+    for (let right = size - 1; right >= 1; right -= 2) {
+      if (right === 6) right = 5;
+      for (let v = 0; v < size; v++) for (let j = 0; j < 2; j++) {
+        const x = right - j, up = ((right + 1) & 2) === 0, y = up ? size - 1 - v : v;
+        if (!F[y][x] && i < cw.length * 8) { M[y][x] = ((cw[i >>> 3] >>> (7 - (i & 7))) & 1) === 1; i++; }
+      }
+    }
+    const MASKS = [(x, y) => (x + y) % 2 === 0, (x, y) => y % 2 === 0, x => x % 3 === 0, (x, y) => (x + y) % 3 === 0,
+      (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0, (x, y) => x * y % 2 + x * y % 3 === 0,
+      (x, y) => (x * y % 2 + x * y % 3) % 2 === 0, (x, y) => ((x + y) % 2 + x * y % 3) % 2 === 0];
+    const apply = m => { for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) if (!F[y][x] && MASKS[m](x, y)) M[y][x] = !M[y][x]; };
+    /* pénalité simplifiée : suites de même couleur, carrés 2×2, équilibre clair/foncé */
+    const penalty = () => {
+      let p = 0, dark = 0;
+      for (let a = 0; a < size; a++) {
+        let rr = 1, rc = 1;
+        for (let b = 1; b < size; b++) {
+          if (M[a][b] === M[a][b - 1]) { rr++; if (rr === 5) p += 3; else if (rr > 5) p++; } else rr = 1;
+          if (M[b][a] === M[b - 1][a]) { rc++; if (rc === 5) p += 3; else if (rc > 5) p++; } else rc = 1;
+        }
+      }
+      for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+        if (M[y][x]) dark++;
+        if (x < size - 1 && y < size - 1 && M[y][x] === M[y][x + 1] && M[y][x] === M[y + 1][x] && M[y][x] === M[y + 1][x + 1]) p += 3;
+      }
+      return p + Math.floor(Math.abs(dark * 20 - size * size * 10) / (size * size)) * 10;
+    };
+    let best = 0, bestP = Infinity;
+    for (let m = 0; m < 8; m++) { apply(m); format(m); const p = penalty(); if (p < bestP) { bestP = p; best = m; } apply(m); }
+    apply(best); format(best);
+    return M;
+  }
+  /* SVG carré, avec la marge blanche obligatoire de 4 modules */
+  function svg(text, opt) {
+    const o = Object.assign({ dark: '#14213d', light: '#ffffff' }, opt || {}), M = encode(text), n = M.length, q = 4;
+    let d = '';
+    M.forEach((row, y) => row.forEach((on, x) => { if (on) d += `M${x + q},${y + q}h1v1h-1z`; }));
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n + 2 * q} ${n + 2 * q}" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="${o.light}"/><path d="${d}" fill="${o.dark}"/></svg>`;
+  }
+  return { encode, svg };
+})();
+
+/* ---------- Serveur local (OpenLoto-serveur lancé sur ce PC, même wifi que les joueurs) ---------- */
+const LOCAL_PORT = 8123;
+const isLocalUrl = u => /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/?$/i.test(String(u || '').trim());
+let localDetectAt = 0;
+async function detectLocal(manual) {
+  localDetectAt = Date.now();
+  const port = (String(NET.url || '').match(/:(\d+)\/?$/) || [])[1] || LOCAL_PORT;
+  const base = 'http://127.0.0.1:' + (isLocalUrl(NET.url) ? port : LOCAL_PORT);
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 2000);
+  let j = null;
+  try { const r = await fetch(base + '/openloto-local', { signal: ctl.signal, cache: 'no-store' }); if (r.ok) j = await r.json(); } catch (e) {}
+  clearTimeout(to);
+  if (!j || j.app !== 'openloto-local' || !j.key) {
+    if (manual) ask('Serveur local introuvable', 'Le serveur local ne répond pas sur ce PC.\n\nLancez « OpenLoto-serveur » (il doit afficher l’adresse à donner aux joueurs), puis réessayez.',
+      [{ label:'Fermer', value:true, primary:true }], true, { tone:'warn' });
+    return null;
+  }
+  const changed = NET.url !== 'http://127.0.0.1:' + j.port || NET.key !== j.key || JSON.stringify(NET.lan || []) !== JSON.stringify(j.urls || []);
+  NET.url = 'http://127.0.0.1:' + j.port; NET.key = j.key; NET.lan = Array.isArray(j.urls) ? j.urls : [];
+  if (changed) { saveNet(); netFail = 0; netRetryAt = 0; clearTimeout(netRetryTimer); }
+  renderNet();
+  if (!IS_PUBLIC) netSend(buildPublic());
+  if (manual) toast(NET.lan.length ? 'Serveur local connecté. Lien des joueurs : ' + NET.lan[0] : 'Serveur local connecté, mais aucun réseau wifi détecté sur ce PC.');
+  return j;
+}
+/* QR code des joueurs : affiche à imprimer, image PNG, affichage à la demande sur l'écran public */
+let pubQrOn = false;
+function qrPoster() {
+  const u = playerUrl(); if (!u) return;
+  const w = window.open('', '_blank');
+  if (!w) return toast('Fenêtre bloquée : autorisez les fenêtres pour imprimer l’affiche.');
+  const wifi = (NET.wifi || '').trim();
+  w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Affiche — suivre le tirage</title><style>
+    @page{size:A4;margin:14mm}body{margin:0;font-family:"Segoe UI",Arial,sans-serif;color:#14213d;text-align:center}
+    h1{font-size:30pt;margin:6mm 0 2mm}.t{font-size:15pt;color:#5d6b82;margin:0 0 8mm}
+    ol{display:inline-block;text-align:left;font-size:17pt;line-height:1.6;margin:0 0 6mm}
+    .q{width:120mm;height:120mm;margin:0 auto}.q svg{width:100%;height:100%}
+    .u{font-size:22pt;font-weight:800;color:#0f5c63;margin-top:4mm}.f{margin-top:8mm;font-size:11pt;color:#8a97ab}
+    </style></head><body><h1>Suivez le tirage sur votre téléphone</h1><p class="t">${esc(oneLine(D.titre || ''))}</p>
+    <ol>${wifi ? `<li>Connectez-vous au wifi <b>${esc(wifi)}</b></li>` : '<li>Connectez-vous au wifi de la salle</li>'}<li>Scannez ce QR code avec l’appareil photo</li></ol>
+    <div class="q">${QR.svg(u)}</div><div class="u">${esc(u.replace(/\/$/, ''))}</div>
+    <div class="f">Si le téléphone indique « pas d’accès à internet », restez connecté à ce wifi.</div>
+    <script>setTimeout(function(){window.print()},300)<\/script></body></html>`);
+  w.document.close();
+}
+async function qrPng() {
+  const u = playerUrl(); if (!u) return;
+  const img = new Image(), size = 1200;
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(QR.svg(u));
+  await img.decode().catch(() => {});
+  const cv = document.createElement('canvas'); cv.width = cv.height = size;
+  const cx = cv.getContext('2d'); cx.imageSmoothingEnabled = false; cx.drawImage(img, 0, 0, size, size);
+  cv.toBlob(b => {
+    if (!b) return toast('Impossible de créer l’image.');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'qr-code-joueurs.png';
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }, 'image/png');
+}
+function togglePubQr() {
+  if (!playerUrl()) return toast('Configurez d’abord la diffusion vers les téléphones (Réglages → Config réseau) : le QR code contient l’adresse à donner aux joueurs.');
+  pubQrOn = !pubQrOn; sendPublic(); renderNet(); syncQrBtns();
+  toast(pubQrOn ? 'QR code affiché sur l’écran public (il disparaîtra à la prochaine boule).' : 'QR code retiré de l’écran public.');
+}
+/* Boutons « QR code joueurs » : libellé et couleur selon l'état */
+function syncQrBtns() {
+  $$('.qr-pub-btn').forEach(b => {
+    b.classList.toggle('primary', pubQrOn);
+    if (!b.classList.contains('icon')) b.textContent = pubQrOn ? 'Retirer le QR code joueurs' : 'Afficher le QR code joueurs';
+    b.title = pubQrOn ? 'Retirer le QR code de l’écran public' : 'Afficher par-dessus l’écran public le QR code qui permet aux joueurs de suivre le tirage sur leur téléphone';
+  });
+}
+/* Lien à donner aux joueurs : l'adresse wifi du PC quand le serveur tourne sur ce PC */
+function playerUrl() {
+  if (isLocalUrl(NET.url)) return (NET.lan && NET.lan[0]) || '';
+  return NET.url.trim() ? NET.url.trim().replace(/\/+$/, '') + '/' : '';
+}
 const NET_BEAT_MS = 20000, NET_RETRY = [2, 5, 10, 20];
 let netClients = null;   /* téléphones connectés au serveur (si le serveur le communique) */
 let netTimer = null, netRetryTimer = null, netFail = 0, netLastOk = 0, netLastSend = 0, netErr = '', netRetryAt = 0, netSeq = 0;
@@ -2494,6 +2707,7 @@ async function netSend(msg) {
   } catch (e) { why = 'serveur injoignable (réseau ou internet coupé ?)'; }
   clearTimeout(to);
   if (seq !== netSeq) return;          /* un envoi plus récent est parti entre-temps */
+  if (!ok && isLocalUrl(NET.url) && Date.now() - localDetectAt > 4000) { detectLocal(false); }
   if (ok) { netFail = 0; netErr = ''; netLastOk = Date.now(); setNetStatus('ok'); }
   else {
     netFail++; netErr = why;
@@ -2549,8 +2763,17 @@ async function testNet() {
 function renderNet() {
   $$('[data-net-url]').forEach(u => u.value = NET.url);
   $$('[data-net-key]').forEach(k => k.value = NET.key);
-  $$('[data-net-link]').forEach(l => l.textContent = NET.url.trim() ? 'Lien à communiquer aux joueurs : ' + NET.url.replace(/\/+$/, '') + '/' : 'Renseignez l’adresse du serveur pour activer la diffusion.');
-  setNetStatus('wait', (NET.url.trim() && NET.key.trim()) ? 'Prêt — cliquez sur « Tester la connexion ».' : 'Non configuré');
+  const pu = playerUrl(), local = isLocalUrl(NET.url);
+  $$('[data-net-link]').forEach(l => {
+    if (!NET.url.trim()) { l.innerHTML = 'Renseignez l’adresse du serveur pour activer la diffusion.'; return; }
+    if (!pu) { l.innerHTML = '<span class="e">Serveur local actif, mais ce PC n’est connecté à aucun réseau : connectez-le au wifi de la salle, puis relancez le serveur.</span>'; return; }
+    const others = local && NET.lan && NET.lan.length > 1 ? `<div class="muted small">Autres adresses de ce PC : ${NET.lan.slice(1).map(esc).join(' · ')}</div>` : '';
+    l.innerHTML = `<div class="net-qr"><div class="qr">${QR.svg(pu)}</div><div><div class="muted small">Lien à communiquer aux joueurs${local ? ' (même wifi que ce PC)' : ''} :</div><div class="lnk">${esc(pu)}</div>${others}
+      <div class="net-qr-acts"><button class="btn sm" data-act="bigQr">Afficher en grand</button><button class="btn sm" data-act="qrPrint">Imprimer une affiche</button><button class="btn sm" data-act="qrPng">Télécharger l’image</button>
+      <button class="btn sm${pubQrOn ? ' primary' : ''}" data-act="qrPub">${pubQrOn ? 'Retirer de l’écran public' : 'Afficher sur l’écran public'}</button></div></div></div>`;
+  });
+  if (netOn() && netLastOk && !netFail) setNetStatus('ok');
+  else setNetStatus('wait', (NET.url.trim() && NET.key.trim()) ? 'Prêt — cliquez sur « Tester la connexion ».' : 'Non configuré');
 }
 /* Champs réseau réutilisables (dialogue « Config réseau » et dialogue « Message d’accueil »). */
 function netFieldsHtml() {
@@ -2558,7 +2781,10 @@ function netFieldsHtml() {
     <label class="f">Adresse du serveur<input type="text" data-net-url placeholder="http://192.168.1.50:8123" autocomplete="off"></label>
     <label class="f">Clé de diffusion<input type="text" data-net-key placeholder="clé fournie par le serveur" autocomplete="off"></label>
     <button class="btn" data-act="testNet" style="align-self:flex-start">Tester la connexion</button>
+    <div class="net-local"><b>Pas de Raspberry ? Serveur local sur ce PC</b><span class="muted small">Lancez « OpenLoto-serveur » sur ce PC, puis cliquez ci-dessous : l’adresse et la clé se remplissent toutes seules. Les joueurs doivent être sur le même wifi que ce PC (selon les réglages du wifi de la salle).</span>
+      <button class="btn sm primary" data-act="useLocal">Utiliser le serveur local de ce PC</button></div>
     <div class="net-status wait" data-net-status></div>
+    <label class="f">Nom du wifi à indiquer aux joueurs (facultatif)<input type="text" data-net-wifi placeholder="Ex. Salle-des-fetes" autocomplete="off"></label>
     <div class="muted small" data-net-link></div>
   </div>`;
 }
@@ -2566,6 +2792,8 @@ function bindNetFields(root) {
   const u = root.querySelector('[data-net-url]'), k = root.querySelector('[data-net-key]');
   if (u) u.addEventListener('input', () => { NET.url = u.value; saveNet(); renderNet(); });
   if (k) k.addEventListener('input', () => { NET.key = k.value; saveNet(); renderNet(); });
+  const wf = root.querySelector('[data-net-wifi]');
+  if (wf) { wf.value = NET.wifi || ''; wf.addEventListener('input', () => { NET.wifi = wf.value.slice(0, 60); saveNet(); if (pubQrOn) sendPublic(); }); }
   renderNet();
 }
 async function showNetConfig() {
@@ -2807,6 +3035,7 @@ function sanitizePublic(m) {
     nums: Array.isArray(l && l.nums) ? l.nums.slice(0, 12).map(PUB_INT).filter(n => n != null) : [],
     miss: Array.isArray(l && l.miss) ? l.miss.slice(0, 12).map(PUB_INT).filter(n => n != null) : []
   })) });
+  o.qr = (o.qr && typeof o.qr === 'object' && /^https?:\/\/[^\s"<>]{3,190}$/.test(o.qr.url || '')) ? { url: o.qr.url, wifi: String(o.qr.wifi || '').slice(0, 60) } : null;
   if (o.pubmsg && typeof o.pubmsg === 'object') o.pubmsg = { start: String(o.pubmsg.start || ''), wait: String(o.pubmsg.wait || ''), end: String(o.pubmsg.end || ''), endTitle: String(o.pubmsg.endTitle || ''), demo: String(o.pubmsg.demo || ''), anim: o.pubmsg.anim !== false };
   if (o.demo && typeof o.demo === 'object') o.demo = { on: o.demo.on === true, speed: normDemoSpeed(o.demo.speed) };
   return o;
@@ -3006,6 +3235,7 @@ function renderPublic(m) {
   m = sanitizePublic(m);
   if (m && typeof m === 'object') { if (typeof m.logo === 'string' && m.logo) pubLogo = m.logo; else if (pubLogo) m.logo = pubLogo; }
   if (m && m.notice) { pubNoticeCfg = m.notice; if (pubNoticeCfg.on === false) hidePubNotice(); }
+  paintPubQr(m && m.qr);
   if (m && m.empty && m.demo && m.demo.on) {
     const key = pubDemoKey(m);
     { const gb = $('#pubGridBtn'); if (gb) gb.hidden = true; }
@@ -3019,6 +3249,17 @@ function renderPublic(m) {
   paintPub(m);
   updatePubGridBtn(m);
   updatePubConn();
+}
+let pubQrKey = '';
+function paintPubQr(q) {
+  let el = $('#pubQr');
+  const key = q ? q.url + '|' + q.wifi : '';
+  if (key === pubQrKey) return; pubQrKey = key;
+  if (!q) { if (el) el.hidden = true; return; }
+  if (!el) { el = document.createElement('div'); el.id = 'pubQr'; el.className = 'pub-qr'; document.body.appendChild(el); }
+  el.innerHTML = `<div class="pub-qr-card"><h2>Suivez le tirage sur votre téléphone</h2>${q.wifi ? `<div class="w">1. Connectez-vous au wifi <b>${esc(q.wifi)}</b> &nbsp; 2. Scannez ce QR code</div>` : '<div class="w">Connectez-vous au wifi de la salle, puis scannez ce QR code</div>'}
+    <div class="q">${QR.svg(q.url)}</div><div class="u">${esc(q.url.replace(/\/$/, ''))}</div></div>`;
+  el.hidden = false;
 }
 function initPublic() {
   document.body.classList.add('public');
@@ -5111,6 +5352,11 @@ function bindEvents() {
       case 'rcolToggle': setRcol(!POSTE.rcolOff); break;
       case 'testBip': unlockAudio(); playBip(true); break;
       case 'testNet': testNet(); break;
+      case 'useLocal': detectLocal(true); break;
+      case 'qrPrint': qrPoster(); break;
+      case 'qrPng': qrPng(); break;
+      case 'qrPub': togglePubQr(); break;
+      case 'bigQr': { const w = b.closest('.net-qr'); if (w) { w.classList.toggle('big'); b.textContent = w.classList.contains('big') ? 'Réduire' : 'Afficher en grand'; } break; }
       case 'showWinners': showWinners(); break;
       case 'showOrder': showOrder(); break;
       case 'exportJournalCsv': exportJournal('csv'); break;
@@ -5378,6 +5624,8 @@ if (IS_PUBLIC) {
 } else {
   bindEvents();
   saveC();
+  if (isLocalUrl(NET.url)) detectLocal(false);
+  setInterval(() => { if (isLocalUrl(NET.url) && netFail && Date.now() - localDetectAt > 15000) detectLocal(false); }, 5000);
   let startTab = 'direct';
   try { startTab = localStorage.getItem(TAB_KEY) || 'direct'; } catch (e) {}
   showTab(startTab === 'config' || startTab === 'journal' ? startTab : 'direct');
