@@ -864,6 +864,38 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
 .cn.zhit{background:var(--bad-soft)!important;color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad)!important;border-color:transparent}
 .sel-lines{display:flex;gap:4px;align-items:center;min-height:42px;border:1px solid var(--line);border-radius:10px;padding:0 10px}
 .sel-lines .chk2{margin:0;padding:0 4px;color:var(--ink)}
+/* ===== v17 : téléphones — anneaux non rognés, contrôle en portrait sans lot ===== */
+/* marge intérieure : l'anneau blanc de la dernière boule ne déborde plus du cadre défilant */
+#pub .pub-grid{padding:calc(var(--u)*.9)}
+#pub .pub-gridwrap{padding-top:calc(var(--u)*.9)}
+@media (orientation:portrait){
+  /* contrôle d'un carton : le lot et la condition laissent la place à la grille et au carton */
+  #pub.mode-carton .pub-lotband{display:none}
+  #pub.mode-carton{gap:calc(var(--u)*1.2)}
+  #pub.mode-carton .pub-gridwrap{gap:calc(var(--u)*1)}
+  #pub.mode-carton .pb.mid{width:min(calc(var(--u)*10),18vw);height:min(calc(var(--u)*10),18vw);font-size:min(calc(var(--u)*5.6),10vw);outline-width:calc(var(--u)*.35);outline-offset:calc(var(--u)*.3)}
+  #pub.mode-carton .pg-count{font-size:clamp(.9rem,calc(var(--u)*2.6),1.4rem)}
+  #pub.mode-carton .pub-grid{width:min(100%,calc(var(--u)*42))}
+  #pub.mode-carton .pub-code{font-size:clamp(.95rem,calc(var(--u)*2.6),1.5rem);margin-bottom:calc(var(--u)*.6)}
+  #pub.mode-carton .pub-verdict{font-size:clamp(1rem,calc(var(--u)*3),1.7rem);padding:calc(var(--u)*.6) 3vw;margin-bottom:calc(var(--u)*1)}
+  #pub.mode-carton .pub-lines{gap:calc(var(--u)*1)}
+  #pub.mode-carton .pub-line{padding:calc(var(--u)*.8) 2vw}
+  #pub.mode-carton .pn{width:min(calc(var(--u)*6.4),11vw);height:min(calc(var(--u)*6.4),11vw);font-size:min(calc(var(--u)*3.1),5.5vw)}
+  #pub.mode-carton .pn.last{outline-width:calc(var(--u)*.5);outline-offset:calc(var(--u)*.35)}
+}
+/* ===== v18 : téléphone en portrait (tirage, vue grille) : dernière boule plus grosse, centrée, nombre de boules dessous ===== */
+@media (orientation:portrait){
+  #pub.grid-on:not(.mode-carton) .pub-gridwrap{gap:calc(var(--u)*3)}
+  #pub.grid-on:not(.mode-carton) .pg-head{flex-direction:column;gap:calc(var(--u)*1.4)}
+  #pub.grid-on:not(.mode-carton) .pb.mid{width:min(calc(var(--u)*21),36vw);height:min(calc(var(--u)*21),36vw);font-size:min(calc(var(--u)*12),20vw);outline-width:calc(var(--u)*.5);outline-offset:calc(var(--u)*.4)}
+  #pub.grid-on:not(.mode-carton) .pg-count{text-align:center;font-size:clamp(.85rem,calc(var(--u)*2.3),1.25rem)}
+}
+/* petits écrans peu hauts (iPhone SE…) : tout reste visible sans défiler */
+@media (orientation:portrait) and (max-height:700px){
+  #pub.grid-on:not(.mode-carton) .pub-gridwrap{gap:calc(var(--u)*2)}
+  #pub.grid-on:not(.mode-carton) .pb.mid{width:min(calc(var(--u)*16),32vw);height:min(calc(var(--u)*16),32vw);font-size:min(calc(var(--u)*9),18vw)}
+  #pub.grid-on:not(.mode-carton) .pub-grid{width:min(100%,calc(var(--u)*46))}
+}
 </style>
 </head>
 <body>
