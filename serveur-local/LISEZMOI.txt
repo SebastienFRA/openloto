@@ -1,0 +1,33 @@
+OpenLoto - serveur local (salle des fêtes)
+==========================================
+
+À quoi ça sert ?
+  Les joueurs suivent le tirage sur leur téléphone, sans Raspberry ni internet :
+  le PC de l'organisateur sert lui-même la page, sur le wifi de la salle.
+
+Utilisation
+  1. Connectez le PC au wifi de la salle (ou à votre propre routeur wifi).
+  2. Double-cliquez sur OpenLoto-serveur.exe.
+     - Windows peut afficher « Windows a protégé votre ordinateur » : cliquez sur
+       « Informations complémentaires », puis « Exécuter quand même ».
+     - Au premier lancement, le pare-feu demande l'autorisation : cochez
+       « Réseaux privés » (et « Réseaux publics » si le wifi de la salle est déclaré public).
+  3. Ouvrez OpenLoto sur ce même PC :
+     Réglages > Config réseau (téléphones) > « Utiliser le serveur local de ce PC ».
+     Le lien à donner aux joueurs et son QR code s'affichent.
+  4. Laissez la fenêtre du serveur ouverte pendant tout le loto.
+
+Le serveur diffuse le fichier « Loto….html » le plus récent, trouvé dans son dossier
+ou dans le dossier parent. Le nom du fichier diffusé s'affiche dans sa fenêtre.
+
+Limites
+  - Le wifi doit permettre aux appareils de communiquer entre eux. Beaucoup de wifi
+    publics ou « invités » l'interdisent (isolation des clients) : dans ce cas, utilisez
+    votre propre routeur wifi (il fonctionne très bien sans internet).
+  - Sur un wifi sans internet, les téléphones affichent « Pas d'accès à internet » :
+    les joueurs doivent rester connectés à ce wifi.
+  - Le PC ne doit pas se mettre en veille.
+
+Mac / Linux, ou si l'exécutable est bloqué
+  Installez Node.js (https://nodejs.org), puis dans un terminal ouvert dans ce dossier :
+      node openloto-serveur.js
