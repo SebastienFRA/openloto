@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Saisie des cartons · OpenLoto</title>
+<style>
+:root{
+  --bg:#eef2f5; --card:#fff; --ink:#14213d; --muted:#5d6b82; --line:#d6dee8; --field:#fff;
+  --teal:#0f5c63; --teal-2:#147a83; --teal-soft:#dff0f1;
+  --amber:#f5a300; --amber-soft:#fff1cf;
+  --ok:#17794a; --ok-soft:#ddf3e6; --bad:#a82121; --bad-soft:#fbe3e1; --warn:#955b00; --warn-soft:#ffecc7;
+  --paper:#fffdf6; --grid:#c8d3df;
+  --num:"Arial Rounded MT Bold","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:"Avenir Next","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  --mono:Consolas,"Cascadia Mono","SF Mono",ui-monospace,monospace;
+}
+html.dark{
+  color-scheme:dark;
+  --bg:#0f171e; --card:#17222c; --ink:#e2e9ef; --muted:#98a9b9; --line:#2b3a47; --field:#1c2934;
+  --teal:#167b84; --teal-2:#1c9099; --teal-soft:#14373b;
+  --amber-soft:#3a2f12; --ok:#5fd394; --ok-soft:#14331f; --bad:#f39a91; --bad-soft:#3b1a1a; --warn:#f2c063; --warn-soft:#3a2f12;
+  --paper:#1a2630; --grid:#34475a;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--body)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+h1,h2,h3{margin:0;line-height:1.2}
+
+/* barre du haut */
+.top{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:14px;padding:10px 20px;background:var(--teal);color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.top h1{font-size:1.1rem;font-weight:700;margin-right:auto}
+.top h1 span{font-weight:500;opacity:.75}
+.icon-btn{display:grid;place-items:center;width:36px;height:36px;border-radius:9px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff}
+.icon-btn svg{width:18px;height:18px;fill:currentColor}
+.save-state{font-size:.75rem;font-weight:700;border-radius:9px;padding:4px 9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#8fe6b4}
+.save-state.err{background:rgba(255,60,50,.22);color:#ffc4bd}
+
+.wrap{max-width:1180px;margin:0 auto;padding:18px 20px 40px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;align-items:start}
+@media(max-width:960px){.wrap{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(20,33,61,.06)}
+.card h2{font-size:1.02rem;margin-bottom:10px}
+.col{display:grid;gap:18px;min-width:0}
+
+/* boutons et champs */
+.btn{border:1px solid var(--line);background:var(--field);border-radius:9px;padding:8px 14px;font-weight:600}
+.btn:hover{border-color:var(--teal-2)}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn.primary:hover{background:var(--teal-2)}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:4px 10px;font-size:.84rem}
+.btn:disabled{opacity:.5;cursor:default}
+input[type=number],input[type=text],input[type=search]{background:var(--field);border:1.5px solid var(--line);border-radius:9px;padding:7px 10px}
+input:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(245,163,0,.25)}
+.chk{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--teal)}
+.muted{color:var(--muted)} .small{font-size:.85rem}
+
+/* réglages */
+.settings{display:grid;gap:12px}
+.set-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.set-row input[type=number]{width:74px;text-align:center;font-weight:700}
+.set-row .lbl{min-width:0}
+
+/* carton de saisie */
+.entry{display:grid;gap:12px;justify-items:center}
+.editbar{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--amber-soft);border:2px solid var(--amber);border-radius:12px;padding:8px 12px;font-weight:700}
+.plate-info:empty{display:none}
+.plate-info{min-height:1.3em;text-align:center;font-weight:600;color:var(--teal-2);max-width:560px}
+.carton{width:100%;max-width:560px;background:var(--paper);border:3px solid var(--teal);border-radius:16px;overflow:hidden;box-shadow:0 6px 0 rgba(15,92,99,.25),0 12px 26px rgba(0,0,0,.12)}
+.carton.editing{border-color:var(--amber);box-shadow:0 6px 0 rgba(245,163,0,.35),0 12px 26px rgba(0,0,0,.12)}
+.c-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;background:var(--teal);color:#fff}
+.carton.editing .c-head{background:var(--amber);color:#14213d}
+.c-title{font:900 1.7rem/1 var(--num);letter-spacing:.32em;padding-left:.32em}
+.c-id{display:flex;flex-direction:column;align-items:center;gap:3px}
+.c-id span{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;opacity:.9}
+#idInput{width:180px;font:700 1.3rem var(--mono);letter-spacing:.15em;text-align:center;border:2px solid #fff;border-radius:9px;padding:5px 4px;background:#fff;color:#14213d}
+.c-body{display:grid;gap:10px;padding:16px}
+.c-line{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.c-line input{width:100%;min-width:0;height:62px;text-align:center;font:800 1.8rem var(--num);border:2px solid var(--grid);border-radius:12px;background:var(--field);padding:0}
+.c-line input:focus{background:var(--amber-soft);border-color:var(--amber)}
+.c-line input.bad,#idInput.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.c-foot{text-align:center;font-size:.7rem;letter-spacing:.3em;color:var(--teal-2);padding:0 0 10px;opacity:.8}
+
+/* aperçu du carton réel (9 colonnes) */
+.preview{width:100%;max-width:560px}
+.preview .lbl{font-size:.78rem;color:var(--muted);margin-bottom:4px;text-align:center}
+.real{display:grid;grid-template-columns:repeat(9,1fr);border:2px solid var(--teal);border-radius:10px;overflow:hidden;background:var(--paper)}
+.real span{display:grid;place-items:center;height:34px;font:700 1rem var(--num);border-right:1px solid var(--grid);border-bottom:1px solid var(--grid)}
+.real span:nth-child(9n){border-right:0}
+.real span:nth-last-child(-n+9){border-bottom:0}
+.real span.on{background:var(--teal-soft);color:var(--teal)}
+html.dark .real span.on{color:#9fe3e8}
+.real span.clash{background:var(--bad-soft);color:var(--bad)}
+
+.msg{min-height:1.4em;font-weight:600;text-align:center;max-width:560px}
+.msg.err{color:var(--bad)} .msg.ok{color:var(--ok)} .msg.warn{color:var(--warn)}
+.hint{color:var(--muted);font-size:.8rem;text-align:center;max-width:560px}
+.btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+/* dictée */
+.mic.on{background:var(--ok);border-color:var(--ok);color:#fff;animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(23,121,74,.5)}70%{box-shadow:0 0 0 10px rgba(23,121,74,0)}100%{box-shadow:0 0 0 0 rgba(23,121,74,0)}}
+.heard{min-height:1.2em;font-size:.84rem;color:var(--muted);font-style:italic}
+
+/* rapport de plaque */
+.report{border-left:6px solid var(--ok)}
+.report.err{border-left-color:var(--bad)}
+.report h3{font-size:1rem;margin-bottom:6px}
+.report ul{margin:6px 0;padding-left:20px}
+.okline{color:var(--ok);font-weight:600} .errline{color:var(--bad);font-weight:600}
+.link{border:0;background:none;color:var(--teal-2);text-decoration:underline;padding:0 2px;font-weight:600}
+
+/* liste */
+.list-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.list-head h2{margin:0}
+.list-tools{display:flex;gap:8px;flex-wrap:wrap}
+.search{width:100%;margin-bottom:10px}
+#list{max-height:min(62vh,640px);overflow:auto;border:1px solid var(--line);border-radius:10px}
+.item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item.current{background:var(--amber-soft)}
+.item .code{font:700 .95rem var(--mono);min-width:6.5em}
+.item .nums{flex:1;min-width:0;font:.86rem var(--mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .acts{display:flex;gap:6px;flex:0 0 auto}
+.badge{font-size:.7rem;font-weight:700;padding:1px 7px;border-radius:9px;border:0;cursor:pointer}
+.badge.ok{background:var(--ok-soft);color:var(--ok)} .badge.err{background:var(--bad-soft);color:var(--bad)} .badge.prog{background:var(--warn-soft);color:var(--warn)}
+.empty{padding:16px;color:var(--muted);text-align:center}
+.more{padding:10px;text-align:center;color:var(--muted);font-size:.84rem}
+.import-report{margin-top:10px;font-size:.86rem;border-radius:10px;padding:8px 12px;background:var(--teal-soft)}
+.import-report .e{color:var(--bad)}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:12px;background:#14213d;color:#fff;border-radius:12px;padding:10px 14px;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:calc(100% - 32px)}
+.toast .btn{background:transparent;color:#ffd27a;border-color:rgba(255,255,255,.3)}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Saisie des cartons <span>· OpenLoto</span></h1>
+  <span class="save-state" id="saveState" title="Les cartons sont enregistrés automatiquement dans ce navigateur">Sauvegarde auto</span>
+  <button class="icon-btn" id="themeBtn" title="Thème clair / sombre" aria-label="Thème clair / sombre"></button>
+</header>
+
+<main class="wrap">
+  <div class="col">
+    <section class="card settings" aria-label="Réglages">
+      <div class="set-row">
+        <label for="idLen" class="lbl">Nombre de chiffres du numéro de carton</label>
+        <input type="number" id="idLen" min="1" max="12" value="6">
+      </div>
+      <div class="set-row">
+        <label class="chk"><input type="checkbox" id="plateOn"> Mode plaque :</label>
+        <input type="number" id="plateSize" min="2" max="12" value="6" aria-label="Cartons par plaque">
+        <span class="muted small">cartons à numéros consécutifs</span>
+        <button class="btn sm" id="plateNew" title="Clore la plaque en cours et en commencer une nouvelle">Nouvelle plaque</button>
+      </div>
+      <div class="set-row">
+        <button class="btn sm mic" id="mic">🎤 Dictée vocale</button>
+        <label class="chk small"><input type="checkbox" id="padId" checked> Compléter le n° dicté avec des zéros à gauche</label>
+        <span class="heard" id="heard"></span>
+      </div>
+    </section>
+
+    <section class="card entry" aria-label="Saisie d’un carton">
+      <div class="editbar" id="editbar" hidden><span id="editLabel"></span><button class="btn sm" id="cancelEdit">Annuler la modification</button></div>
+      <div class="plate-info" id="plateInfo"></div>
+      <div class="carton" id="carton">
+        <div class="c-head">
+          <div class="c-title">LOTO</div>
+          <label class="c-id"><span>N° du carton</span><input type="text" id="idInput" inputmode="numeric" autocomplete="off" spellcheck="false"></label>
+        </div>
+        <div class="c-body" id="grid"></div>
+        <div class="c-foot">★ ★ ★ BONNE CHANCE ★ ★ ★</div>
+      </div>
+      <div class="preview">
+        <div class="lbl">Aperçu du carton réel (une colonne par dizaine) : comparez avec le carton papier</div>
+        <div class="real" id="real"></div>
+      </div>
+      <div class="msg" id="msg" role="status"></div>
+      <div class="btns"><button class="btn primary" id="validate">Valider le carton</button><button class="btn" id="resetBtn">Effacer</button></div>
+      <div class="hint">Les cases avancent toutes seules · Entrée : valider · Retour arrière sur une case vide : case précédente · Échap : effacer / annuler</div>
+    </section>
+
+    <section class="card report" id="plateReport" hidden></section>
+  </div>
+
+  <div class="col">
+    <section class="card" aria-label="Cartons enregistrés">
+      <div class="list-head">
+        <h2 id="count">0 carton</h2>
+        <div class="list-tools">
+          <label class="btn sm" title="Ajouter les cartons d’un fichier .txt déjà exporté">Importer .txt<input type="file" id="importFile" accept=".txt,text/plain" multiple hidden></label>
+          <button class="btn sm primary" id="export">Exporter en .txt</button>
+          <button class="btn sm danger" id="clear">Tout vider</button>
+        </div>
+      </div>
+      <input type="search" class="search" id="search" placeholder="Rechercher un numéro de carton…" aria-label="Rechercher un carton">
+      <div id="list"></div>
+      <div id="importReport"></div>
+      <p class="muted small" style="margin:10px 0 0">Le fichier exporté se charge dans OpenLoto : <b>Configuration → Cartons → Importer</b>. Format d’une ligne : <code>112294 ; 10 24 44 51 76 ; 1 17 31 60 84 ; 25 46 67 70 86</code></p>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="toast" hidden><span id="toastTxt"></span><button class="btn sm" id="toastBtn" hidden>Annuler</button></div>
+
+<script>
+(function () {
+  'use strict';
+  /* Clés de stockage inchangées depuis la version précédente : les cartons déjà saisis sont conservés. */
+  const STORE = 'loto_cartons_v1', CFG = 'loto_cartons_idlen', PLATE_KEY = 'loto_plaque_mode_v1', THEME_KEY = 'openloto-saisie-theme';
+  const LINES = 3, PER_LINE = 5, MAX = 90, LIST_MAX = 200;
+  const $ = id => document.getElementById(id);
+  const idInput = $('idInput'), idLen = $('idLen'), grid = $('grid'), msg = $('msg'), listEl = $('list'), countEl = $('count');
+  const carton = $('carton'), editbar = $('editbar'), editLabel = $('editLabel'), validateBtn = $('validate'), realEl = $('real');
+
+  const load = (k, def) => { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? def : v; } catch (e) { return def; } };
+  let cartons = (load(STORE, []) || []).filter(c => c && c.id && Array.isArray(c.lines));
+  let editIndex = -1;            /* -1 = ajout ; sinon index du carton en cours de modification */
+
+  /* ---------- Thème ---------- */
+  const SUN = '<svg viewBox="0 0 24 24"><path d="M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0-5 1.5 3h-3L12 2zm0 20-1.5-3h3L12 22zM2 12l3-1.5v3L2 12zm20 0-3 1.5v-3L22 12zM4.9 4.9l3.2 1-2.1 2.1-1.1-3.1zm14.2 14.2-3.2-1 2.1-2.1 1.1 3.1zM4.9 19.1l1-3.2 2.1 2.1-3.1 1.1zM19.1 4.9l-1 3.2-2.1-2.1 3.1-1.1z"/></svg>';
+  const MOON = '<svg viewBox="0 0 24 24"><path d="M21 14.5A9 9 0 0 1 9.5 3a9 9 0 1 0 11.5 11.5z"/></svg>';
+  function applyTheme(t) { document.documentElement.classList.toggle('dark', t === 'dark'); $('themeBtn').innerHTML = t === 'dark' ? SUN : MOON; }
+  let theme = (() => { try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; } })() || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  applyTheme(theme);
+  $('themeBtn').onclick = () => { theme = theme === 'dark' ? 'light' : 'dark'; applyTheme(theme); try { localStorage.setItem(THEME_KEY, theme); } catch (e) {} };
+
+  /* ---------- Enregistrement ---------- */
+  function save() {
+    try { localStorage.setItem(STORE, JSON.stringify(cartons)); setSaveState(true); }
+    catch (e) { setSaveState(false); setMsg('Enregistrement impossible dans ce navigateur : exportez vos cartons en .txt pour ne rien perdre.', 'err'); }
+  }
+  function setSaveState(ok) { const s = $('saveState'); s.classList.toggle('err', !ok); s.textContent = ok ? 'Sauvegarde auto' : 'Non enregistré'; }
+
+  /* ---------- Grille de saisie (3 × 5) ---------- */
+  const cells = [];
+  for (let r = 0; r < LINES; r++) {
+    const row = document.createElement('div'); row.className = 'c-line';
+    for (let c = 0; c < PER_LINE; c++) {
+      const inp = document.createElement('input');
+      inp.type = 'text'; inp.maxLength = 2; inp.inputMode = 'numeric'; inp.autocomplete = 'off';
+      inp.setAttribute('aria-label', `Ligne ${r + 1}, numéro ${c + 1}`);
+      row.appendChild(inp); cells.push(inp);
+    }
+    grid.appendChild(row);
+  }
+  const fields = [idInput, ...cells];
+  realEl.innerHTML = '<span></span>'.repeat(LINES * 9);
+  const realCells = [...realEl.children];
+
+  const col = n => Math.min(Math.floor(n / 10), 8);           /* 1-9 → 0 ; 80-90 → 8 */
+  const pad = v => String(v).padStart(2, '0');
+  const idDigits = () => Math.min(12, Math.max(1, parseInt(idLen.value, 10) || 6));
+
+  function applyIdLen() {
+    const n = idDigits(); idLen.value = n; idInput.maxLength = n; idInput.placeholder = '0'.repeat(n);
+    try { localStorage.setItem(CFG, n); } catch (e) {}
+  }
+  { const n = parseInt(load(CFG, 6), 10); if (n >= 1 && n <= 12) idLen.value = n; }
+  idLen.addEventListener('change', () => { applyIdLen(); recomputePlate(); updatePlateInfo(); idInput.focus(); });
+  applyIdLen();
+
+  function setMsg(text, type) { msg.textContent = text; msg.className = 'msg ' + (type || ''); }
+  function clearBad() { fields.forEach(f => f.classList.remove('bad')); }
+
+  fields.forEach((f, i) => {
+    f.addEventListener('input', () => {
+      f.value = f.value.replace(/\D/g, '');
+      f.classList.remove('bad');
+      const max = f === idInput ? idDigits() : 2;
+      if (f.value.length >= max && i < fields.length - 1) { fields[i + 1].focus(); }
+      updatePreview();
+    });
+    f.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); validate(); }
+      else if (e.key === 'Escape') { e.preventDefault(); escape(); }
+      else if (e.key === 'Backspace' && f.value === '' && i > 0) { e.preventDefault(); fields[i - 1].focus(); }
+    });
+    f.addEventListener('focus', () => f.select());
+  });
+  function escape() { if (editIndex >= 0) stopEdit(); else { resetForm(); prepareNext(); } setMsg(''); }
+
+  /* Aperçu « carton papier » : chaque numéro dans la colonne de sa dizaine */
+  function updatePreview() {
+    realCells.forEach(s => { s.textContent = ''; s.className = ''; });
+    for (let r = 0; r < LINES; r++) {
+      const used = {};
+      for (let c = 0; c < PER_LINE; c++) {
+        const v = parseInt(cells[r * PER_LINE + c].value, 10);
+        if (!(v >= 1 && v <= MAX)) continue;
+        const s = realCells[r * 9 + col(v)];
+        if (used[col(v)]) { s.textContent += ' / ' + pad(v); s.className = 'clash'; }
+        else { s.textContent = pad(v); s.className = 'on'; used[col(v)] = true; }
+      }
+    }
+  }
+
+  /* ---------- Mode plaque : numéros consécutifs, contrôle des 90 numéros ---------- */
+  const plateOn = $('plateOn'), plateSize = $('plateSize'), plateInfo = $('plateInfo'), plateReport = $('plateReport');
+  let plate = (p => p ? { on: !!p.on, size: Math.min(12, Math.max(2, parseInt(p.size, 10) || 6)), closed: Array.isArray(p.closed) ? p.closed : [] } : { on: false, size: 6, closed: [] })(load(PLATE_KEY, null));
+  plateOn.checked = plate.on; plateSize.value = plate.size;
+  let plateState = { inProgress: false, id: 1, count: 0, nextId: '' };
+  let reportPlate = null;
+  function savePlate() { try { localStorage.setItem(PLATE_KEY, JSON.stringify(plate)); } catch (e) {} }
+  const plateCartons = p => cartons.map((c, i) => ({ c, i })).filter(x => x.c.plate === p);
+
+  /* Plaque en cours (celle du dernier carton saisi) et numéro attendu pour le carton suivant */
+  function recomputePlate() {
+    const maxP = cartons.reduce((m, c) => Math.max(m, c.plate || 0), 0);
+    plateState = { inProgress: false, id: maxP + 1, count: 0, nextId: '' };
+    if (!plate.on || !cartons.length) return;
+    const last = cartons[cartons.length - 1];
+    if (!last.plate || plate.closed.includes(last.plate)) return;
+    const cnt = plateCartons(last.plate).length;
+    if (cnt >= plate.size) return;
+    const n = parseInt(last.id, 10), len = idDigits();
+    const next = isNaN(n) ? '' : String(n + 1).padStart(len, '0');
+    plateState = { inProgress: true, id: last.plate, count: cnt, nextId: next.length === len ? next : '' };
+  }
+  function updatePlateInfo() {
+    plateInfo.textContent = !plate.on ? '' : plateState.inProgress
+      ? `Plaque ${plateState.id} · carton ${plateState.count + 1}/${plate.size}${plateState.nextId ? ' · n° suivant renseigné automatiquement : ' + plateState.nextId : ''}`
+      : `Nouvelle plaque (${plate.size} cartons) : saisissez le n° du 1er carton, les suivants se remplissent tout seuls.`;
+  }
+  /* Après une validation : n° suivant pré-rempli (mode plaque), curseur sur la bonne case */
+  function prepareNext() {
+    updatePlateInfo();
+    if (editIndex >= 0) return;
+    if (plate.on && plateState.inProgress && plateState.nextId && idInput.value === '') { idInput.value = plateState.nextId; cells[0].focus(); }
+    else idInput.focus();
+  }
+  function checkPlate(p) {
+    const items = plateCartons(p), where = {};
+    items.forEach(x => x.c.lines.flat().forEach(n => (where[n] = where[n] || []).push(x.i)));
+    const dups = [], missing = [];
+    for (let n = 1; n <= MAX; n++) { const w = where[n]; if (!w) missing.push(n); else if (w.length > 1) dups.push({ n, idx: w }); }
+    const expectAll = items.length * LINES * PER_LINE === MAX, complete = items.length >= plate.size;
+    return { items, dups, missing, expectAll, complete, ok: complete && !dups.length && (!expectAll || !missing.length) };
+  }
+  function showPlateReport(p) {
+    reportPlate = p;
+    const r = checkPlate(p);
+    plateReport.hidden = false; plateReport.classList.toggle('err', !r.ok); plateReport.innerHTML = '';
+    const el = (tag, txt, cls) => { const e = document.createElement(tag); if (txt) e.textContent = txt; if (cls) e.className = cls; return e; };
+    const link = idx => { const b = el('button', cartons[idx].id, 'link'); b.title = 'Modifier ce carton'; b.onclick = () => startEdit(idx); return b; };
+    const first = r.items[0], last = r.items[r.items.length - 1];
+    plateReport.appendChild(el('h3', `Plaque ${p}${first ? ` · cartons ${first.c.id} → ${last.c.id}` : ''} (${r.items.length}/${plate.size})`));
+    if (r.ok) plateReport.appendChild(el('div', r.expectAll ? '✓ Les 90 numéros apparaissent exactement une fois sur la plaque.' : '✓ Aucun numéro en double sur la plaque.', 'okline'));
+    else {
+      if (!r.complete) plateReport.appendChild(el('div', `Plaque incomplète : ${r.items.length} carton(s) sur ${plate.size}.`, 'errline'));
+      if (r.dups.length) {
+        plateReport.appendChild(el('div', `${r.dups.length} numéro(s) en double :`, 'errline'));
+        const ul = el('ul');
+        r.dups.forEach(d => { const li = el('li', `Numéro ${pad(d.n)} dans les cartons `); d.idx.forEach((ix, k) => { if (k) li.append(', '); li.appendChild(link(ix)); }); ul.appendChild(li); });
+        plateReport.appendChild(ul);
+      }
+      if (r.expectAll && r.missing.length) plateReport.appendChild(el('div', `${r.missing.length} numéro(s) absent(s) de la plaque : ${r.missing.map(pad).join(', ')}.`, 'errline'));
+      if (!r.expectAll) plateReport.appendChild(el('div', `Cette plaque compte ${r.items.length * LINES * PER_LINE} numéros : seuls les doublons sont contrôlés.`, 'muted small'));
+    }
+    const acts = el('div', '', 'btns'); acts.style.justifyContent = 'flex-start'; acts.style.marginTop = '10px';
+    const re = el('button', 'Revérifier', 'btn sm'); re.onclick = () => showPlateReport(p);
+    const cl = el('button', 'Fermer', 'btn sm'); cl.onclick = () => { plateReport.hidden = true; reportPlate = null; };
+    acts.append(re, cl); plateReport.appendChild(acts);
+    return r;
+  }
+  function refreshReport() {
+    if (reportPlate === null || plateReport.hidden) return;
+    if (plateCartons(reportPlate).length) showPlateReport(reportPlate); else { plateReport.hidden = true; reportPlate = null; }
+  }
+  plateOn.onchange = () => { plate.on = plateOn.checked; savePlate(); recomputePlate(); render(); prepareNext(); };
+  plateSize.onchange = () => { plate.size = Math.min(12, Math.max(2, parseInt(plateSize.value, 10) || 6)); plateSize.value = plate.size; savePlate(); recomputePlate(); render(); prepareNext(); };
+  $('plateNew').onclick = () => {
+    if (!plate.on) { plate.on = true; plateOn.checked = true; }
+    if (plateState.inProgress && !plate.closed.includes(plateState.id)) plate.closed.push(plateState.id);
+    savePlate(); recomputePlate(); idInput.value = ''; render(); prepareNext(); setMsg('Nouvelle plaque : saisissez le n° du 1er carton.', 'ok');
+  };
+
+  /* ---------- Contrôle d'un carton (partagé par la saisie et l'import) ---------- */
+  /* Renvoie { lines } ou { err, cell } (cell = index de la case fautive pour la saisie) */
+  function checkNumbers(vals) {
+    if (vals.length !== LINES * PER_LINE) return { err: `il faut ${LINES * PER_LINE} numéros (${LINES} lignes de ${PER_LINE})` };
+    const badIdx = vals.findIndex(v => !(v >= 1 && v <= MAX));
+    if (badIdx !== -1) return { err: `les numéros doivent être compris entre 01 et ${MAX}`, cell: badIdx };
+    for (let i = 0; i < vals.length; i++) for (let j = i + 1; j < vals.length; j++)
+      if (vals[i] === vals[j]) return { err: `${pad(vals[i])} apparaît deux fois sur le carton`, cell: j, cell2: i };
+    for (let r = 0; r < LINES; r++) for (let a = 0; a < PER_LINE; a++) for (let b = a + 1; b < PER_LINE; b++) {
+      const ia = r * PER_LINE + a, ib = r * PER_LINE + b;
+      if (col(vals[ia]) === col(vals[ib])) return { err: `ligne ${r + 1} : ${pad(vals[ia])} et ${pad(vals[ib])} sont dans la même colonne (même dizaine)`, cell: ib, cell2: ia };
+    }
+    /* chaque ligne est rangée dans l'ordre du carton papier (par colonne) */
+    return { lines: [...Array(LINES)].map((_, r) => vals.slice(r * PER_LINE, r * PER_LINE + PER_LINE).sort((x, y) => x - y)) };
+  }
+  const signature = lines => lines.flat().slice().sort((a, b) => a - b).join(',');
+
+  function validate() {
+    clearBad();
+    const idStr = idInput.value, n = idDigits();
+    if (idStr.length !== n) { idInput.classList.add('bad'); idInput.focus(); return setMsg(`Le numéro du carton doit comporter ${n} chiffres.`, 'err'); }
+    if (cartons.some((c, i) => i !== editIndex && c.id === idStr)) { idInput.classList.add('bad'); idInput.focus(); return setMsg(`Le carton ${idStr} est déjà dans la liste.`, 'err'); }
+    const empty = cells.findIndex(c => c.value === '');
+    if (empty !== -1) { cells[empty].classList.add('bad'); cells[empty].focus(); return setMsg('Toutes les cases doivent être remplies.', 'err'); }
+    const vals = cells.map(c => parseInt(c.value, 10));
+    const chk = checkNumbers(vals);
+    if (chk.err) {
+      if (chk.cell != null) { cells[chk.cell].classList.add('bad'); cells[chk.cell].focus(); }
+      if (chk.cell2 != null) cells[chk.cell2].classList.add('bad');
+      return setMsg(chk.err.charAt(0).toUpperCase() + chk.err.slice(1) + '.', 'err');
+    }
+    const lines = chk.lines, sig = signature(lines);
+    const twin = cartons.find((c, i) => i !== editIndex && signature(c.lines) === sig);
+
+    if (editIndex >= 0) {
+      cartons[editIndex] = Object.assign({}, cartons[editIndex], { id: idStr, lines });
+      save(); const done = idStr; stopEdit(); refreshReport();
+      setMsg(`Carton ${done} modifié.` + (twin ? ` ⚠ Mêmes numéros que le carton ${twin.id}.` : ''), twin ? 'warn' : 'ok');
+      return;
+    }
+    const entry = { id: idStr, lines };
+    let overlap = [];
+    if (plate.on) {
+      entry.plate = plateState.id;
+      const used = new Set(); plateCartons(entry.plate).forEach(x => x.c.lines.flat().forEach(v => used.add(v)));
+      overlap = vals.filter(v => used.has(v));
+    }
+    cartons.push(entry);
+    save(); recomputePlate(); resetForm(); render(); prepareNext();
+    let m = `Carton ${idStr} ajouté.`, t = 'ok';
+    if (twin) { m += ` ⚠ Mêmes numéros que le carton ${twin.id}.`; t = 'warn'; }
+    if (plate.on) {
+      if (overlap.length) { m += ` ⚠ Déjà présent(s) sur cette plaque : ${overlap.map(pad).join(', ')}.`; t = 'err'; }
+      if (plateCartons(entry.plate).length >= plate.size) {
+        const r = showPlateReport(entry.plate);
+        m += r.ok ? ` ✓ Plaque ${entry.plate} complète et correcte.` : ` ⚠ Plaque ${entry.plate} : anomalies détectées (voir le rapport).`;
+        if (!r.ok) t = 'err';
+      }
+    }
+    setMsg(m, t);
+  }
+
+  function resetForm() { fields.forEach(f => { f.value = ''; f.classList.remove('bad'); }); updatePreview(); idInput.focus(); }
+  function startEdit(i) {
+    const c = cartons[i]; editIndex = i;
+    idInput.value = c.id; c.lines.flat().forEach((v, k) => { if (cells[k]) cells[k].value = pad(v); });
+    clearBad(); updatePreview();
+    carton.classList.add('editing'); editbar.hidden = false;
+    editLabel.textContent = `Modification du carton ${c.id}`; validateBtn.textContent = 'Enregistrer la modification';
+    setMsg(''); render();
+    carton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    cells[0].focus();
+  }
+  function stopEdit() {
+    editIndex = -1; carton.classList.remove('editing'); editbar.hidden = true; validateBtn.textContent = 'Valider le carton';
+    resetForm(); recomputePlate(); prepareNext(); render();
+  }
+  validateBtn.onclick = validate;
+  $('resetBtn').onclick = escape;
+  $('cancelEdit').onclick = () => { stopEdit(); setMsg(''); };
+
+  /* ---------- Liste ---------- */
+  const fmt = c => c.id + ' ; ' + c.lines.map(l => l.map(pad).join(' ')).join(' ; ');
+  function plateStatuses() {
+    const groups = {}, out = {};
+    cartons.forEach(c => { if (c.plate) (groups[c.plate] = groups[c.plate] || []).push(c); });
+    for (const p in groups) {
+      const items = groups[p], seen = new Set(); let dup = false;
+      items.forEach(c => c.lines.flat().forEach(n => { if (seen.has(n)) dup = true; seen.add(n); }));
+      const complete = items.length >= plate.size, full = items.length * LINES * PER_LINE === MAX;
+      out[p] = !complete ? { cls: 'prog', sym: items.length + '/' + plate.size } : (dup || (full && seen.size !== MAX)) ? { cls: 'err', sym: '✗' } : { cls: 'ok', sym: '✓' };
+    }
+    return out;
+  }
+  function render() {
+    countEl.textContent = cartons.length + (cartons.length > 1 ? ' cartons' : ' carton');
+    listEl.innerHTML = '';
+    if (!cartons.length) { listEl.innerHTML = '<div class="empty">Aucun carton enregistré pour l’instant.</div>'; return; }
+    const q = $('search').value.trim().toLowerCase();
+    /* les plus récents en premier ; affichage limité pour rester rapide avec des milliers de cartons */
+    let idx = cartons.map((c, i) => i).reverse();
+    if (q) idx = idx.filter(i => cartons[i].id.toLowerCase().includes(q));
+    if (!idx.length) { listEl.innerHTML = '<div class="empty">Aucun carton ne correspond à cette recherche.</div>'; return; }
+    const statuses = plateStatuses(), frag = document.createDocumentFragment();
+    idx.slice(0, LIST_MAX).forEach(i => {
+      const c = cartons[i];
+      const d = document.createElement('div'); d.className = 'item' + (i === editIndex ? ' current' : '');
+      if (c.plate && statuses[c.plate]) {
+        const st = statuses[c.plate], bd = document.createElement('button');
+        bd.className = 'badge ' + st.cls; bd.textContent = 'P' + c.plate + ' ' + st.sym; bd.title = 'Voir la vérification de la plaque ' + c.plate;
+        bd.onclick = () => showPlateReport(c.plate); d.appendChild(bd);
+      }
+      const code = document.createElement('span'); code.className = 'code'; code.textContent = c.id;
+      const nums = document.createElement('span'); nums.className = 'nums'; nums.textContent = c.lines.map(l => l.map(pad).join(' ')).join('  ·  ');
+      const acts = document.createElement('span'); acts.className = 'acts';
+      const e = document.createElement('button'); e.className = 'btn sm'; e.textContent = 'Modifier'; e.onclick = () => startEdit(i);
+      const b = document.createElement('button'); b.className = 'btn sm danger'; b.textContent = 'Supprimer'; b.onclick = () => removeCarton(i);
+      acts.append(e, b); d.append(code, nums, acts); frag.appendChild(d);
+    });
+    listEl.appendChild(frag);
+    if (idx.length > LIST_MAX) {
+      const more = document.createElement('div'); more.className = 'more';
+      more.textContent = `… et ${idx.length - LIST_MAX} autres cartons : utilisez la recherche pour les retrouver.`;
+      listEl.appendChild(more);
+    }
+  }
+  $('search').addEventListener('input', render);
+
+  /* Suppression avec possibilité d'annuler */
+  function removeCarton(i) {
+    const c = cartons[i];
+    if (editIndex === i) stopEdit(); else if (editIndex > i) editIndex--;
+    cartons.splice(i, 1); save(); recomputePlate(); updatePlateInfo(); render(); refreshReport();
+    toast(`Carton ${c.id} supprimé.`, () => {
+      cartons.splice(Math.min(i, cartons.length), 0, c);
+      if (editIndex >= i) editIndex++;
+      save(); recomputePlate(); updatePlateInfo(); render(); refreshReport();
+    });
+  }
+  let toastTimer = null;
+  function toast(text, undo) {
+    const t = $('toast'), b = $('toastBtn');
+    $('toastTxt').textContent = text; t.hidden = false; b.hidden = !undo;
+    b.onclick = () => { t.hidden = true; clearTimeout(toastTimer); undo && undo(); };
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 6000);
+  }
+
+  /* ---------- Export / import / vider ---------- */
+  $('export').onclick = () => {
+    if (!cartons.length) return setMsg('Rien à exporter.', 'err');
+    const d = new Date(), st = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const blob = new Blob([cartons.map(fmt).join('\r\n') + '\r\n'], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = `cartons-loto-${st}-${cartons.length}.txt`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast(`${cartons.length} cartons exportés.`);
+  };
+  /* Import d'un .txt (format de l'export) : les cartons déjà présents (même n°) sont ignorés */
+  $('importFile').addEventListener('change', async e => {
+    const files = [...e.target.files]; e.target.value = ''; if (!files.length) return;
+    const known = new Set(cartons.map(c => c.id)); let added = 0, skipped = 0; const errors = [];
+    for (const f of files) {
+      let text; try { text = await f.text(); } catch (err) { errors.push(`${f.name} : lecture impossible`); continue; }
+      text.split(/\r?\n/).forEach((raw, k) => {
+        if (!raw.trim()) return;
+        const parts = raw.split(/[;|\t]/).map(s => s.trim()).filter(Boolean);
+        const id = (parts.shift() || '').replace(/\s+/g, '');
+        const vals = parts.join(' ').split(/[\s,]+/).filter(Boolean).map(Number);
+        if (!/^\d+$/.test(id)) { errors.push(`${f.name}, ligne ${k + 1} : numéro de carton illisible`); return; }
+        if (known.has(id)) { skipped++; return; }
+        const chk = checkNumbers(vals);
+        if (chk.err) { errors.push(`${f.name}, ligne ${k + 1} (${id}) : ${chk.err}`); return; }
+        cartons.push({ id, lines: chk.lines }); known.add(id); added++;
+      });
+    }
+    save(); recomputePlate(); updatePlateInfo(); render();
+    const rep = $('importReport');
+    rep.innerHTML = '';
+    const box = document.createElement('div'); box.className = 'import-report';
+    box.textContent = `${added} carton(s) ajouté(s)` + (skipped ? `, ${skipped} déjà présent(s) ignoré(s)` : '') + (errors.length ? `, ${errors.length} ligne(s) refusée(s) :` : '.');
+    if (errors.length) {
+      const ul = document.createElement('div'); ul.className = 'e';
+      errors.slice(0, 15).forEach(t => { const l = document.createElement('div'); l.textContent = t; ul.appendChild(l); });
+      if (errors.length > 15) { const l = document.createElement('div'); l.textContent = `… et ${errors.length - 15} autre(s)`; ul.appendChild(l); }
+      box.appendChild(ul);
+    }
+    rep.appendChild(box);
+  });
+  $('clear').onclick = () => {
+    if (!cartons.length || !confirm(`Vider toute la liste (${cartons.length} cartons) ?\n\nPensez à exporter en .txt avant si besoin.`)) return;
+    cartons = []; save(); plate.closed = []; savePlate(); recomputePlate(); updatePlateInfo();
+    plateReport.hidden = true; reportPlate = null; $('importReport').innerHTML = '';
+    if (editIndex >= 0) stopEdit(); else render();
+  };
+
+  /* ---------- Dictée vocale (Chrome / Edge) ---------- */
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const micBtn = $('mic'), heard = $('heard'), padId = $('padId');
+  let rec = null, micOn = false;
+  const UNITS = { un:1, une:1, deux:2, trois:3, quatre:4, cinq:5, six:6, sept:7, huit:8, neuf:9 };
+  const TEENS = { onze:11, douze:12, treize:13, quatorze:14, quinze:15, seize:16 };
+  const TENS = { vingt:20, vingts:20, trente:30, quarante:40, cinquante:50 };
+  const CMDS = { valider:'valider', validez:'valider', 'validé':'valider', 'entrée':'valider', entree:'valider',
+    annuler:'effacer', effacer:'effacer', efface:'effacer', recommencer:'effacer', retour:'retour', 'précédent':'retour', precedent:'retour', corriger:'retour' };
+  const tokenize = text => text.toLowerCase().replace(/[’']/g, ' ').replace(/[-.,;:!?]/g, ' ').split(/\s+/).filter(t => t && t !== 'et');
+  /* Phrase → [{n}] (cases), [{d}] (chiffres du n° de carton) et [{c}] (commandes) */
+  function parseSpeech(text, idMode) {
+    const t = tokenize(text), out = []; let i = 0;
+    const isQ80 = j => t[j] === 'quatre' && /^vingts?$/.test(t[j + 1] || '');
+    const unitAt = j => (t[j] in UNITS && !isQ80(j)) ? UNITS[t[j]] : null;
+    const tail = () => {                                    /* après « soixante » ou « quatre-vingt » */
+      const x = t[i];
+      if (x === 'dix') { i++; const y = t[i]; if (y === 'sept' || y === 'huit' || y === 'neuf') { i++; return 10 + UNITS[y]; } return 10; }
+      if (x in TEENS) { i++; return TEENS[x]; }
+      const u = unitAt(i); if (u !== null) { i++; return u; }
+      return 0;
+    };
+    while (i < t.length) {
+      const w = t[i];
+      if (CMDS[w]) { out.push({ c: CMDS[w] }); i++; continue; }
+      if (/^\d+$/.test(w)) {
+        if (idMode) { out.push({ d: w }); i++; continue; }
+        const nx = t[i + 1];
+        if (w === '0' && nx !== undefined && (/^[1-9]$/.test(nx) || unitAt(i + 1) !== null)) { i++; continue; }
+        if (w.length <= 2) out.push({ n: parseInt(w, 10) });
+        else for (let k = 0; k < w.length; k += 2) out.push({ n: parseInt(w.slice(k, k + 2), 10) });
+        i++; continue;
+      }
+      let v = null;
+      if (w === 'zéro' || w === 'zero') {
+        const nx = t[i + 1];
+        if (!idMode && nx !== undefined && (/^[1-9]$/.test(nx) || unitAt(i + 1) !== null)) { i++; continue; }
+        v = 0; i++;
+      } else if (isQ80(i)) { i += 2; v = 80 + tail(); }
+      else if (w in UNITS) { v = UNITS[w]; i++; }
+      else if (w in TENS) { i++; v = TENS[w]; const u = unitAt(i); if (u !== null) { v += u; i++; } }
+      else if (w === 'soixante') { i++; v = 60 + tail(); }
+      else if (w === 'dix') { i++; v = 10; const y = t[i]; if (y === 'sept' || y === 'huit' || y === 'neuf') { v += UNITS[y]; i++; } }
+      else if (w in TEENS) { v = TEENS[w]; i++; }
+      else { i++; continue; }
+      out.push(idMode ? { d: String(v) } : { n: v });
+    }
+    return out;
+  }
+  function focusFirstEmpty() { if (idInput.value.length < idDigits()) { idInput.focus(); return; } (cells.find(c => c.value.length < 2) || cells[cells.length - 1]).focus(); }
+  function command(c) {
+    if (c === 'valider') validate();
+    else if (c === 'effacer') escape();
+    else if (c === 'retour') {
+      let k = fields.indexOf(document.activeElement);
+      if (k < 0) { focusFirstEmpty(); k = fields.indexOf(document.activeElement); }
+      const target = (k === fields.length - 1 && fields[k].value !== '') ? k : Math.max(0, k - 1);
+      fields[target].value = ''; fields[target].classList.remove('bad'); fields[target].focus(); updatePreview();
+    }
+  }
+  function applySpeech(text) {
+    let k = fields.indexOf(document.activeElement);
+    if (k < 0) { focusFirstEmpty(); k = fields.indexOf(document.activeElement); }
+    const idMode = k === 0, n = idDigits(), wasEmpty = idInput.value === '';
+    let buf = '';
+    const flushId = () => {
+      if (!buf) return;
+      let v = idInput.value + buf; buf = '';
+      if (padId.checked && wasEmpty && v.length < n) v = v.padStart(n, '0');
+      idInput.value = v.slice(0, n); idInput.classList.remove('bad');
+      if (idInput.value.length >= n) cells[0].focus();
+    };
+    for (const it of parseSpeech(text, idMode)) {
+      if (it.c) { flushId(); command(it.c); return; }
+      if (idMode) { if (it.d !== undefined && idInput.value.length + buf.length < n) buf += it.d; continue; }
+      if (it.n !== undefined && k >= 1) {
+        fields[k].value = pad(it.n); fields[k].classList.remove('bad');
+        if (k < fields.length - 1) { k++; fields[k].focus(); }
+        else { k = fields.length; setMsg('Carton complet : dites « valider ».', 'ok'); }
+        if (k >= fields.length) break;
+      }
+    }
+    flushId(); updatePreview();
+  }
+  function updateMicBtn() { micBtn.classList.toggle('on', micOn); micBtn.textContent = micOn ? '🎤 J’écoute… (cliquer pour arrêter)' : '🎤 Dictée vocale'; }
+  function startMic() {
+    rec = new SR(); rec.lang = 'fr-FR'; rec.continuous = true; rec.interimResults = false; rec.maxAlternatives = 1;
+    rec.onresult = e => {
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (!e.results[i].isFinal) continue;
+        const txt = e.results[i][0].transcript.trim();
+        heard.textContent = 'Entendu : « ' + txt + ' »'; applySpeech(txt);
+      }
+    };
+    rec.onerror = e => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { setMsg('Accès au micro refusé.', 'err'); stopMic(); }
+      else if (e.error === 'audio-capture') { setMsg('Aucun micro détecté.', 'err'); stopMic(); }
+      else if (e.error === 'network') { setMsg('Dictée indisponible : elle nécessite une connexion Internet.', 'err'); stopMic(); }
+    };
+    rec.onend = () => { if (micOn) { try { rec.start(); } catch (e) {} } };
+    micOn = true; updateMicBtn(); focusFirstEmpty();
+    try { rec.start(); } catch (e) {}
+  }
+  function stopMic() { micOn = false; try { rec && rec.stop(); } catch (e) {} updateMicBtn(); }
+  if (!SR) { micBtn.disabled = true; micBtn.textContent = '🎤 Dictée : Chrome ou Edge uniquement'; micBtn.title = 'La reconnaissance vocale n’est pas disponible dans ce navigateur.'; }
+  else micBtn.onclick = () => micOn ? stopMic() : startMic();
+
+  /* ---------- Démarrage ---------- */
+  recomputePlate(); render(); updatePreview(); prepareNext();
+})();
+</script>
+</body>
+</html>
