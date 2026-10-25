@@ -133,6 +133,15 @@ html.dark .real span.on{color:#9fe3e8}
 .import-report{margin-top:10px;font-size:.86rem;border-radius:10px;padding:8px 12px;background:var(--teal-soft)}
 .import-report .e{color:var(--bad)}
 
+/* vérification des plaques */
+.pc-rule{font-size:.82rem;color:var(--muted);margin-bottom:8px}
+.pc-sum{display:grid;gap:3px;margin-bottom:10px}
+.pc-ok{color:var(--ok);font-weight:700} .pc-bad{color:var(--bad);font-weight:700} .pc-info{color:var(--muted)}
+.pc-h{margin:14px 0 6px;font-size:.95rem}
+.pc-item{border-left:4px solid var(--bad);background:var(--bad-soft);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+.pc-fix{margin-top:4px}
+.pc-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+
 /* toast */
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:12px;background:#14213d;color:#fff;border-radius:12px;padding:10px 14px;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:calc(100% - 32px)}
 .toast .btn{background:transparent;color:#ffd27a;border-color:rgba(255,255,255,.3)}
@@ -194,6 +203,7 @@ html.dark .real span.on{color:#9fe3e8}
         <h2 id="count">0 carton</h2>
         <div class="list-tools">
           <label class="btn sm" title="Ajouter les cartons d’un fichier .txt déjà exporté">Importer .txt<input type="file" id="importFile" accept=".txt,text/plain" multiple hidden></label>
+          <button class="btn sm" id="platesBtn" title="Retrouve les plaques de 6 cartons consécutifs et signale les erreurs de saisie probables">Vérifier les plaques</button>
           <button class="btn sm primary" id="export">Exporter en .txt</button>
           <button class="btn sm danger" id="clear">Tout vider</button>
         </div>
@@ -202,6 +212,10 @@ html.dark .real span.on{color:#9fe3e8}
       <div id="list"></div>
       <div id="importReport"></div>
       <p class="muted small" style="margin:10px 0 0">Le fichier exporté se charge dans OpenLoto : <b>Configuration → Cartons → Importer</b>. Format d’une ligne : <code>112294 ; 10 24 44 51 76 ; 1 17 31 60 84 ; 25 46 67 70 86</code></p>
+    </section>
+    <section class="card" id="platesCard" hidden aria-label="Vérification des plaques">
+      <div class="list-head"><h2>Vérification des plaques</h2><div class="list-tools"><button class="btn sm" id="platesRerun">Relancer</button><button class="btn sm" id="platesClose">Fermer</button></div></div>
+      <div id="platesOut"></div>
     </section>
   </div>
 </main>
@@ -416,7 +430,7 @@ html.dark .real span.on{color:#9fe3e8}
 
     if (editIndex >= 0) {
       cartons[editIndex] = Object.assign({}, cartons[editIndex], { id: idStr, lines });
-      save(); const done = idStr; stopEdit(); refreshReport();
+      save(); const done = idStr; stopEdit(); refreshReport(); refreshPlatesCheck();
       setMsg(`Carton ${done} modifié.` + (twin ? ` ⚠ Mêmes numéros que le carton ${twin.id}.` : ''), twin ? 'warn' : 'ok');
       return;
     }
@@ -512,11 +526,11 @@ html.dark .real span.on{color:#9fe3e8}
   function removeCarton(i) {
     const c = cartons[i];
     if (editIndex === i) stopEdit(); else if (editIndex > i) editIndex--;
-    cartons.splice(i, 1); save(); recomputePlate(); updatePlateInfo(); render(); refreshReport();
+    cartons.splice(i, 1); save(); recomputePlate(); updatePlateInfo(); render(); refreshReport(); refreshPlatesCheck();
     toast(`Carton ${c.id} supprimé.`, () => {
       cartons.splice(Math.min(i, cartons.length), 0, c);
       if (editIndex >= i) editIndex++;
-      save(); recomputePlate(); updatePlateInfo(); render(); refreshReport();
+      save(); recomputePlate(); updatePlateInfo(); render(); refreshReport(); refreshPlatesCheck();
     });
   }
   let toastTimer = null;
@@ -556,7 +570,7 @@ html.dark .real span.on{color:#9fe3e8}
         cartons.push({ id, lines: chk.lines }); known.add(id); added++;
       });
     }
-    save(); recomputePlate(); updatePlateInfo(); render();
+    save(); recomputePlate(); updatePlateInfo(); render(); refreshPlatesCheck();
     const rep = $('importReport');
     rep.innerHTML = '';
     const box = document.createElement('div'); box.className = 'import-report';
@@ -682,6 +696,168 @@ html.dark .real span.on{color:#9fe3e8}
   function stopMic() { micOn = false; try { rec && rec.stop(); } catch (e) {} updateMicBtn(); }
   if (!SR) { micBtn.disabled = true; micBtn.textContent = '🎤 Dictée : Chrome ou Edge uniquement'; micBtn.title = 'La reconnaissance vocale n’est pas disponible dans ce navigateur.'; }
   else micBtn.onclick = () => micOn ? stopMic() : startMic();
+
+/* ---------- Vérification des plaques par numéros consécutifs ----------
+   Chez certains fournisseurs (par exemple les cartons Lotoquine), 6 cartons aux numéros consécutifs
+   forment une plaque : ensemble, ils contiennent chaque numéro de 1 à 90 exactement une fois.
+   On retrouve ces plaques dans la liste, puis on signale les erreurs de saisie probables.
+   items : [{ code, lines:[[…],[…],[…]], ref }] ; ref = ce que l'interface utilise pour ouvrir le carton */
+function analysePlates(items, opt) {
+  const size = opt.size || 6, max = opt.max || 90, lastCol = Math.floor((max - 1) / 10);
+  const col = n => Math.min(Math.floor(n / 10), lastCol);
+  const by = new Map(), ignored = [];
+  items.forEach(it => {
+    const code = String(it.code).trim();
+    if (!/^\d{1,15}$/.test(code)) { ignored.push(it); return; }
+    const n = Number(code);
+    if (!by.has(n)) by.set(n, { code, n, lines: it.lines, nums: it.lines.flat(), ref: it.ref });
+  });
+  const codes = [...by.keys()].sort((a, b) => a - b), used = new Set();
+  const win = s => { const cs = []; for (let k = 0; k < size; k++) { const c = by.get(s + k); if (!c || used.has(c.n)) return null; cs.push(c); } return cs; };
+  const count = cs => { const m = new Map(); cs.forEach(c => c.nums.forEach(x => m.set(x, (m.get(x) || 0) + 1))); return m; };
+
+  /* 1) plaques exactes : 6 cartons consécutifs qui couvrent les 90 numéros */
+  const ok = [];
+  for (const s of codes) {
+    const cs = win(s); if (!cs) continue;
+    const m = count(cs);
+    if (m.size === max && [...m.values()].every(v => v === 1)) { ok.push({ start: s, cartons: cs }); cs.forEach(c => used.add(c.n)); }
+  }
+  /* Décalage des plaques (début de plaque modulo 6), estimé par tranches de 300 numéros de carton :
+     c'est le découpage qui donne le moins de numéros en double entre cartons d'une même plaque. */
+  const BLOCK = size * 50, blockOff = new Map();
+  const dupsFor = (list, off) => {
+    const g = new Map();
+    list.forEach(c => { const k = Math.floor((c.n - off) / size); if (!g.has(k)) g.set(k, new Map()); const m = g.get(k); c.nums.forEach(x => m.set(x, (m.get(x) || 0) + 1)); });
+    let d = 0; g.forEach(m => m.forEach(v => { if (v > 1) d += v - 1; })); return d;
+  };
+  const blocks = new Map();
+  codes.forEach(n => { const b = Math.floor(n / BLOCK); if (!blocks.has(b)) blocks.set(b, []); blocks.get(b).push(by.get(n)); });
+  blocks.forEach((list, b) => {
+    const okHere = ok.find(p => Math.floor(p.start / BLOCK) === b);
+    if (okHere) { blockOff.set(b, ((okHere.start % size) + size) % size); return; }
+    if (list.length < 4) return;                                   /* trop peu de cartons pour décider */
+    const scores = [...Array(size)].map((_, o) => dupsFor(list, o));
+    const sorted = scores.slice().sort((x, y) => x - y);
+    if (sorted[0] * 3 + 2 <= sorted[1]) blockOff.set(b, scores.indexOf(sorted[0]));   /* gagnant net uniquement */
+  });
+  const offsetNear = n => {
+    const b = Math.floor(n / BLOCK);
+    if (blockOff.has(b)) return blockOff.get(b);
+    for (let d = 1; d <= 2; d++) {                                 /* tranche voisine, si elle est connue */
+      if (blockOff.has(b - d)) return blockOff.get(b - d);
+      if (blockOff.has(b + d)) return blockOff.get(b + d);
+    }
+    return null;
+  };
+
+  /* 2) plaques presque complètes : quelques numéros en double / absents = erreurs de saisie probables */
+  const cand = [];
+  for (const s of codes) {
+    const cs = win(s); if (!cs) continue;
+    const m = count(cs), missing = [];
+    for (let x = 1; x <= max; x++) if (!m.has(x)) missing.push(x);
+    if (missing.length && missing.length <= 3) {
+      const off = offsetNear(s);
+      cand.push({ start: s, cartons: cs, m, missing, aligned: off === null || ((s % size) + size) % size === off });
+    }
+  }
+  cand.sort((a, b) => (a.missing.length - b.missing.length) || (b.aligned - a.aligned) || (a.start - b.start));
+  const errors = [];
+  for (const p of cand) {
+    if (p.cartons.some(c => used.has(c.n))) continue;
+    p.cartons.forEach(c => used.add(c.n));
+    const dups = [...p.m.entries()].filter(([, v]) => v > 1).map(([x]) => x).sort((a, b) => a - b);
+    /* pour chaque numéro en double : quel carton pourrait porter à la place un numéro absent ? */
+    const fixes = dups.map(x => {
+      const holders = p.cartons.filter(c => c.nums.includes(x));
+      const options = [];
+      holders.forEach(c => p.missing.forEach(y => {
+        const row = c.lines.find(l => l.includes(x));
+        const fits = !c.nums.includes(y) && row.every(v => v === x || col(v) !== col(y));
+        if (fits) options.push({ carton: c, from: x, to: y });
+      }));
+      return { x, holders, options };
+    });
+    errors.push({ start: p.start, cartons: p.cartons, dups, missing: p.missing, fixes });
+  }
+
+  /* 3) cartons restants : rattachés à leur plaque supposée (même décalage que la plaque voisine) */
+  const groups = new Map(), lone = [];
+  codes.filter(n => !used.has(n)).forEach(n => {
+    const off = offsetNear(n);
+    if (off === null) { lone.push(by.get(n)); return; }
+    const s = n - (((n - off) % size) + size) % size;
+    if (!groups.has(s)) groups.set(s, []);
+    groups.get(s).push(by.get(n));
+  });
+  const conflicts = [], partial = [];
+  [...groups.entries()].sort((a, b) => a[0] - b[0]).forEach(([s, cs]) => {
+    const m = count(cs), dups = [...m.entries()].filter(([, v]) => v > 1).map(([x]) => x).sort((a, b) => a - b);
+    const absent = []; for (let k = 0; k < size; k++) if (!by.has(s + k)) absent.push(s + k);
+    const g = { start: s, cartons: cs, absent, dups: dups.map(x => ({ x, holders: cs.filter(c => c.nums.includes(x)) })) };
+    (dups.length ? conflicts : partial).push(g);
+  });
+  return { size, max, ok, errors, conflicts, partial, lone, ignored, total: items.length };
+}
+/* Rapport HTML de analysePlates ; editBtn(carton) renvoie le bouton « Modifier » propre à chaque outil */
+function platesReportHtml(r, editBtn) {
+  const E = s => String(s).replace(/[&<>"]/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[ch]));
+  const p2 = n => String(n).padStart(2, '0');
+  const nb = (n, one, many) => `${n.toLocaleString('fr-FR')} ${n > 1 ? many : one}`;
+  const codeOf = (n, like) => String(n).padStart(like.length, '0');
+  const span = g => `${E(codeOf(g.start, g.cartons[0].code))} → ${E(codeOf(g.start + r.size - 1, g.cartons[0].code))}`;
+  const btns = cs => `<span class="pc-acts">${cs.map(c => editBtn(c)).join('')}</span>`;
+  let h = `<div class="pc-rule">Règle utilisée : ${r.size} cartons aux numéros consécutifs forment une plaque qui contient chaque numéro de 1 à ${r.max} une seule fois (c’est le cas des cartons Lotoquine, par exemple).</div>`;
+  if (!r.ok.length && !r.errors.length) {
+    return h + `<div class="pc-sum"><b>Aucune plaque de ${r.size} cartons consécutifs n’a été reconnue.</b> Vos cartons ne suivent peut-être pas cette numérotation, ou trop peu de cartons de chaque plaque ont été saisis.</div>`;
+  }
+  const partialCartons = r.partial.reduce((s, g) => s + g.cartons.length, 0);
+  h += `<div class="pc-sum">
+    <div class="pc-ok">✓ ${nb(r.ok.length, 'plaque complète et correcte', 'plaques complètes et correctes')} (${nb(r.ok.length * r.size, 'carton', 'cartons')})</div>
+    ${r.errors.length ? `<div class="pc-bad">✗ ${nb(r.errors.length, 'plaque avec une erreur de saisie probable', 'plaques avec une erreur de saisie probable')}</div>` : ''}
+    ${r.conflicts.length ? `<div class="pc-bad">✗ ${nb(r.conflicts.length, 'plaque incomplète avec un numéro en double', 'plaques incomplètes avec un numéro en double')}</div>` : ''}
+    ${r.partial.length ? `<div class="pc-info">• ${nb(r.partial.length, 'plaque incomplète', 'plaques incomplètes')} (${nb(partialCartons, 'carton', 'cartons')}) sans erreur détectée : il manque des cartons de la plaque, la vérification n’est que partielle.</div>` : ''}
+    ${r.lone.length ? `<div class="pc-info">• ${nb(r.lone.length, 'carton', 'cartons')} sans plaque identifiable.</div>` : ''}
+    ${r.ignored.length ? `<div class="pc-info">• ${nb(r.ignored.length, 'carton ignoré', 'cartons ignorés')} (numéro de carton non numérique).</div>` : ''}
+  </div>`;
+  if (r.errors.length) {
+    h += `<h4 class="pc-h">Erreurs de saisie probables</h4>`;
+    r.errors.forEach(e => {
+      const what = `${e.dups.map(p2).join(', ')} ${e.dups.length > 1 ? 'apparaissent' : 'apparaît'} deux fois, ${e.missing.map(p2).join(', ')} ${e.missing.length > 1 ? 'manquent' : 'manque'}`;
+      const lines = e.fixes.map(f => {
+        const cs = [...new Set(f.options.map(o => o.carton))];
+        if (cs.length === 1) {
+          const o = f.options[0];
+          return `<div class="pc-fix">Correction probable : carton <b>${E(o.carton.code)}</b>, le ${p2(o.from)} est sans doute un ${f.options.filter(x => x.carton === o.carton).map(x => p2(x.to)).join(' ou ')}. ${btns([o.carton])}</div>`;
+        }
+        if (cs.length > 1) return `<div class="pc-fix">Sur le carton ${cs.map(c => `<b>${E(c.code)}</b>`).join(' ou ')}, le ${p2(f.x)} est sans doute un ${[...new Set(f.options.map(o => p2(o.to)))].join(' ou ')} : vérifiez sur le carton papier. ${btns(cs)}</div>`;
+        return `<div class="pc-fix">Le ${p2(f.x)} est sur les cartons ${f.holders.map(c => `<b>${E(c.code)}</b>`).join(' et ')} : vérifiez-les sur papier. ${btns(f.holders)}</div>`;
+      }).join('');
+      h += `<div class="pc-item"><div><b>Plaque ${span(e)}</b> : ${what}.</div>${lines}</div>`;
+    });
+  }
+  if (r.conflicts.length) {
+    h += `<h4 class="pc-h">Numéros en double dans des plaques incomplètes</h4>`;
+    r.conflicts.forEach(g => {
+      h += `<div class="pc-item"><div><b>Plaque ${span(g)}</b> (${g.cartons.length}/${r.size} cartons saisis) :</div>${g.dups.map(d =>
+        `<div class="pc-fix">le ${p2(d.x)} est sur les cartons ${d.holders.map(c => `<b>${E(c.code)}</b>`).join(' et ')} : l’un des deux est mal saisi. ${btns(d.holders)}</div>`).join('')}</div>`;
+    });
+  }
+  return h;
+}
+
+  function runPlatesCheck(scroll) {
+    const r = analysePlates(cartons.map((c, i) => ({ code: c.id, lines: c.lines, ref: i })), { size: 6, max: MAX });
+    $('platesOut').innerHTML = platesReportHtml(r, c => `<button class="btn sm" data-edit="${c.ref}">Modifier ${c.code.replace(/[^0-9]/g, '')}</button>`);
+    $('platesCard').hidden = false;
+    if (scroll) $('platesCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  const refreshPlatesCheck = () => { if (!$('platesCard').hidden) runPlatesCheck(false); };
+  $('platesBtn').onclick = () => { if (!cartons.length) return setMsg('Aucun carton à vérifier.', 'err'); runPlatesCheck(true); };
+  $('platesRerun').onclick = () => runPlatesCheck(false);
+  $('platesClose').onclick = () => { $('platesCard').hidden = true; };
+  $('platesOut').addEventListener('click', e => { const b = e.target.closest('[data-edit]'); if (b) startEdit(+b.dataset.edit); });
 
   /* ---------- Démarrage ---------- */
   recomputePlate(); render(); updatePreview(); prepareNext();
