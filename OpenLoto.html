@@ -704,6 +704,54 @@ body.public .top,body.public main{display:none}
 #directMain.rcol-off{grid-template-columns:clamp(170px,14vw,270px) minmax(0,1fr) minmax(0,1.15fr) 50px}
 #directMain.rcol-off #actWrap{display:none}
 @media(max-width:1000px){#directMain.rcol-off #actWrap{display:flex}#actMini{display:none!important}.act-head{display:none}}
+/* accueil et visite guidée */
+.hdr-help{min-width:36px;padding:5px 0;font:800 1rem var(--num)}
+.wl-back{position:fixed;inset:0;z-index:1005;background:rgba(9,30,34,.62);backdrop-filter:blur(3px);display:grid;place-items:center;padding:16px}
+.wl{width:min(980px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:var(--card);color:var(--ink);border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.35);display:flex;flex-direction:column}
+.wl-hero{background:linear-gradient(135deg,#0f5c63,#147a83);color:#fff;padding:26px 32px 22px;display:flex;gap:22px;align-items:center;border-radius:22px 22px 0 0}
+.wl-hero img{width:92px;height:92px;flex:0 0 auto;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
+.wl-hero h1{margin:0;font:800 2.1rem/1.1 var(--num)}
+.wl-hero p{margin:8px 0 0;font-size:1.05rem;opacity:.92;max-width:640px}
+.wl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:22px 30px 8px}
+.wl-c{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border-radius:14px;padding:13px 14px}
+.wl-c i{flex:0 0 38px;height:38px;border-radius:50%;display:grid;place-items:center;font:800 1rem var(--num);color:#fff;box-shadow:var(--sphere);font-style:normal}
+.wl-c b{display:block;margin-bottom:2px}
+.wl-c span{color:var(--muted);font-size:.86rem;line-height:1.35}
+.wl-note{padding:4px 30px 0;color:var(--muted);font-size:.84rem}
+.wl-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 30px 22px}
+.wl-foot .btn.primary{font-size:1.05rem;padding:12px 22px}
+.wl-foot label{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:.88rem;margin-left:auto;font-weight:400}
+@media(max-width:860px){.wl-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.wl-grid{grid-template-columns:1fr;padding:16px}.wl-hero{padding:20px;flex-direction:column;text-align:center}.wl-hero h1{font-size:1.6rem}.wl-note,.wl-foot{padding-left:16px;padding-right:16px}.wl-foot label{margin-left:0}}
+#tour{position:fixed;inset:0;z-index:1000;pointer-events:none}
+#tour.paused{display:none}
+.tour-blk{position:fixed;pointer-events:auto;background:transparent}
+.tour-hole{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(9,30,34,.62),0 0 0 4px var(--amber);pointer-events:none;transition:left .25s,top .25s,width .25s,height .25s}
+#tour.noclick .tour-hole{pointer-events:auto}
+.tour-tip{position:fixed;pointer-events:auto;background:var(--card);color:var(--ink);border-radius:16px;box-shadow:0 18px 44px rgba(0,0,0,.35);padding:16px 18px 14px;z-index:2;transition:left .25s,top .25s}
+.tour-k{font-size:.76rem;font-weight:700;color:var(--teal-2);text-transform:uppercase;letter-spacing:.05em}
+.tour-tip h3{margin:4px 0 6px;font-size:1.15rem}
+.tour-tip p{margin:0 0 12px;font-size:.93rem;line-height:1.45}
+.tour-bar{height:5px;border-radius:3px;background:var(--line);margin:6px 0 10px;overflow:hidden}
+.tour-bar span{display:block;height:100%;background:var(--amber);transition:width .25s}
+.tour-btns{display:flex;gap:8px;align-items:center}.tour-btns .grow{flex:1}
+#tour.busy .tour-btns .btn{opacity:.6;pointer-events:none}
+html.dark .tour-k{color:#7fd3da}
+/* horloge du direct : en tête de la colonne de droite, ou en haut du bloc des boules quand la colonne est rangée */
+.clk-t{font-family:var(--num);font-weight:800;color:var(--ink);line-height:1;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.clk-s{font-weight:600;color:var(--muted);font-size:.78rem;line-height:1.2}
+.clk-col{display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px 0 8px;border-bottom:1px solid var(--line);text-align:center}
+.clk-col .clk-t{font-size:clamp(1.7rem,2.6vw,2.5rem)}
+.draw-input{container-type:inline-size}
+.draw-head{display:flex;align-items:baseline;gap:4px 10px;margin-bottom:5px}
+.draw-head label{margin:0!important;min-width:0}
+.clk-a{display:none;margin-left:auto;align-items:baseline;gap:8px;white-space:nowrap}
+.clk-a .clk-t{font-size:clamp(1.05rem,2.1vw,1.7rem)}
+#directMain.rcol-off .clk-a{display:flex}
+@media(max-width:1000px){#directMain.rcol-off .clk-a{display:none}}
+@container (max-width:420px){.clk-a .clk-s{display:none}}
+@container (max-width:300px){.clk-a .clk-t{font-size:1rem}}
+#tab-direct.rz-compact .clk-col{padding-bottom:5px}
 #tab-direct.rz-compact .ctl-open{padding:9px 10px;font-size:1rem}
 /* écran public : contrôle en cours */
 .pub-check{font-size:clamp(1.2rem,4.5vh,2.6rem)}
@@ -943,6 +991,7 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
   <div class="hdr-wait" id="hdrWait" hidden title="Diffusion en attente : cliquez sur « Démarrer le loto » quand le loto commence."><span id="hdrWaitTxt">Diffusion en attente</span></div>
   <button type="button" class="hdr-net" id="hdrNet" data-act="netConfig" hidden><span id="hdrNetTxt">Téléphones</span><span class="hdr-cnt" id="hdrNetCnt"></span></button>
   <div class="save" id="saveStatus" title="Sauvegarde automatique active">Sauvegarde auto</div>
+  <button class="hdr-btn hdr-help" id="helpBtn" data-act="welcome" type="button" title="Présentation d’OpenLoto et visite guidée">?</button>
   <button class="hdr-btn hdr-theme" id="themeBtn" data-act="theme" type="button"></button>
   <button class="hdr-btn" id="fsBtn" data-act="fullscreen">Plein écran</button>
 </header>
@@ -986,7 +1035,7 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
         <div class="tempo-gauge" id="tempoGauge" role="img" aria-label="Temps restant pour le rythme de tirage"><span class="tg-fill" id="tempoGaugeFill"></span></div>
         <div id="lastBall" class="last-ball empty" aria-live="polite">—</div>
         <div class="draw-input">
-          <label for="ballInput">Numéro qui vient de sortir</label>
+          <div class="draw-head"><label for="ballInput">Numéro qui vient de sortir</label><span class="clk clk-a" title="Heure actuelle"><span class="clk-s" data-clk-s></span><span class="clk-t" data-clk-t></span></span></div>
           <div class="inline">
             <span class="tempo-dot off" role="img" aria-label="Indicateur de rythme de tirage"></span>
             <input id="ballInput" type="number" inputmode="numeric" min="1" max="90" placeholder="N°">
@@ -1022,6 +1071,7 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
     <div class="colwrap" id="actWrap">
     <aside class="col actions">
       <div class="act-head"><button class="btn ghost" data-act="rcolToggle" title="Ranger cette colonne : le direct s’élargit">Ranger »</button></div>
+      <div class="clk clk-col" title="Heure actuelle"><span class="clk-t" data-clk-t></span><span class="clk-s" data-clk-s data-long></span></div>
       <button class="btn" data-act="startLoto" id="startLotoBtn" title="Les infos (lot, condition) ne sont diffusées à l’écran public et aux téléphones qu’à partir de ce moment.">Démarrer le loto</button>
       <hr>
       <button class="btn primary big" id="nextBtn" data-act="next">Étape suivante</button>
@@ -1623,6 +1673,16 @@ function loadKey(k) {
   return null;
 }
 
+/* Visite guidée interrompue (page fermée) : on remet la configuration et le direct d'avant la visite */
+const KEY_TOUR = 'openloto-visite-sauvegarde';
+if (!IS_PUBLIC) try {
+  const b = JSON.parse(localStorage.getItem(KEY_TOUR) || 'null');
+  if (b) {
+    if (typeof b.c === 'string') localStorage.setItem(KEY_C, b.c); else localStorage.removeItem(KEY_C);
+    if (typeof b.d === 'string') localStorage.setItem(KEY_D, b.d); else localStorage.removeItem(KEY_D);
+    localStorage.removeItem(KEY_TOUR);
+  }
+} catch (e) {}
 /* C = configuration en cours d'édition ; D = copie utilisée par le direct (chargée depuis un fichier) */
 let C = IS_PUBLIC ? null : (loadKey(KEY_C) || (() => { const old = loadKey(KEY_OLD); if (old) { old.live = defaults().live; return old; } return normalize(); })());
 let D = IS_PUBLIC ? null : (loadKey(KEY_D) || normalize());
@@ -2067,6 +2127,332 @@ async function restoreSnap() {
   logEvent('restore', { count: s.draws.length });
   clearVerify(); rearmTempo(); commit(); toast(`${pl(s.draws.length, 'boule rétablie', 'boules rétablies')}.`);
 }
+/* =====================================================================
+   ACCUEIL ET VISITE GUIDÉE
+   L'accueil s'ouvre à la première ouverture (puis via le bouton « ? »).
+   La visite se déroule sur un loto de démonstration : la configuration et le
+   direct de l'utilisateur sont mis de côté puis remis tels quels à la fin
+   (même si la page est fermée en cours de visite). Rien n'est envoyé aux téléphones.
+   ===================================================================== */
+const KEY_WELCOME = 'openloto-bienvenue';
+var TOUR = null;
+function tourOn() { return !!TOUR; }
+function welcomeDue() { try { return localStorage.getItem(KEY_WELCOME) !== '1'; } catch (e) { return false; } }
+function showWelcome() {
+  if (TOUR || simOn() || $('#welcome')) return;
+  const seen = !welcomeDue();
+  const logo = ($('.top .ol-mark') || {}).src || '';
+  const card = (c, n, t, s) => `<div class="wl-c"><i style="background:${c}">${n}</i><div><b>${t}</b><span>${s}</span></div></div>`;
+  const ov = document.createElement('div');
+  ov.id = 'welcome'; ov.className = 'wl-back';
+  ov.innerHTML = `<div class="wl" role="dialog" aria-modal="true" aria-labelledby="wlTitle">
+    <div class="wl-hero">${logo ? `<img src="${logo}" alt="">` : ''}<div><h1 id="wlTitle">Bienvenue dans OpenLoto</h1>
+      <p>Le gestionnaire de loto pour les associations : vous saisissez les boules au fil du tirage, la salle suit sur le grand écran et sur les téléphones.</p></div></div>
+    <div class="wl-grid">
+      ${card('#e53935', '1', 'Le déroulé du loto', 'Étapes, lots, conditions de gain (ligne, carton plein, tour, au choix, loto inversé) et entractes.')}
+      ${card('#fb8c00', '2', 'Un écran public', 'Dernière boule, grille, lot en cours et messages, en grand pour toute la salle.')}
+      ${card('#fdd835;color:#3a2a00', '3', 'Contrôle des cartons', 'Tapez le numéro du carton : OpenLoto dit tout de suite s’il est gagnant.')}
+      ${card('#43a047', '4', 'Vos cartons', 'Import de votre fichier, outil de saisie et vérification des plaques.')}
+      ${card('#1e88e5', '5', 'Journal et bilan', 'Chaque boule, chaque gagnant est noté ; bilan et export en fin de soirée.')}
+      ${card('#8e24aa', '6', 'Sans installation', 'Un seul fichier, sans internet, avec sauvegarde automatique.')}
+    </div>
+    <div class="wl-note">La visite se fait sur un loto de démonstration : votre configuration et vos cartons sont remis tels quels à la fin. Vous pourrez revoir cette page et relancer la visite à tout moment avec le bouton <b>?</b> en haut de l’écran.</div>
+    <div class="wl-foot">
+      <button type="button" class="btn primary" data-wl="tour">▶ Visite guidée (4 min)</button>
+      <button type="button" class="btn" data-wl="close">${seen ? 'Fermer' : 'Commencer sans visite'}</button>
+      <label><input type="checkbox" id="wlNoMore" checked> Ne plus afficher à l’ouverture</label>
+    </div></div>`;
+  const close = go => {
+    try { if ($('#wlNoMore', ov).checked) localStorage.setItem(KEY_WELCOME, '1'); else localStorage.removeItem(KEY_WELCOME); } catch (e) {}
+    document.removeEventListener('keydown', onKey, true);
+    ov.remove();
+    if (go) tourStart();
+  };
+  const onKey = e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(false); } };
+  ov.addEventListener('click', e => { const b = e.target.closest('[data-wl]'); if (b) close(b.dataset.wl === 'tour'); });
+  document.addEventListener('keydown', onKey, true);
+  document.body.appendChild(ov);
+  setTimeout(() => { const b = $('[data-wl=tour]', ov); if (b) b.focus({ preventScroll:true }); }, 0);
+}
+
+/* ---------- loto de démonstration ---------- */
+function tourDemo() {
+  let s = 20261025;
+  const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  const ri = n => Math.floor(rnd() * n);
+  const cartons = [];
+  for (let k = 0; k < 60; k++) {
+    const used = new Set(), lines = [];
+    for (let l = 0; l < 3; l++) {
+      const cols = new Set(); while (cols.size < 5) cols.add(ri(9));
+      lines.push([...cols].map(c => { let v; do { const lo = c === 0 ? 1 : c * 10, hi = c === 8 ? 90 : c * 10 + 9; v = lo + ri(hi - lo + 1); } while (used.has(v)); used.add(v); return v; }).sort((a, b) => a - b));
+    }
+    cartons.push({ code: String(101 + k), lines });
+  }
+  return normalize({ titre:'Loto de démonstration', cartons, steps:[
+    { lot:'Panier garni', type:'lignes', lignes:1, gagnants:1, reset:true },
+    { lot:'Bon d’achat 50 €', type:'lignes', lignes:2, gagnants:1 },
+    { lot:'Entracte', type:'pause', duree:15 },
+    { lot:'Téléviseur', type:'plein', gagnants:1 },
+    { lot:'Lots de consolation', type:'lignes', lignes:1, gagnants:5, reset:true } ] });
+}
+const TOUR_CARTON = '107';
+const tourWait = ms => new Promise(r => setTimeout(r, ms));
+/* Complète le tirage pour que le carton de démonstration gagne la première étape (une ligne) */
+async function tourEnsureWin() {
+  if (!D.live.started) startLoto();
+  if (checkOpen || !$('#dlg').hidden) return;
+  const c = D.cartons.find(x => x.code === TOUR_CARTON); if (!c) return;
+  const all = new Set(c.lines.flat());
+  for (let k = 0; D.live.draws.length < 3 && k < 90; k++) {
+    const n = 1 + ((k * 37 + 11) % 90);
+    if (!all.has(n) && !D.live.draws.includes(n)) { await addBall(n); await tourWait(250); }
+  }
+  for (const n of c.lines[0]) if (!D.live.draws.includes(n)) { await addBall(n); await tourWait(250); }
+}
+const tourClick = (sel, re) => { const b = $$(sel).find(x => !re || re.test(x.textContent)); if (b) b.click(); };
+const dlgIs = re => !$('#dlg').hidden && re.test($('#dlgTitle').textContent);
+
+/* ---------- étapes de la visite ---------- */
+const TOUR_STEPS = [
+  { tab:'config', sel:'#cfg-block-params', k:'La configuration', t:'Titre, logo et paramètres',
+    p:'La configuration se prépare à l’avance, dans cet onglet. Le titre (le nom de votre association) et le logo s’affichent en haut de l’écran public ; vous choisissez aussi d’y montrer le lot en cours et sa règle.' },
+  { tab:'config', sel:'#cfg-block-deroule .cfg-head', big:'#cfg-block-deroule', k:'La configuration', t:'Le déroulement du loto',
+    p:'La liste des lots, dans l’ordre où ils seront joués. Chaque étape a un lot, une condition de gain et un nombre de gagnants. Ajoutez des entractes ou des annonces entre deux lots.' },
+  { tab:'config', sel:'#stepList .step-row', k:'La configuration', t:'Une étape',
+    p:'Conditions possibles : une ligne, deux lignes, carton plein, tour du carton, lignes au choix ou loto inversé. « Nouvelle partie » remet les boules à zéro au début de l’étape.' },
+  { tab:'config', sel:'#cfg-block-cartons .cfg-head', big:'#cfg-block-cartons', k:'La configuration', t:'Vos cartons',
+    p:'Pour vérifier les gagnants, OpenLoto doit connaître les numéros de chaque carton. Importez un fichier texte, ou saisissez-les avec l’outil OpenLoto-saisie-cartons. « Contrôler les plaques » repère les erreurs de saisie.' },
+  { tab:'config', sel:'#cfg-block-notice [data-act=pubMessages]', k:'La configuration', t:'Les messages de l’écran public',
+    p:'Avant le début du loto, à la fin, ou quand aucun loto n’est chargé, l’écran public affiche vos messages. Vous les personnalisez ici.' },
+  { tab:'config', sel:'#cfg-block-files [data-act=loadDirectFromCfg]', click:true, k:'La configuration', t:'Charger dans le direct',
+    p:'Quand tout est prêt, chargez la configuration dans le direct. Ce que vous modifiez ensuite ici ne touche pas le loto en cours. Pensez aussi à « Exporter la configuration » pour la garder dans un fichier.',
+    go: () => showTab('direct') },
+  { tab:'direct', sel:'#stepbar', k:'Le direct', t:'Les étapes du loto',
+    p:'Le direct, c’est l’écran de l’organisateur pendant le loto. À gauche, les étapes : celle en cours est encadrée.' },
+  { tab:'direct', sel:'#lotCard', k:'Le direct', t:'Le lot en jeu',
+    p:'Le lot en cours, sa condition de gain, les gagnants déjà validés et les étapes qui suivent.' },
+  { tab:'direct', sel:'#actWrap [data-act=openPublic]', k:'Le direct', t:'L’écran public',
+    p:'Ouvre l’écran destiné à la salle dans une nouvelle fenêtre : faites-la glisser sur le vidéoprojecteur ou la télé, puis passez-la en plein écran.' },
+  { tab:'direct', sel:'#startLotoBtn', click:true, k:'Le direct', t:'Démarrer le loto',
+    p:'Tant que le loto n’est pas démarré, l’écran public affiche votre message d’attente et aucune boule ne peut être tirée. Cliquez ici quand la salle est prête : le lot et la condition de la première étape s’affichent.',
+    done: () => D.live.started, go: () => startLoto() },
+  { tab:'direct', sel:'.draw-input', click:true, k:'Le direct', t:'Saisir les boules',
+    p:'Tapez le numéro annoncé puis Entrée (ou « Ajouter »). Essayez avec quelques numéros ; « Suivant » complètera le tirage pour qu’un carton de démonstration gagne.',
+    enter: () => setTimeout(() => { const i = $('#ballInput'); if (i && !i.disabled) i.focus(); }, 50), go: tourEnsureWin },
+  { tab:'direct', sel:'.draw-input [data-act=undo]', k:'Le direct', t:'Corriger une erreur',
+    p:'Une boule mal saisie ? « Annuler » retire la dernière boule sortie. Rien n’est perdu : chaque action est notée dans le journal.' },
+  { tab:'direct', sel:'#board:not([hidden]), #pubPreview:not([hidden])', k:'Le direct', t:'La grille',
+    p:'Les numéros sortis s’allument dans leur couleur ; les dernières boules sont juste au-dessus. « Aperçu public » montre exactement ce que voit la salle.' },
+  { tab:'direct', sel:'#midCol .ctl-open', click:true, k:'Contrôle d’un carton', t:'Un joueur crie « Quine ! »',
+    p:'Ouvrez le contrôle des cartons (touche F3). Le tirage est mis en pause et l’écran public l’indique.',
+    done: () => checkOpen, go: async () => { await tourEnsureWin(); openCheck(); } },
+  { sel:'#ctl .ctl-code', click:true, k:'Contrôle d’un carton', t:'Le numéro du carton',
+    p:`Tapez le numéro écrit sur le carton du joueur, puis « Vérifier ». Pour la démonstration, essayez le carton ${TOUR_CARTON}.`,
+    enter: () => setTimeout(() => { const i = $('#codeInput'); if (i) i.focus(); }, 50),
+    go: () => { const i = $('#codeInput'); i.value = TOUR_CARTON; doVerify(); } },
+  { sel:'#verifyResult', click:true, k:'Contrôle d’un carton', t:'Le verdict',
+    p:'OpenLoto affiche le carton et ses numéros sortis, et dit s’il est gagnant pour la condition en cours. Le carton peut aussi s’afficher sur l’écran public. Validez le gagnant.',
+    done: () => dlgIs(/Gagnant validé/), go: () => tourClick('#verifyResult [data-act=validate]') },
+  { sel:'#dlgBox', dlg:true, click:true, k:'Contrôle d’un carton', t:'Gagnant validé',
+    p:'Choisissez la suite : passer au lot suivant, vérifier un autre gagnant (en cas de départage), ou continuer le tirage.',
+    done: () => !dlgIs(/Gagnant validé/), go: () => tourClick('#dlgBtns .btn', /Étape suivante/) },
+  { sel:'#dlgBox', dlg:true, click:true, k:'Le direct', t:'Avant de changer de lot',
+    p:'OpenLoto rappelle le prochain lot, sa condition et ce qui arrive aux boules déjà sorties : de quoi l’annoncer à la salle avant de valider.',
+    skip: () => $('#dlg').hidden, done: () => $('#dlg').hidden, go: () => tourClick('#dlgBtns .btn.primary') },
+  { tab:'direct', sel:'#nextBtn', k:'Le direct', t:'Étape suivante',
+    p:'Ce bouton passe au lot suivant ; « Étape précédente » revient en arrière en cas d’erreur. Les entractes s’enchaînent de la même façon.' },
+  { tab:'direct', sel:'#actWrap [data-act=settings]', k:'Le direct', t:'Les réglages',
+    p:'La voix qui annonce les boules, les raccourcis clavier, la sauvegarde, et la simulation d’un loto complet pour s’entraîner.' },
+  { tab:'direct', sel:'#endLotoBtn:not([hidden])', k:'Le direct', t:'Terminer le loto',
+    p:'À la fin de la soirée, l’écran public affiche votre message de fin. Le loto peut être rouvert si besoin.' },
+  { tab:'journal', sel:'#tab-journal .card', k:'Le journal', t:'Tout est noté',
+    p:'Chaque boule, chaque gagnant et chaque changement de lot, avec l’heure. Bilan imprimable et export en fin de loto.' },
+  { tab:'direct', sel:'#helpBtn', k:'Fin de la visite', t:'À vous de jouer !',
+    p:'Votre configuration et votre direct vont être remis tels qu’ils étaient. Ce bouton « ? » rouvre la présentation et la visite quand vous voulez.', last:true }
+];
+
+/* ---------- moteur de la visite ---------- */
+function tourStart() {
+  if (TOUR || simOn()) return;
+  closeCheckNow();
+  if (!$('#dlg').hidden) return toast('Fermez d’abord la fenêtre ouverte.');
+  const tab = ['direct', 'config', 'journal'].find(t => !$('#tab-' + t).hidden) || 'direct';
+  TOUR = { C, D, tab, rcolOff: !!POSTE.rcolOff, i: -1, busy:false, timer:null };
+  /* copie de secours : si la page est fermée pendant la visite, tout est remis au prochain chargement */
+  try { localStorage.setItem(KEY_TOUR, JSON.stringify({ c: localStorage.getItem(KEY_C), d: localStorage.getItem(KEY_D) })); } catch (e) {}
+  C = tourDemo();
+  D = normalize(Object.assign({}, cfgFields(C), { source:{ name:'Démonstration', at:Date.now() } }));
+  logEvent('partie', { label:'Visite guidée (démonstration)' }); logEvent('load', { why:'démonstration' }); logStep();
+  verifiedCode = ''; verifiedView = null; resetReveal();
+  saveC(); commit();
+  if (POSTE.rcolOff) setRcol(false);
+  document.body.classList.add('tour-on');
+  const ov = document.createElement('div');
+  ov.id = 'tour';
+  ov.innerHTML = `<div class="tour-blk"></div><div class="tour-blk"></div><div class="tour-blk"></div><div class="tour-blk"></div>
+    <div class="tour-hole"></div>
+    <div class="tour-tip" role="dialog" aria-live="polite"><div class="tour-k"></div><div class="tour-bar"><span></span></div><h3></h3><p></p>
+      <div class="tour-btns"><button type="button" class="btn sm" data-tour="prev">‹ Précédent</button><span class="grow"></span><button type="button" class="btn sm ghost" data-tour="quit">Quitter</button><button type="button" class="btn sm primary" data-tour="next">Suivant ›</button></div></div>`;
+  ov.addEventListener('click', e => {
+    const b = e.target.closest('[data-tour]');
+    if (b) { if (b.dataset.tour === 'next') tourNext(); else if (b.dataset.tour === 'prev') tourGo(TOUR.i - 1, -1); else tourEnd(); return; }
+    if (e.target.classList.contains('tour-blk')) { e.preventDefault(); e.stopPropagation(); }
+  });
+  document.body.appendChild(ov);
+  window.addEventListener('keydown', tourKey, true);
+  window.addEventListener('resize', tourLayout);
+  TOUR.timer = setInterval(tourTick, 150);
+  sendPublic();
+  tourGo(0, 1);
+}
+function tourEl(step) {
+  for (const sel of step.sel.split(',')) {
+    const el = $(sel.trim());
+    if (el && el.getClientRects().length) return el;
+  }
+  return null;
+}
+async function tourGo(i, dir) {
+  if (!TOUR) return;
+  while (i >= 0 && i < TOUR_STEPS.length && TOUR_STEPS[i].skip && TOUR_STEPS[i].skip()) i += dir || 1;
+  if (i < 0) return;
+  if (i >= TOUR_STEPS.length) return tourEnd();
+  /* en arrière, on ne revient pas sur une étape qui dépend d'une fenêtre fermée depuis */
+  const gone = s => (s.dlg && $('#dlg').hidden) || ((s.sel.startsWith('#ctl') || s.sel === '#verifyResult') && !checkOpen);
+  if (dir < 0) while (i > 0 && gone(TOUR_STEPS[i])) i--;
+  TOUR.i = i; TOUR.hits = 0;
+  const st = TOUR_STEPS[i];
+  if (st.tab && checkOpen && $('#dlg').hidden) closeCheckNow();
+  if (st.tab && $('#tab-' + st.tab).hidden) showTab(st.tab);
+  const tip = $('#tour .tour-tip');
+  $('.tour-k', tip).textContent = `${st.k} · étape ${i + 1} sur ${TOUR_STEPS.length}`;
+  $('.tour-bar span', tip).style.width = ((i + 1) / TOUR_STEPS.length * 100) + '%';
+  $('h3', tip).textContent = st.t;
+  $('p', tip).textContent = st.p;
+  $('[data-tour=prev]', tip).disabled = i === 0;
+  $('[data-tour=next]', tip).textContent = st.last ? 'Terminer' : 'Suivant ›';
+  const el = tourEl(st), big = st.big ? $(st.big) : null;
+  if (el) (big || el).scrollIntoView({ block: big ? 'start' : 'center', inline:'nearest' });
+  if (st.enter) st.enter();
+  tourLayout();
+  if (!st.click) setTimeout(() => { const n = $('#tour [data-tour=next]'); if (n && TOUR && TOUR.i === i) n.focus(); }, 30);
+}
+async function tourNext() {
+  if (!TOUR || TOUR.busy) return;
+  const st = TOUR_STEPS[TOUR.i];
+  if (st.last) return tourEnd();
+  if (st.go && !(st.done && st.done())) {
+    TOUR.busy = true; $('#tour').classList.add('busy');
+    try { await st.go(); } catch (e) {}
+    for (let k = 0; k < 40 && st.done && !st.done(); k++) await tourWait(100);
+    await tourWait(200);                       /* laisse s'ouvrir la fenêtre suivante éventuelle */
+    if (!TOUR) return;
+    TOUR.busy = false; $('#tour').classList.remove('busy');
+    if (TOUR_STEPS[TOUR.i] !== st) return;     /* déjà avancé par tourTick */
+  }
+  tourGo(TOUR.i + 1, 1);
+}
+function tourTick() {
+  if (!TOUR) return;
+  const st = TOUR_STEPS[TOUR.i]; if (!st) return;
+  /* une fenêtre du programme s'ouvre hors des étapes prévues : la visite s'efface le temps de la fermer */
+  const foreign = !$('#dlg').hidden && !st.dlg;
+  $('#tour').classList.toggle('paused', foreign);
+  if (!foreign && !TOUR.busy && st.done && st.done()) { if (++TOUR.hits >= 2) { tourGo(TOUR.i + 1, 1); return; } } else TOUR.hits = 0;
+  tourLayout();
+}
+function tourLayout() {
+  if (!TOUR) return;
+  const st = TOUR_STEPS[TOUR.i]; if (!st) return;
+  const ov = $('#tour'), [b1, b2, b3, b4] = $$('.tour-blk', ov), hole = $('.tour-hole', ov), tip = $('.tour-tip', ov);
+  const vw = window.innerWidth, vh = window.innerHeight, el = tourEl(st);
+  const put = (e, x, y, w, h) => { e.style.left = x + 'px'; e.style.top = y + 'px'; e.style.width = Math.max(0, w) + 'px'; e.style.height = Math.max(0, h) + 'px'; };
+  let r = null;
+  if (el) {
+    const q = el.getBoundingClientRect(), pad = 6;
+    const x1 = Math.max(4, q.left - pad), y1 = Math.max(4, q.top - pad), x2 = Math.min(vw - 4, q.right + pad), y2 = Math.min(vh - 4, q.bottom + pad);
+    if (x2 > x1 && y2 > y1) r = { left:x1, top:y1, right:x2, bottom:y2, width:x2 - x1, height:y2 - y1 };
+  }
+  hole.hidden = !r;
+  if (r) {
+    put(hole, r.left, r.top, r.width, r.height);
+    put(b1, 0, 0, vw, r.top); put(b2, 0, r.bottom, vw, vh - r.bottom);
+    put(b3, 0, r.top, r.left, r.height); put(b4, r.right, r.top, vw - r.right, r.height);
+    ov.classList.toggle('noclick', !st.click);
+  } else { put(b1, 0, 0, vw, vh); [b2, b3, b4].forEach(b => put(b, 0, 0, 0, 0)); ov.classList.remove('noclick'); }
+  /* bulle : à droite, à gauche, en dessous, au-dessus de la zone, sinon en bas à droite */
+  const tw = Math.min(360, vw - 24), th = tip.offsetHeight, m = 16, cl = (v, a, b) => Math.max(a, Math.min(b, v));
+  tip.style.width = tw + 'px';
+  let x, y;
+  if (!r) { x = (vw - tw) / 2; y = (vh - th) / 2; }
+  else if (r.right + m + tw <= vw - 8) { x = r.right + m; y = cl(r.top, 8, vh - th - 8); }
+  else if (r.left - m - tw >= 8) { x = r.left - m - tw; y = cl(r.top, 8, vh - th - 8); }
+  else if (r.bottom + m + th <= vh - 8) { y = r.bottom + m; x = cl(r.left, 8, vw - tw - 8); }
+  else if (r.top - m - th >= 8) { y = r.top - m - th; x = cl(r.left, 8, vw - tw - 8); }
+  else { x = vw - tw - 12; y = vh - th - 12; }
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+function tourKey(e) {
+  if (!TOUR) return;
+  const st = TOUR_STEPS[TOUR.i] || {};
+  if (!$('#dlg').hidden && !st.dlg) return;                          /* fenêtre hors visite : elle garde la main */
+  const inTip = e.target.closest && e.target.closest('#tour .tour-tip');
+  const el = tourEl(st), inZone = st.click && el && el.contains(e.target);
+  if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); tourEnd(); return; }
+  if (!isTypingField(e.target) && !(st.dlg && $('#dlgBox').contains(e.target))) {
+    if (e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); tourNext(); return; }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); tourGo(TOUR.i - 1, -1); return; }
+  }
+  if (inTip || inZone) return;
+  if (st.dlg && $('#dlgBox').contains(e.target)) return;
+  if (e.key === 'Tab') return;
+  e.preventDefault(); e.stopPropagation();
+}
+function tourEnd() {
+  if (!TOUR) return;
+  const T = TOUR;
+  clearInterval(T.timer);
+  window.removeEventListener('keydown', tourKey, true);
+  window.removeEventListener('resize', tourLayout);
+  const ov = $('#tour'); if (ov) ov.remove();
+  document.body.classList.remove('tour-on');
+  /* referme proprement ce que la démonstration a ouvert */
+  if (!$('#dlg').hidden) { const bs = $$('#dlgBtns .btn'); const b = bs.find(x => /Continuer|Annuler|Fermer|Revenir/.test(x.textContent)) || bs[bs.length - 1]; if (b) b.click(); }
+  ckPending = []; verifiedCode = ''; verifiedView = null;
+  closeCheckNow();
+  TOUR = null;
+  C = T.C; D = T.D;
+  saveC(); saveD();
+  try { localStorage.removeItem(KEY_TOUR); } catch (e) {}
+  resetReveal(); clearVerify();
+  if (T.rcolOff) setRcol(true);
+  showTab(T.tab);
+  sendPublic();
+  toast('Visite terminée : votre configuration et votre direct sont remis tels qu’ils étaient.');
+}
+
+/* Horloge du direct : heure actuelle + durée depuis le démarrage du loto */
+function clockTick() {
+  const hhmm = t => new Date(t).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+  const dur = ms => { const m = Math.max(0, Math.floor(ms / 60000)); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`; };
+  const now = Date.now(), L = D && D.live;
+  let shortTxt = '', longTxt = '';
+  if (L && D.steps && D.steps.length) {
+    const j = L.journal || [], last = type => { for (let i = j.length - 1; i >= 0; i--) if (j[i].type === type) return j[i]; return null; };
+    const st = L.started ? last('start') : null;
+    if (!L.started) longTxt = 'Loto non démarré';
+    else if (st && !simOn()) {
+      const en = L.ended ? last('end') : null;
+      if (en && en.t >= st.t) { shortTxt = `durée ${dur(en.t - st.t)}`; longTxt = `Terminé à ${hhmm(en.t)} · durée ${dur(en.t - st.t)}`; }
+      else { shortTxt = `depuis ${dur(now - st.t)}`; longTxt = `Loto commencé à ${hhmm(st.t)} · ${dur(now - st.t)}`; }
+    }
+  }
+  const t = hhmm(now);
+  document.querySelectorAll('[data-clk-t]').forEach(e => { if (e.textContent !== t) e.textContent = t; });
+  document.querySelectorAll('[data-clk-s]').forEach(e => { const v = e.hasAttribute('data-long') ? longTxt : shortTxt; if (e.textContent !== v) e.textContent = v; e.hidden = !v; });
+}
+setInterval(clockTick, 1000); setTimeout(clockTick, 0);
 /* Terminer / rouvrir le loto */
 async function finishLoto(){
   if (!D || !D.steps.length) { toast('Aucun loto en cours.'); return false; }
@@ -2457,7 +2843,7 @@ function buildPublic() {
   const base = { loto:'state', t:Date.now(), titre:D.titre, logo:D.logo, logoPos:D.logoPos, colors:D.colors,
     notice:{ on:NOTICE.on, title:NOTICE.title, text:NOTICE.text },
     pubmsg:{ start:PUBMSG.start, wait:PUBMSG.wait, end:PUBMSG.end, endTitle:PUBMSG.endTitle, demo:PUBMSG.demoText, anim:PUBMSG.anim !== false },
-    demo:{ on:PUBMSG.demoOn === true, speed:PUBMSG.demoSpeed }, ...(simOn() ? { sim:true } : {}),
+    demo:{ on:PUBMSG.demoOn === true, speed:PUBMSG.demoSpeed }, ...(simOn() ? { sim:true } : tourOn() ? { sim:true, simLabel:'DÉMONSTRATION' } : {}),
     ...(pubQrOn && playerUrl() ? { qr:{ url:playerUrl(), wifi:(NET.wifi || '').trim() } } : {}) };
   if (!D.steps.length) return Object.assign(base, { empty:true });
   const st = curStep(), L = D.live;
@@ -2687,12 +3073,12 @@ let netClients = null;   /* téléphones connectés au serveur (si le serveur le
 let netTimer = null, netRetryTimer = null, netFail = 0, netLastOk = 0, netLastSend = 0, netErr = '', netRetryAt = 0, netSeq = 0;
 const netOn = () => !!(NET.url && NET.url.trim() && NET.key && NET.key.trim());
 function pushNet(msg) {
-  if (!netOn() || simOn()) { updateHdrNet(); return; }
+  if (!netOn() || simOn() || tourOn()) { updateHdrNet(); return; }
   clearTimeout(netTimer);
   netTimer = setTimeout(() => netSend(msg), 60);
 }
 async function netSend(msg) {
-  if (!netOn() || simOn()) return;
+  if (!netOn() || simOn() || tourOn()) return;
   clearTimeout(netRetryTimer); netRetryAt = 0;
   const seq = ++netSeq;
   netLastSend = Date.now();
@@ -2742,7 +3128,7 @@ function updateHdrNet() {
 }
 function netHeartbeat() {
   updateHdrNet();
-  if (IS_PUBLIC || !netOn() || netRetryAt || simOn()) return;
+  if (IS_PUBLIC || !netOn() || netRetryAt || simOn() || tourOn()) return;
   if (Date.now() - netLastSend >= NET_BEAT_MS - 500) netSend(buildPublic());
 }
 async function testNet() {
@@ -3265,7 +3651,7 @@ function renderPublic(m) {
   }
   stopPubDemo();
   pubLastMsg = m;
-  { const sb = $('#pubSim'); if (sb) sb.hidden = !(m && m.sim); }
+  { const sb = $('#pubSim'); if (sb) { sb.hidden = !(m && m.sim); if (m && m.sim) sb.textContent = m.simLabel || 'SIMULATION'; } }
   paintPub(m);
   updatePubGridBtn(m);
   updatePubConn();
@@ -5359,6 +5745,7 @@ function bindEvents() {
       case 'palierConfig': showPalierConfig(); break;
       case 'voiceConfig': showVoiceConfig(); break;
       case 'settings': showSettings(); break;
+      case 'welcome': showWelcome(); break;
       case 'theme': POSTE.theme = POSTE.theme === 'dark' ? 'light' : 'dark'; savePoste(); applyTheme(); break;
       case 'holdWin': holdWinner(d.code); break;
       case 'tieKeep': keepTie(+d.i); break;
@@ -5586,6 +5973,7 @@ case 'rsOrient': runOrient = d.val === 'landscape' ? 'landscape' : 'portrait'; u
   });
   setInterval(netHeartbeat, 1000);
   setRcol(POSTE.rcolOff); setBoardView(POSTE.boardView); applyTheme();
+  setTimeout(() => { if (welcomeDue() && $('#dlg').hidden) showWelcome(); }, 400);
   resetReveal();   /* au chargement, les boules déjà sorties sont toutes affichées (même avec un délai d'affichage) */
   window.addEventListener('resize', () => { if (!$('#pubPreview').hidden) pvFit(); });
   document.addEventListener('fullscreenchange', () => { $('#fsBtn').textContent = document.fullscreenElement ? 'Quitter le plein écran' : 'Plein écran'; });
