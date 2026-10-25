@@ -50,7 +50,7 @@ OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'
 ![Contrôle d'un carton gagnant](docs/captures/controle-carton.png)
 
 ### La saisie des cartons
-- Un outil à part, `outils/saisie-cartons.html`, pour enregistrer vos cartons un par un, au clavier ou à la voix (Chrome et Edge).
+- Un outil à part, `outils/OpenLoto-saisie-cartons.html`, pour enregistrer vos cartons un par un, au clavier ou à la voix (Chrome et Edge).
 - Les cases avancent toutes seules ; un aperçu du carton réel (une colonne par dizaine) permet de comparer d'un coup d'œil avec le carton papier.
 - Contrôles à la saisie : numéros de 1 à 90, pas de doublon, un seul numéro par dizaine sur une ligne, numéro de carton unique, carton identique à un autre signalé.
 - Mode plaque : numéros de carton consécutifs remplis automatiquement et vérification que chaque numéro de 1 à 90 apparaît une seule fois sur la plaque.
@@ -114,7 +114,7 @@ Vous utilisez des cartons d'un autre fournisseur ? Dites-nous, via l'onglet **Is
 
 ## Démarrage rapide (sans serveur)
 
-1. Téléchargez `Loto.html`.
+1. Téléchargez `OpenLoto.html`.
 2. Ouvrez-le avec un navigateur récent (Chrome, Edge ou Firefox).
 3. Dans l'onglet **Configuration**, renseignez le titre, le logo, le déroulé et vos cartons.
 4. Cliquez sur **Charger dans le direct**, ouvrez l'écran public et lancez le loto.
@@ -139,10 +139,12 @@ Tout est enregistré dans le navigateur de l'ordinateur. Pensez à **exporter la
 Le PC de l'organisateur sert lui-même la page aux téléphones, sans internet.
 
 1. Connectez le PC au wifi de la salle, ou à votre propre routeur wifi.
-2. Lancez **`OpenLoto-serveur.exe`** (Windows), à télécharger dans les [Releases](../../releases/latest) du dépôt. Placez-le dans le dossier de `Loto.html`, ou dans un sous-dossier : il diffuse le fichier `Loto….html` le plus récent qu'il y trouve.
+2. Lancez le serveur, à télécharger dans les [Releases](../../releases/latest) du dépôt. Il diffuse le fichier `OpenLoto….html` le plus récent qu'il trouve dans son dossier ou dans le dossier au-dessus.
+   - **Windows** : placez `OpenLoto-serveur.exe` dans `serveur-local-windows/` et double-cliquez dessus.
    - Windows peut afficher « Windows a protégé votre ordinateur » (programme non signé) : *Informations complémentaires* → *Exécuter quand même*.
    - Le pare-feu demande une autorisation au premier lancement : acceptez au moins les réseaux privés.
-   - Sur Mac ou Linux, ou si l'exécutable est bloqué : installez [Node.js](https://nodejs.org), puis lancez `node serveur-local/openloto-serveur.js`.
+   - **Linux (PC)** : placez `OpenLoto-serveur-linux-x64` dans `serveur-local-linux/`, puis dans un terminal ouvert dans ce dossier : `sh lancer-serveur-linux.sh`. Sans ce fichier, le script utilise Node.js s'il est installé (`sudo apt install nodejs`).
+   - **Mac**, ou si l'exécutable est bloqué : installez [Node.js](https://nodejs.org), puis lancez `node serveur-local-windows/openloto-serveur.js`.
 3. Dans OpenLoto, sur ce PC : **Réglages → Config réseau → Utiliser le serveur local de ce PC**. L'adresse et la clé se remplissent seules (une nouvelle clé est créée à chaque lancement et récupérée automatiquement).
 4. Donnez le lien aux joueurs : QR code, affiche à imprimer ou affichage sur l'écran public.
 
@@ -161,37 +163,41 @@ Sur le Raspberry Pi (Raspberry Pi OS) :
 sudo apt install -y nodejs
 
 # Utilisateur dédié et dossier du service
-sudo useradd --system --no-create-home --shell /usr/sbin/nologin loto
-sudo mkdir -p /opt/loto
+sudo useradd --system --no-create-home --shell /usr/sbin/nologin openloto
+sudo mkdir -p /opt/openloto
 
 # Fichiers d'OpenLoto
-sudo cp Loto.html raspberry/loto-server.js /opt/loto/
-sudo cp raspberry/loto.env.example /opt/loto/loto.env
-sudo cp raspberry/loto.service /etc/systemd/system/loto.service
+sudo cp OpenLoto.html raspberry/openloto-server.js /opt/openloto/
+sudo cp raspberry/openloto.env.example /opt/openloto/openloto.env
+sudo cp raspberry/openloto.service /etc/systemd/system/openloto.service
 
-# Clé de diffusion : générez-en une et collez-la dans loto.env
+# Clé de diffusion : générez-en une et collez-la dans openloto.env
 openssl rand -hex 24
-sudo nano /opt/loto/loto.env
+sudo nano /opt/openloto/openloto.env
 
 # Droits et démarrage
-sudo chown -R root:loto /opt/loto
-sudo chmod 640 /opt/loto/loto.env
+sudo chown -R root:openloto /opt/openloto
+sudo chmod 640 /opt/openloto/openloto.env
 sudo systemctl daemon-reload
-sudo systemctl enable --now loto
+sudo systemctl enable --now openloto
 ```
 
-Le service écoute sur le port **8123**. Après chaque modification de la clé : `sudo systemctl restart loto`.
+Le service écoute sur le port **8123**. Après chaque modification de la clé : `sudo systemctl restart openloto`.
+
+Pour mettre OpenLoto à jour, il suffit de remplacer `/opt/openloto/OpenLoto.html` par la nouvelle version (les téléphones la chargent à leur prochaine connexion).
+
+> Installation antérieure (dossier `/opt/loto`, service `loto`) : elle continue de fonctionner telle quelle. Copiez simplement la nouvelle version sous le nom `/opt/loto/Loto.html`.
 
 ### Changer le port d'écoute
 
 Le port se règle dans le fichier du service, à la ligne `Environment=PORT=8123` :
 
 ```bash
-sudo nano /etc/systemd/system/loto.service
+sudo nano /etc/systemd/system/openloto.service
 # remplacez 8123 par le port voulu, par exemple : Environment=PORT=8080
 
 sudo systemctl daemon-reload
-sudo systemctl restart loto
+sudo systemctl restart openloto
 ```
 
 Pensez ensuite à reporter le nouveau port dans l'adresse du serveur côté organisateur (`http://192.168.1.50:8080`), dans le lien donné aux joueurs et, le cas échéant, dans la redirection de port de votre box.
@@ -200,7 +206,7 @@ Pensez ensuite à reporter le nouveau port dans l'adresse du serveur côté orga
 
 Dans OpenLoto : **Réglages → Config réseau (téléphones)**.
 - **Adresse du serveur** : par exemple `http://192.168.1.50:8123`.
-- **Clé de diffusion** : la même que dans `loto.env`.
+- **Clé de diffusion** : la même que dans `openloto.env`.
 
 Cliquez sur **Tester la connexion**. Le lien à communiquer aux joueurs s'affiche avec son QR code : affiche à imprimer, image PNG, ou affichage sur l'écran public.
 
@@ -212,17 +218,22 @@ Cliquez sur **Tester la connexion**. Le lien à communiquer aux joueurs s'affich
 
 ```
 OpenLoto/
-├── Loto.html                  Le programme (organisateur + écran public)
+├── OpenLoto.html              Le programme (organisateur + écran public)
 ├── outils/
-│   └── saisie-cartons.html    Saisie des cartons (export .txt pour OpenLoto)
-├── serveur-local/
-│   ├── openloto-serveur.js    Serveur local (sur le PC de l'organisateur)
-│   ├── LISEZMOI.txt           Mode d'emploi
-│   └── CONSTRUIRE.md          Fabriquer OpenLoto-serveur.exe à partir du script
+│   └── OpenLoto-saisie-cartons.html  Saisie des cartons (export .txt pour OpenLoto)
+├── serveur-local-windows/     Serveur local pour Windows
+│   ├── openloto-serveur.js    Le serveur (script Node.js)
+│   ├── LISEZMOI.txt           Mode d'emploi (+ OpenLoto-serveur.exe des Releases)
+│   └── CONSTRUIRE.md          Fabriquer l'exécutable à partir du script
+├── serveur-local-linux/       Serveur local pour Linux (PC)
+│   ├── openloto-serveur.js    Le même serveur
+│   ├── lancer-serveur-linux.sh  Lancement
+│   ├── LISEZMOI.txt           Mode d'emploi (+ OpenLoto-serveur-linux-x64 des Releases)
+│   └── CONSTRUIRE.md          Fabriquer le programme à partir du script
 ├── raspberry/
-│   ├── loto-server.js         Serveur de diffusion (Node.js, sans dépendance)
-│   ├── loto.service           Service systemd
-│   └── loto.env.example       Modèle du fichier de clé
+│   ├── openloto-server.js     Serveur de diffusion (Node.js, sans dépendance)
+│   ├── openloto.service       Service systemd
+│   └── openloto.env.example   Modèle du fichier de clé
 ├── docs/captures/             Captures d'écran du README
 ├── docs/logo/                 Logo (SVG, PNG) et image de présentation GitHub
 ├── LICENSE
