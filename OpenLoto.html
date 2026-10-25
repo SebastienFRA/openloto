@@ -927,6 +927,8 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
 .pub-qr-card .q svg{width:100%;height:100%;display:block}
 .pub-qr-card .u{font:800 clamp(1.1rem,4vh,2.6rem) var(--num);color:#0f5c63;text-align:center;word-break:break-all}
 .pub-qr-card .w{font-size:clamp(.95rem,2.8vh,1.7rem);color:#5d6b82;text-align:center}
+/* ===== v28 : message de fin centré sur téléphone en portrait ===== */
+@media (orientation:portrait){#pub.mode-end .pub-right{flex:1 1 auto;justify-content:center}}
 </style>
 </head>
 <body>
@@ -1204,8 +1206,8 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
       <div class="cfg-head" style="margin-bottom:0"><h2>Écran public</h2></div>
       <button class="btn primary" data-act="openPublic">Ouvrir l’écran public</button>
       <button class="btn qr-pub-btn" data-act="qrPub" title="Afficher par-dessus l’écran public le QR code qui permet aux joueurs de suivre le tirage sur leur téléphone">Afficher le QR code joueurs</button>
-      <button class="btn" data-act="noticeConfig">Configurer le message d’accueil</button>
-      <button class="btn" data-act="pubMsgConfig">Configurer les messages et le mode démo</button>
+      <button class="btn" data-act="pubMessages">Messages de l’écran public…</button>
+      <button class="btn" data-act="netConfig">Config réseau (téléphones) <span class="net-dot wait" data-net-dot aria-hidden="true"></span></button>
       <div class="muted small" id="noticeSummary"></div>
       <div class="muted small" id="pubMsgSummary"></div>
       <div class="inline" style="gap:6px"><span class="net-dot wait" data-net-dot aria-hidden="true"></span><span class="net-status wait" data-net-status>Diffusion réseau non configurée.</span></div>
@@ -2834,7 +2836,6 @@ async function showNoticeConfig() {
         <label class="chk2"><input type="checkbox" data-nt-on${NOTICE.on ? ' checked' : ''}> Afficher le message sur l’écran public en ligne</label>
         <label class="f">Titre (facultatif)<input type="text" data-nt-title maxlength="80" autocomplete="off"></label>
         <label class="f">Message<textarea data-nt-text maxlength="600" rows="5"></textarea></label>
-        <details><summary class="muted small" style="cursor:pointer">Config réseau de diffusion</summary>${netFieldsHtml()}</details>
       </div>`,
       bind: root => {
         const on = root.querySelector('[data-nt-on]'), ti = root.querySelector('[data-nt-title]'), tx = root.querySelector('[data-nt-text]');
@@ -2842,7 +2843,6 @@ async function showNoticeConfig() {
         on.addEventListener('change', () => draft.on = on.checked);
         ti.addEventListener('input', () => draft.title = ti.value);
         tx.addEventListener('input', () => draft.text = tx.value);
-        bindNetFields(root);
       }
     });
   if (r !== 'send') return;
@@ -2851,6 +2851,20 @@ async function showNoticeConfig() {
   renderNoticeSummary();
   sendPublic();
   toast('Message d’accueil enregistré et diffusé.');
+}
+/* Choix du message à configurer */
+async function showPubMessages() {
+  const b = (act, label, sub) => `<button type="button" class="btn" data-r="${act}"><b>${label}</b><br><span class="muted small">${sub}</span></button>`;
+  const r = await ask('Messages de l’écran public', '', [{ label:'Fermer', value:false, primary:true }], false, {
+    wide:true,
+    visual: `<div class="set-dlg"><div class="set-grid">
+      ${b('noticeConfig', 'Message d’accueil', 'Affiché une fois à l’arrivée des joueurs sur leur téléphone.')}
+      ${b('pubMsgConfig', 'Attente, fin et mode démo', 'Avant le démarrage, sans loto chargé, à la fin du loto ; animation des boules.')}
+    </div></div>`,
+    bind: (root, close) => root.addEventListener('click', e => { const x = e.target.closest('[data-r]'); if (x) close(x.dataset.r); })
+  });
+  if (r === 'noticeConfig') return showNoticeConfig();
+  if (r === 'pubMsgConfig') return showPubMsgConfig();
 }
 /* Messages de l'écran public : attente, mode démo et message de fin. */
 async function showPubMsgConfig() {
@@ -3025,7 +3039,8 @@ function pubMsgTxt(m, key) {
   const v = m && m.pubmsg ? m.pubmsg[key] : null;
   return v || PUBMSG[key] || (key === 'start' ? PUBMSG_DEFAULT_START : PUBMSG_DEFAULT_WAIT);
 }
-function pubMsgHtml(m, key) { return esc(pubMsgTxt(m, key)).replace(/\n/g, '<br>'); }
+const nbspFr = t => String(t).replace(/ ([!?:;»])/g, '\u00a0$1').replace(/« /g, '«\u00a0');
+function pubMsgHtml(m, key) { return esc(nbspFr(pubMsgTxt(m, key))).replace(/\n/g, '<br>'); }
 /* Assainit l'état reçu du réseau avant tout rendu (défense en profondeur contre l'injection). */
 const PUB_HEX = /^#[0-9a-f]{6}$/i, PUB_INT = n => { const v = parseInt(n, 10); return Number.isInteger(v) ? v : null; };
 function sanitizePublic(m) {
@@ -3182,7 +3197,7 @@ function paintPub(m){
     $('#pubBalls').innerHTML = '';
     const pm = m.pubmsg || {};
     const t = pm.endTitle || '', tx = pm.end || PUBMSG_DEFAULT_END;
-    panel.innerHTML = `<div class="pub-end">${t ? `<div class="name">${esc(t)}</div>` : ''}<div class="txt">${esc(tx).replace(/\n/g, '<br>')}</div></div>`;
+    panel.innerHTML = `<div class="pub-end">${t ? `<div class="name">${esc(t)}</div>` : ''}<div class="txt">${esc(nbspFr(tx)).replace(/\n/g, '<br>')}</div></div>`;
     return;
   }
   if (m.waiting) {
@@ -5285,7 +5300,7 @@ async function showSettings() {
     wide:true,
     visual: `<div class="set-dlg">
       <h4>Diffusion et poste</h4>
-      <div class="set-grid">${b('netConfig', 'Config réseau (téléphones) <span class="net-dot ' + netState + '" aria-hidden="true"></span>')}${b('voiceConfig', 'Voix et raccourcis')}</div>
+      <div class="set-grid">${b('netConfig', 'Config réseau (téléphones) <span class="net-dot ' + netState + '" aria-hidden="true"></span>')}${b('voiceConfig', 'Voix et raccourcis')}${b('pubMessages', 'Messages de l’écran public')}</div>
       <h4>Tirage</h4>
       <div class="set-grid">${b('palierConfig', 'Paliers de rythme')}</div>
       <h4>Fichiers</h4>
@@ -5339,6 +5354,7 @@ function bindEvents() {
       case 'openPublic': openPublic(); break;
       case 'netConfig': showNetConfig(); break;
       case 'noticeConfig': showNoticeConfig(); break;
+      case 'pubMessages': showPubMessages(); break;
       case 'pubMsgConfig': showPubMsgConfig(); break;
       case 'palierConfig': showPalierConfig(); break;
       case 'voiceConfig': showVoiceConfig(); break;
