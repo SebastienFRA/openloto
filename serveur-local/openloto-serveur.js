@@ -5,11 +5,11 @@
  * Lancez-le sur le PC de l'organisateur : les téléphones des joueurs connectés au même wifi
  * suivent le tirage à l'adresse affichée. Aucune dépendance, aucune connexion internet nécessaire.
  *
- * Le fichier OpenLoto servi aux téléphones est le « Loto….html » le plus récent,
- * cherché dans le dossier du serveur, puis dans le dossier parent.
+ * Le fichier servi aux téléphones est le « OpenLoto….html » (ou « Loto….html ») le plus récent,
+ * cherché dans le dossier du serveur, puis jusqu'à deux niveaux au-dessus.
  * La clé de diffusion est créée à chaque lancement ; OpenLoto la récupère tout seul sur ce PC.
  *
- * Variables facultatives : PORT (défaut 8123), LOTO_FILE (chemin du fichier HTML), MAX_CLIENTS (défaut 300).
+ * Variables facultatives : PORT (défaut 8123), OPENLOTO_FILE (chemin du fichier HTML), MAX_CLIENTS (défaut 300).
  */
 
 const http = require('http');
@@ -35,20 +35,20 @@ const HOST = '0.0.0.0';
 const KEY = crypto.randomBytes(18).toString('hex');                 /* nouvelle clé à chaque lancement */
 const DIR = process.pkg ? path.dirname(process.execPath) : __dirname;   /* dossier de l'exécutable */
 function findHtml() {
-  if (process.env.LOTO_FILE) return process.env.LOTO_FILE;
-  /* le fichier « Loto….html » le plus récent, dans le dossier du serveur, sinon dans le dossier parent */
-  for (const dir of [DIR, path.dirname(DIR)]) {
+  const env = process.env.OPENLOTO_FILE || process.env.LOTO_FILE; if (env) return env;
+  /* le fichier « OpenLoto….html » (ou ancien nom « Loto….html ») le plus récent : dossier du serveur, sinon dossier parent, sinon le niveau au-dessus */
+  for (const dir of [DIR, path.dirname(DIR), path.dirname(path.dirname(DIR))]) {
     let best = null, bestT = 0;
     try {
       for (const f of fs.readdirSync(dir)) {
-        if (!/^loto.*\.html?$/i.test(f)) continue;
+        if (!/^(open)?loto.*\.html?$/i.test(f) || /saisie/i.test(f)) continue;
         const t = fs.statSync(path.join(dir, f)).mtimeMs;
         if (t > bestT) { bestT = t; best = path.join(dir, f); }
       }
     } catch (e) {}
     if (best) return best;
   }
-  return path.join(DIR, 'Loto.html');
+  return path.join(DIR, 'OpenLoto.html');
 }
 const FILE = findHtml();
 /* Adresses de ce PC sur le réseau local (wifi, câble) */
@@ -307,8 +307,8 @@ function banner() {
   L.push('     OpenLoto  -  serveur local pour les téléphones');
   L.push('  ==========================================================');
   L.push('');
-  L.push('  Fichier diffusé : ' + (htmlRaw ? path.basename(FILE) + (path.dirname(FILE) !== DIR ? '  (dossier parent)' : '') : 'INTROUVABLE'));
-  if (!htmlRaw) L.push('  -> Placez Loto.html dans le même dossier que ce programme (ou le dossier parent), puis relancez-le.');
+  L.push('  Fichier diffusé : ' + (htmlRaw ? path.basename(FILE) + (path.dirname(FILE) !== DIR ? '  (' + path.dirname(FILE) + ')' : '') : 'INTROUVABLE'));
+  if (!htmlRaw) L.push('  -> Placez OpenLoto.html dans le même dossier que ce programme (ou un ou deux niveaux au-dessus), puis relancez-le.');
   L.push('');
   if (!main.length) {
     L.push('  Aucun réseau détecté : connectez ce PC au wifi de la salle, puis relancez.');
