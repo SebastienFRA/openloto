@@ -38,7 +38,7 @@ OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'
 - Vérification par le code du carton : gagnant, non gagnant ou combinaison complète **avant** la dernière boule (annonce en retard).
 - Départage : mise en attente de plusieurs gagnants, choix du gagnant retenu, lot supplémentaire.
 - Pendant le contrôle, l'écran public affiche la grille et le carton vérifié.
-- Base de cartons importable et modifiable (testé avec plus de 5 000 cartons).
+- Base de cartons importable et modifiable (testé avec plus de 5 000 cartons), avec contrôle des plaques (voir plus bas).
 
 ![Contrôle d'un carton gagnant](docs/captures/controle-carton.png)
 
@@ -47,6 +47,7 @@ OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'
 - Les cases avancent toutes seules ; un aperçu du carton réel (une colonne par dizaine) permet de comparer d'un coup d'œil avec le carton papier.
 - Contrôles à la saisie : numéros de 1 à 90, pas de doublon, un seul numéro par dizaine sur une ligne, numéro de carton unique, carton identique à un autre signalé.
 - Mode plaque : numéros de carton consécutifs remplis automatiquement et vérification que chaque numéro de 1 à 90 apparaît une seule fois sur la plaque.
+- **Vérification des plaques** : retrouve les plaques de 6 cartons consécutifs et signale les erreurs de saisie probables, avec la correction suggérée (voir plus bas).
 - Recherche, modification, suppression (avec annulation), import d'un fichier déjà exporté pour reprendre ou fusionner une saisie.
 - Export en `.txt`, à importer dans OpenLoto : **Configuration → Cartons → Importer**.
 
@@ -78,6 +79,27 @@ Pratique pour répartir la saisie entre plusieurs bénévoles : chacun saisit un
 
 ### Simulation
 - Mode simulation pour répéter un loto : nombre de cartons en jeu, vitesse, erreurs de joueurs, durée réelle estimée.
+
+---
+
+## Vérification des plaques et fournisseurs de cartons
+
+Chez certains fournisseurs, les cartons sont imprimés par **plaques de 6 cartons aux numéros consécutifs** (par exemple 106282 à 106287) qui, ensemble, contiennent **chaque numéro de 1 à 90 exactement une fois**. Même vendus à l'unité, ces cartons gardent cette propriété.
+
+OpenLoto s'en sert pour repérer les erreurs de saisie, sans rien deviner :
+- les plaques complètes et correctes sont validées ;
+- dans une plaque où un numéro apparaît deux fois et un autre manque, la faute de frappe est presque certaine : le contrôle indique sur quel(s) carton(s) elle se trouve et par quel numéro la corriger ;
+- pour les plaques dont tous les cartons n'ont pas été saisis, un numéro présent sur deux cartons de la même plaque est aussi signalé.
+
+Le contrôle se lance depuis l'outil de saisie (**Vérifier les plaques**) ou dans OpenLoto (**Configuration → Cartons → Contrôler les plaques**). Sur 2 300 cartons réels, il a retrouvé 205 plaques et signalé 11 erreurs de saisie en moins d'une seconde.
+
+**Fournisseurs dont les cartons suivent cette logique :**
+
+| Fournisseur | Plaques de 6 cartons consécutifs couvrant 1 à 90 |
+|---|---|
+| Lotoquine | ✓ constaté |
+
+Vous utilisez des cartons d'un autre fournisseur ? Dites-nous, via l'onglet **Issues** du dépôt, si leurs plaques suivent la même règle (ou une autre) : nous compléterons ce tableau.
 
 ---
 
