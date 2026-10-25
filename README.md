@@ -4,6 +4,8 @@
 
 OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'organisateur saisit les boules, contrôle les cartons des gagnants et fait défiler les lots. Le tirage s'affiche sur un écran public (vidéoprojecteur, télé) et, si vous le souhaitez, sur les téléphones des joueurs grâce à un petit serveur sur Raspberry Pi.
 
+![Le direct : saisie des boules, grille, déroulé du loto](docs/captures/direct.png)
+
 ---
 
 ## Fonctionnalités
@@ -16,6 +18,8 @@ OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'
 - Écran maintenu allumé pendant le loto, confirmation avant de fermer la page.
 - Thème clair ou sombre.
 
+![Le direct en thème sombre](docs/captures/theme-sombre.png)
+
 ### Le déroulé du loto
 - Étapes successives : lots, entractes (avec durée) et annonces.
 - Conditions de victoire :
@@ -27,6 +31,8 @@ OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'
 - Couleurs de cartons par lot, nouvelle partie (boules remises à zéro), note affichée pendant le jeu.
 - Avertissement en rouge quand on revient en arrière ou qu'on saute des étapes.
 
+![Configuration du déroulé : lots, conditions de victoire, entracte](docs/captures/configuration.png)
+
 ### Le contrôle des cartons
 - Fenêtre de contrôle (F3) qui met le tirage en pause.
 - Vérification par le code du carton : gagnant, non gagnant ou combinaison complète **avant** la dernière boule (annonce en retard).
@@ -34,16 +40,24 @@ OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'
 - Pendant le contrôle, l'écran public affiche la grille et le carton vérifié.
 - Base de cartons importable et modifiable (testé avec plus de 5 000 cartons).
 
+![Contrôle d'un carton gagnant](docs/captures/controle-carton.png)
+
 ### L'écran public
 - Fenêtre séparée à placer sur un second écran, ou aperçu dans la page de l'organisateur.
 - Titre et logo de l'association (logo allégé automatiquement), lot en cours et condition.
 - Animation de chaque nouvelle boule (désactivable), message d'accueil et de fin, mode démo.
+
+![Écran public pendant le tirage](docs/captures/ecran-public.png)
+
+![Écran public pendant le contrôle d'un carton](docs/captures/ecran-public-controle.png)
 
 ### Sur les téléphones (option Raspberry Pi)
 - Les joueurs suivent le tirage sur leur téléphone via un lien, sans application.
 - Grille complète ou dernières boules, plein écran, écran maintenu allumé.
 - Nombre de téléphones connectés affiché chez l'organisateur, avec reconnexion automatique.
 - Données légères : environ 0,6 Mo par heure et par téléphone.
+
+![Suivi du tirage sur les téléphones des joueurs](docs/captures/telephones.jpg)
 
 ### Après le loto
 - Journal complet de la soirée (boules, gagnants, départages, pic de téléphones connectés).
@@ -137,11 +151,14 @@ OpenLoto/
 │   ├── loto-server.js         Serveur de diffusion (Node.js, sans dépendance)
 │   ├── loto.service           Service systemd
 │   └── loto.env.example       Modèle du fichier de clé
+├── docs/captures/             Captures d'écran du README
 ├── LICENSE
 └── README.md
 ```
 
 ---
+
+> Les captures d'écran montrent un loto fictif (lots, cartons et association inventés).
 
 ## Note sur le développement
 
