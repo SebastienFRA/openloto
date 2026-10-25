@@ -42,6 +42,18 @@ OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'
 
 ![Contrôle d'un carton gagnant](docs/captures/controle-carton.png)
 
+### La saisie des cartons
+- Un outil à part, `outils/saisie-cartons.html`, pour enregistrer vos cartons un par un, au clavier ou à la voix (Chrome et Edge).
+- Les cases avancent toutes seules ; un aperçu du carton réel (une colonne par dizaine) permet de comparer d'un coup d'œil avec le carton papier.
+- Contrôles à la saisie : numéros de 1 à 90, pas de doublon, un seul numéro par dizaine sur une ligne, numéro de carton unique, carton identique à un autre signalé.
+- Mode plaque : numéros de carton consécutifs remplis automatiquement et vérification que chaque numéro de 1 à 90 apparaît une seule fois sur la plaque.
+- Recherche, modification, suppression (avec annulation), import d'un fichier déjà exporté pour reprendre ou fusionner une saisie.
+- Export en `.txt`, à importer dans OpenLoto : **Configuration → Cartons → Importer**.
+
+Pratique pour répartir la saisie entre plusieurs bénévoles : chacun saisit une partie des cartons sur son ordinateur, puis les fichiers exportés sont importés ensemble dans OpenLoto.
+
+![Saisie des cartons avec aperçu du carton réel](docs/captures/saisie-cartons.png)
+
 ### L'écran public
 - Fenêtre séparée à placer sur un second écran, ou aperçu dans la page de l'organisateur.
 - Titre et logo de l'association (logo allégé automatiquement), lot en cours et condition.
@@ -147,6 +159,8 @@ Cliquez sur **Tester la connexion**. Le lien affiché est celui à communiquer a
 ```
 OpenLoto/
 ├── Loto.html                  Le programme (organisateur + écran public)
+├── outils/
+│   └── saisie-cartons.html    Saisie des cartons (export .txt pour OpenLoto)
 ├── raspberry/
 │   ├── loto-server.js         Serveur de diffusion (Node.js, sans dépendance)
 │   ├── loto.service           Service systemd
