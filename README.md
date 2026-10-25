@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/logo/openloto-logo-blanc.svg">
+    <img src="docs/logo/openloto-logo.svg" alt="OpenLoto" width="420">
+  </picture>
+</p>
+
 # OpenLoto
 
 **Gestionnaire de loto pour associations : tirage en direct, contrôle des cartons et écran public, dans un seul fichier HTML.**
@@ -188,6 +195,7 @@ OpenLoto/
 │   ├── loto.service           Service systemd
 │   └── loto.env.example       Modèle du fichier de clé
 ├── docs/captures/             Captures d'écran du README
+├── docs/logo/                 Logo (SVG, PNG) et image de présentation GitHub
 ├── LICENSE
 └── README.md
 ```
