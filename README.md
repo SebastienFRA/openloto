@@ -17,11 +17,18 @@ OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'
 
 ## Fonctionnalités
 
+### Accueil et visite guidée
+- À la première ouverture, une page d'accueil présente OpenLoto ; elle se rouvre à tout moment avec le bouton **?** du bandeau.
+- **Visite guidée interactive** (environ 4 minutes) : la configuration, puis le direct (démarrer le loto, saisir les boules, contrôler un carton, valider un gagnant, passer au lot suivant, journal).
+- La visite se déroule sur un **loto de démonstration** : votre configuration et votre direct sont mis de côté puis remis tels quels à la fin, même si la page est fermée en cours de route. Rien n'est envoyé aux téléphones ; l'écran public affiche un bandeau « DÉMONSTRATION ».
+
 ### Le direct
 - Saisie des boules au clavier ou tirage aléatoire, avec annulation de la dernière boule.
 - Grille des numéros sortis, 5 dernières boules, ordre de sortie.
 - Annonce vocale des boules (voix du système), avec une phrase personnalisable (`le {n}`, `{n}… {chiffres}`…) et une répétition automatique.
 - Raccourcis clavier configurables (par défaut : F2 saisie, F3 contrôle, F4 valider, F6 répéter, F8 tirage aléatoire, F9 étape suivante, Ctrl+Z annuler).
+- Sous le lot en cours, au choix : l'**aperçu de l'écran public** (ce que voit la salle) ou **« Ça chauffe ! »** : combien de cartons de la base sont à 1, 2 ou 3 numéros de la condition du lot, et les numéros les plus attendus (visible seulement par l'organisateur ; les cartons gagnants non réclamés sont mis de côté pour le lot en cours).
+- Horloge et durée écoulée depuis le démarrage du loto (en tête de la colonne de droite, ou dans le bloc des boules quand la colonne est rangée).
 - Écran maintenu allumé pendant le loto, confirmation avant de fermer la page.
 - Thème clair ou sombre.
 
@@ -115,7 +122,7 @@ Vous utilisez des cartons d'un autre fournisseur ? Dites-nous, via l'onglet **Is
 ## Démarrage rapide (sans serveur)
 
 1. Téléchargez `OpenLoto.html`.
-2. Ouvrez-le avec un navigateur récent (Chrome, Edge ou Firefox).
+2. Ouvrez-le avec un navigateur récent (Chrome, Edge ou Firefox). La page d'accueil propose une visite guidée pour découvrir le programme.
 3. Dans l'onglet **Configuration**, renseignez le titre, le logo, le déroulé et vos cartons.
 4. Cliquez sur **Charger dans le direct**, ouvrez l'écran public et lancez le loto.
 
