@@ -669,8 +669,25 @@ body.public .top,body.public main{display:none}
 }
 /* ===== v3 : contrôle des cartons, aperçu public, colonne repliable ===== */
 .lot-card{display:flex;flex-direction:column}
-.lot-foot{margin-top:auto;padding-top:10px;display:flex;justify-content:flex-end}
-.lot-foot .btn{font-size:.88rem}
+/* sous le lot : aperçu de l'écran public ou « Ça chauffe ! » */
+.lot-extra{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.lot-extra.tight{visibility:hidden}
+.lx-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.lx-sub{margin-left:auto;text-align:right}
+.lx-body{flex:1 1 0;min-height:0;display:flex;flex-direction:column}
+.lx-body .pub-preview{min-height:0}
+.heat{overflow:auto;scrollbar-width:thin}
+.heat-row{display:grid;grid-template-columns:minmax(120px,auto) 1fr 52px;gap:10px;align-items:center;margin:6px 0;font-size:.92rem}
+.heat-bar{height:14px;border-radius:7px;background:var(--line);overflow:hidden}
+.heat-bar span{display:block;height:100%;border-radius:7px;min-width:2px;transition:width .3s}
+.heat-row b{text-align:right;font-family:var(--num)}
+.heat-row.win{color:var(--ok);font-weight:700}
+.heat-top{display:flex;gap:10px 12px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:.88rem;color:var(--muted)}
+.heat-top .ball{position:relative;width:34px;height:34px;font-size:.95rem}
+.heat-top .ball small{position:absolute;right:-7px;top:-7px;background:var(--card);color:var(--ink);border-radius:9px;font:700 .66rem/1 var(--body);padding:2px 5px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.heat-note{font-size:.78rem;color:var(--muted);margin-top:8px}
+.heat-empty{color:var(--muted);font-size:.92rem;padding:6px 0}
+@media(max-width:1000px){.lot-extra{flex:0 0 auto}.lx-body .pub-preview{flex:0 0 auto;aspect-ratio:16/9}.lot-extra.tight{visibility:visible}}
 .ctl-open{display:flex;align-items:center;justify-content:center;gap:10px;flex:0 0 auto;padding:16px 12px;font-size:1.15rem}
 .ctl-open kbd,.ctl-foot kbd{font:600 .78rem var(--body);background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.4);border-radius:5px;padding:1px 6px}
 .ctl{position:fixed;inset:0;z-index:95;background:rgba(20,33,61,.55);display:grid;place-items:center}
@@ -955,7 +972,8 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
 .pc-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
 /* ===== v21 : logo OpenLoto à gauche du bandeau ===== */
 .top .ol-mark{height:34px;width:34px;flex:0 0 auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
-.top .ol-mark + #appLogo:not([hidden]){margin-left:2px;padding-left:2px}
+.top .ol-ver{flex:0 0 auto;font:700 .72rem/1 var(--body);background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 8px;letter-spacing:.03em;color:#fff;white-space:nowrap}
+.top .ol-ver + #appLogo:not([hidden]){margin-left:2px;padding-left:2px}
 /* ===== v23 : serveur local (même wifi) et QR code du lien joueurs ===== */
 .net-local{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:10px;background:var(--teal-soft)}
 .net-local .btn{align-self:flex-start}
@@ -982,7 +1000,7 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
 <body>
 
 <header class="top">
-  <div class="brand"><img class="ol-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjU0IDU0IDQwNCA0MDQiPjx0aXRsZT5PcGVuTG90bzwvdGl0bGU+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJvbC1iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzE0NzM3YiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBiNGE1MCIvPjwvbGluZWFyR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1hbWIiIGN4PSIzNiUiIGN5PSIzMCUiIHI9Ijc1JSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZkOThhIi8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iI2Y1YTMwMCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2I4NmEwMCIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nMCIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmMDkyOGYiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iI2U1MzkzNSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzk0MjUyMiIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nMiIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmY2JmNzIiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iI2ZiOGMwMCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2EzNWIwMCIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nMyIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZGU5OGYiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iI2ZkZDgzNSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E0OGMyMiIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nNCIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNjOGUyYWEiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzljY2M2NSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzY1ODQ0MSIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nNSIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4Y2M5OWIiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzJlOWQ0YSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFkNjYzMCIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nNiIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM3ZWNkZDciLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzE2YTViOCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBlNmI3NyIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nNyIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4OWQ2ZmEiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzI5YjZmNiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFhNzY5ZiIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nOCIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4Y2I4ZTgiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzJmN2ZkNiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFlNTI4YiIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nOSIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNhNWFkZGMiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzVjNmJjMCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzNiNDU3YyIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nMTAiIGN4PSIzNiUiIGN5PSIzMCUiIHI9Ijc1JSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjYzA5OGQxIi8+PHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiM4ZTQ0YWQiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM1YzJjNzAiLz48L3JhZGlhbEdyYWRpZW50PjxyYWRpYWxHcmFkaWVudCBpZD0ib2wtZzExIiBjeD0iMzYlIiBjeT0iMzAlIiByPSI3NSUiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2U4OGVhZSIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjZDYzMzZjIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjOGIyMTQ2Ii8+PC9yYWRpYWxHcmFkaWVudD48L2RlZnM+PGNpcmNsZSBjeD0iMjU2LjAiIGN5PSI5OC4wIiByPSIzNiIgZmlsbD0idXJsKCNvbC1nMCkiLz48ZWxsaXBzZSBjeD0iMjQ0LjEiIGN5PSI4MS44IiByeD0iMTMuNyIgcnk9IjcuMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjM1IiB0cmFuc2Zvcm09InJvdGF0ZSgtMzAgMjQ0LjEgODEuOCkiLz48Y2lyY2xlIGN4PSIzOTIuOCIgY3k9IjE3Ny4wIiByPSIzNiIgZmlsbD0idXJsKCNvbC1nMikiLz48ZWxsaXBzZSBjeD0iMzgxLjAiIGN5PSIxNjAuOCIgcng9IjEzLjciIHJ5PSI3LjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4zNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTMwIDM4MS4wIDE2MC44KSIvPjxjaXJjbGUgY3g9IjQxNC4wIiBjeT0iMjU2LjAiIHI9IjM2IiBmaWxsPSJ1cmwoI29sLWczKSIvPjxlbGxpcHNlIGN4PSI0MDIuMSIgY3k9IjIzOS44IiByeD0iMTMuNyIgcnk9IjcuMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjM1IiB0cmFuc2Zvcm09InJvdGF0ZSgtMzAgNDAyLjEgMjM5LjgpIi8+PGNpcmNsZSBjeD0iMzkyLjgiIGN5PSIzMzUuMCIgcj0iMzYiIGZpbGw9InVybCgjb2wtZzQpIi8+PGVsbGlwc2UgY3g9IjM4MS4wIiBjeT0iMzE4LjgiIHJ4PSIxMy43IiByeT0iNy4yIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuMzUiIHRyYW5zZm9ybT0icm90YXRlKC0zMCAzODEuMCAzMTguOCkiLz48Y2lyY2xlIGN4PSIzMzUuMCIgY3k9IjM5Mi44IiByPSIzNiIgZmlsbD0idXJsKCNvbC1nNSkiLz48ZWxsaXBzZSBjeD0iMzIzLjEiIGN5PSIzNzYuNiIgcng9IjEzLjciIHJ5PSI3LjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4zNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTMwIDMyMy4xIDM3Ni42KSIvPjxjaXJjbGUgY3g9IjI1Ni4wIiBjeT0iNDE0LjAiIHI9IjM2IiBmaWxsPSJ1cmwoI29sLWc2KSIvPjxlbGxpcHNlIGN4PSIyNDQuMSIgY3k9IjM5Ny44IiByeD0iMTMuNyIgcnk9IjcuMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjM1IiB0cmFuc2Zvcm09InJvdGF0ZSgtMzAgMjQ0LjEgMzk3LjgpIi8+PGNpcmNsZSBjeD0iMTc3LjAiIGN5PSIzOTIuOCIgcj0iMzYiIGZpbGw9InVybCgjb2wtZzcpIi8+PGVsbGlwc2UgY3g9IjE2NS4xIiBjeT0iMzc2LjYiIHJ4PSIxMy43IiByeT0iNy4yIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuMzUiIHRyYW5zZm9ybT0icm90YXRlKC0zMCAxNjUuMSAzNzYuNikiLz48Y2lyY2xlIGN4PSIxMTkuMiIgY3k9IjMzNS4wIiByPSIzNiIgZmlsbD0idXJsKCNvbC1nOCkiLz48ZWxsaXBzZSBjeD0iMTA3LjMiIGN5PSIzMTguOCIgcng9IjEzLjciIHJ5PSI3LjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4zNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTMwIDEwNy4zIDMxOC44KSIvPjxjaXJjbGUgY3g9Ijk4LjAiIGN5PSIyNTYuMCIgcj0iMzYiIGZpbGw9InVybCgjb2wtZzkpIi8+PGVsbGlwc2UgY3g9Ijg2LjEiIGN5PSIyMzkuOCIgcng9IjEzLjciIHJ5PSI3LjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4zNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTMwIDg2LjEgMjM5LjgpIi8+PGNpcmNsZSBjeD0iMTE5LjIiIGN5PSIxNzcuMCIgcj0iMzYiIGZpbGw9InVybCgjb2wtZzEwKSIvPjxlbGxpcHNlIGN4PSIxMDcuMyIgY3k9IjE2MC44IiByeD0iMTMuNyIgcnk9IjcuMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjM1IiB0cmFuc2Zvcm09InJvdGF0ZSgtMzAgMTA3LjMgMTYwLjgpIi8+PGNpcmNsZSBjeD0iMTc3LjAiIGN5PSIxMTkuMiIgcj0iMzYiIGZpbGw9InVybCgjb2wtZzExKSIvPjxlbGxpcHNlIGN4PSIxNjUuMSIgY3k9IjEwMy4wIiByeD0iMTMuNyIgcnk9IjcuMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjM1IiB0cmFuc2Zvcm09InJvdGF0ZSgtMzAgMTY1LjEgMTAzLjApIi8+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSI5NiIgZmlsbD0idXJsKCNvbC1hbWIpIi8+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSI1NS43IiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTIzMC4wODQgMjc2LjI0VjI2NC4wOTZMMjU3Ljg5MiAyMjQuMzJIMjc0LjdWMjYzLjIxNkgyODEuOTE2VjI3Ni4yNEgyNzQuN1YyODcuNjhIMjU5LjY1MlYyNzYuMjRaTTI2MC43MDc5OTk5OTk5OTk5NyAyNDAuODY0IDI0NS45MjM5OTk5OTk5OTk5OCAyNjMuMjE2SDI2MC43MDc5OTk5OTk5OTk5N1oiIGZpbGw9IiMwZjVjNjMiLz48ZWxsaXBzZSBjeD0iMjIxLjQiIGN5PSIxOTYuNSIgcng9IjMxLjciIHJ5PSIxNi4zIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuMzUiIHRyYW5zZm9ybT0icm90YXRlKC0zMCAyMjEuNCAxOTYuNSkiLz48L3N2Zz4=" alt="OpenLoto" title="OpenLoto"><img id="appLogo" alt="" hidden><h1 id="appTitle">OpenLoto</h1></div>
+  <div class="brand"><img class="ol-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjU0IDU0IDQwNCA0MDQiPjx0aXRsZT5PcGVuTG90bzwvdGl0bGU+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJvbC1iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzE0NzM3YiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBiNGE1MCIvPjwvbGluZWFyR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1hbWIiIGN4PSIzNiUiIGN5PSIzMCUiIHI9Ijc1JSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZkOThhIi8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iI2Y1YTMwMCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2I4NmEwMCIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nMCIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmMDkyOGYiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iI2U1MzkzNSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzk0MjUyMiIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nMiIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmY2JmNzIiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iI2ZiOGMwMCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2EzNWIwMCIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nMyIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZGU5OGYiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iI2ZkZDgzNSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E0OGMyMiIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nNCIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNjOGUyYWEiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzljY2M2NSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzY1ODQ0MSIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nNSIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4Y2M5OWIiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzJlOWQ0YSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFkNjYzMCIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nNiIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM3ZWNkZDciLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzE2YTViOCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBlNmI3NyIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nNyIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4OWQ2ZmEiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzI5YjZmNiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFhNzY5ZiIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nOCIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4Y2I4ZTgiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzJmN2ZkNiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFlNTI4YiIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nOSIgY3g9IjM2JSIgY3k9IjMwJSIgcj0iNzUlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNhNWFkZGMiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzVjNmJjMCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzNiNDU3YyIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJvbC1nMTAiIGN4PSIzNiUiIGN5PSIzMCUiIHI9Ijc1JSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjYzA5OGQxIi8+PHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiM4ZTQ0YWQiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM1YzJjNzAiLz48L3JhZGlhbEdyYWRpZW50PjxyYWRpYWxHcmFkaWVudCBpZD0ib2wtZzExIiBjeD0iMzYlIiBjeT0iMzAlIiByPSI3NSUiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2U4OGVhZSIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjZDYzMzZjIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjOGIyMTQ2Ii8+PC9yYWRpYWxHcmFkaWVudD48L2RlZnM+PGNpcmNsZSBjeD0iMjU2LjAiIGN5PSI5OC4wIiByPSIzNiIgZmlsbD0idXJsKCNvbC1nMCkiLz48ZWxsaXBzZSBjeD0iMjQ0LjEiIGN5PSI4MS44IiByeD0iMTMuNyIgcnk9IjcuMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjM1IiB0cmFuc2Zvcm09InJvdGF0ZSgtMzAgMjQ0LjEgODEuOCkiLz48Y2lyY2xlIGN4PSIzOTIuOCIgY3k9IjE3Ny4wIiByPSIzNiIgZmlsbD0idXJsKCNvbC1nMikiLz48ZWxsaXBzZSBjeD0iMzgxLjAiIGN5PSIxNjAuOCIgcng9IjEzLjciIHJ5PSI3LjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4zNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTMwIDM4MS4wIDE2MC44KSIvPjxjaXJjbGUgY3g9IjQxNC4wIiBjeT0iMjU2LjAiIHI9IjM2IiBmaWxsPSJ1cmwoI29sLWczKSIvPjxlbGxpcHNlIGN4PSI0MDIuMSIgY3k9IjIzOS44IiByeD0iMTMuNyIgcnk9IjcuMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjM1IiB0cmFuc2Zvcm09InJvdGF0ZSgtMzAgNDAyLjEgMjM5LjgpIi8+PGNpcmNsZSBjeD0iMzkyLjgiIGN5PSIzMzUuMCIgcj0iMzYiIGZpbGw9InVybCgjb2wtZzQpIi8+PGVsbGlwc2UgY3g9IjM4MS4wIiBjeT0iMzE4LjgiIHJ4PSIxMy43IiByeT0iNy4yIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuMzUiIHRyYW5zZm9ybT0icm90YXRlKC0zMCAzODEuMCAzMTguOCkiLz48Y2lyY2xlIGN4PSIzMzUuMCIgY3k9IjM5Mi44IiByPSIzNiIgZmlsbD0idXJsKCNvbC1nNSkiLz48ZWxsaXBzZSBjeD0iMzIzLjEiIGN5PSIzNzYuNiIgcng9IjEzLjciIHJ5PSI3LjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4zNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTMwIDMyMy4xIDM3Ni42KSIvPjxjaXJjbGUgY3g9IjI1Ni4wIiBjeT0iNDE0LjAiIHI9IjM2IiBmaWxsPSJ1cmwoI29sLWc2KSIvPjxlbGxpcHNlIGN4PSIyNDQuMSIgY3k9IjM5Ny44IiByeD0iMTMuNyIgcnk9IjcuMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjM1IiB0cmFuc2Zvcm09InJvdGF0ZSgtMzAgMjQ0LjEgMzk3LjgpIi8+PGNpcmNsZSBjeD0iMTc3LjAiIGN5PSIzOTIuOCIgcj0iMzYiIGZpbGw9InVybCgjb2wtZzcpIi8+PGVsbGlwc2UgY3g9IjE2NS4xIiBjeT0iMzc2LjYiIHJ4PSIxMy43IiByeT0iNy4yIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuMzUiIHRyYW5zZm9ybT0icm90YXRlKC0zMCAxNjUuMSAzNzYuNikiLz48Y2lyY2xlIGN4PSIxMTkuMiIgY3k9IjMzNS4wIiByPSIzNiIgZmlsbD0idXJsKCNvbC1nOCkiLz48ZWxsaXBzZSBjeD0iMTA3LjMiIGN5PSIzMTguOCIgcng9IjEzLjciIHJ5PSI3LjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4zNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTMwIDEwNy4zIDMxOC44KSIvPjxjaXJjbGUgY3g9Ijk4LjAiIGN5PSIyNTYuMCIgcj0iMzYiIGZpbGw9InVybCgjb2wtZzkpIi8+PGVsbGlwc2UgY3g9Ijg2LjEiIGN5PSIyMzkuOCIgcng9IjEzLjciIHJ5PSI3LjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4zNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTMwIDg2LjEgMjM5LjgpIi8+PGNpcmNsZSBjeD0iMTE5LjIiIGN5PSIxNzcuMCIgcj0iMzYiIGZpbGw9InVybCgjb2wtZzEwKSIvPjxlbGxpcHNlIGN4PSIxMDcuMyIgY3k9IjE2MC44IiByeD0iMTMuNyIgcnk9IjcuMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjM1IiB0cmFuc2Zvcm09InJvdGF0ZSgtMzAgMTA3LjMgMTYwLjgpIi8+PGNpcmNsZSBjeD0iMTc3LjAiIGN5PSIxMTkuMiIgcj0iMzYiIGZpbGw9InVybCgjb2wtZzExKSIvPjxlbGxpcHNlIGN4PSIxNjUuMSIgY3k9IjEwMy4wIiByeD0iMTMuNyIgcnk9IjcuMiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjM1IiB0cmFuc2Zvcm09InJvdGF0ZSgtMzAgMTY1LjEgMTAzLjApIi8+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSI5NiIgZmlsbD0idXJsKCNvbC1hbWIpIi8+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSI1NS43IiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTIzMC4wODQgMjc2LjI0VjI2NC4wOTZMMjU3Ljg5MiAyMjQuMzJIMjc0LjdWMjYzLjIxNkgyODEuOTE2VjI3Ni4yNEgyNzQuN1YyODcuNjhIMjU5LjY1MlYyNzYuMjRaTTI2MC43MDc5OTk5OTk5OTk5NyAyNDAuODY0IDI0NS45MjM5OTk5OTk5OTk5OCAyNjMuMjE2SDI2MC43MDc5OTk5OTk5OTk5N1oiIGZpbGw9IiMwZjVjNjMiLz48ZWxsaXBzZSBjeD0iMjIxLjQiIGN5PSIxOTYuNSIgcng9IjMxLjciIHJ5PSIxNi4zIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuMzUiIHRyYW5zZm9ybT0icm90YXRlKC0zMCAyMjEuNCAxOTYuNSkiLz48L3N2Zz4=" alt="OpenLoto" title="OpenLoto"><span class="ol-ver" title="Version d’OpenLoto">v1.0.0</span><img id="appLogo" alt="" hidden><h1 id="appTitle">OpenLoto</h1></div>
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" data-tab="direct" aria-selected="true">Direct</button>
     <button class="tab" role="tab" data-tab="config" aria-selected="false">Configuration</button>
@@ -1022,7 +1040,13 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
           <div id="winnersBox"></div>
         </div>
         <div class="next" id="nextInfo"></div>
-        <div class="lot-foot"><button class="btn sm" id="nextMini" data-act="next">Étape suivante →</button></div>
+        <div class="lot-extra" id="lotExtra">
+          <div class="lx-head"><span class="seg" role="group" aria-label="Affichage sous le lot"><button type="button" data-act="lotExtra" data-v="preview" title="Ce qu’affiche l’écran public, en miniature">Écran public</button><button type="button" data-act="lotExtra" data-v="heat" title="Combien de cartons sont proches du gain (visible seulement ici)">Ça chauffe !</button></span><span class="muted small lx-sub" id="lxSub"></span></div>
+          <div class="lx-body">
+            <div id="pubPreview" class="pub-preview" hidden><div class="pv-wrap" id="pvWrap"><iframe id="pvFrame" title="Aperçu de l’écran public" tabindex="-1"></iframe></div></div>
+            <div id="heatBox" class="heat" hidden></div>
+          </div>
+        </div>
       </div>
       <button class="scrollcue top" data-cue="up" hidden aria-label="Contenu au-dessus">▴</button>
       <button class="scrollcue bottom" data-cue="down" hidden aria-label="Contenu en dessous">▾</button>
@@ -1059,13 +1083,11 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
       <div>
         <div class="inline" style="justify-content:space-between;margin:4px 0 2px">
           <h3 style="margin:0;white-space:nowrap" title="Les 5 dernières boules sorties">Dernières boules</h3>
-          <span class="inline" style="gap:6px;margin-left:auto;flex-wrap:nowrap"><span class="seg" role="group" aria-label="Affichage sous les boules"><button type="button" data-act="boardView" data-v="grid" class="on">Grille</button><button type="button" data-act="boardView" data-v="preview" title="Aperçu de ce qu’affiche l’écran public">Aperçu public</button></span>
-          <button class="btn sm" data-act="showOrder">Ordre de sortie</button></span>
+          <span class="inline" style="gap:6px;margin-left:auto;flex-wrap:nowrap"><button class="btn sm" data-act="showOrder">Ordre de sortie</button></span>
         </div>
         <div id="history" class="history"></div>
       </div>
       <div id="board" class="board"></div>
-      <div id="pubPreview" class="pub-preview" hidden><div class="pv-wrap" id="pvWrap"><iframe id="pvFrame" title="Aperçu de l’écran public" tabindex="-1"></iframe></div></div>
     </div>
 
     <div class="colwrap" id="actWrap">
@@ -2242,8 +2264,10 @@ const TOUR_STEPS = [
     enter: () => setTimeout(() => { const i = $('#ballInput'); if (i && !i.disabled) i.focus(); }, 50), go: tourEnsureWin },
   { tab:'direct', sel:'.draw-input [data-act=undo]', k:'Le direct', t:'Corriger une erreur',
     p:'Une boule mal saisie ? « Annuler » retire la dernière boule sortie. Rien n’est perdu : chaque action est notée dans le journal.' },
-  { tab:'direct', sel:'#board:not([hidden]), #pubPreview:not([hidden])', k:'Le direct', t:'La grille',
-    p:'Les numéros sortis s’allument dans leur couleur ; les dernières boules sont juste au-dessus. « Aperçu public » montre exactement ce que voit la salle.' },
+  { tab:'direct', sel:'#board', k:'Le direct', t:'La grille',
+    p:'Les numéros sortis s’allument dans leur couleur ; les dernières boules sont juste au-dessus. « Ordre de sortie » les liste de la première à la dernière.' },
+  { tab:'direct', sel:'#lotExtra', k:'Le direct', t:'Sous le lot',
+    p:'Au choix : l’écran public en miniature, pour voir ce qu’affiche la salle, ou « Ça chauffe ! » : combien de cartons sont à 1, 2 ou 3 numéros du gain, et les numéros les plus attendus. Seul l’organisateur le voit.' },
   { tab:'direct', sel:'#midCol .ctl-open', click:true, k:'Contrôle d’un carton', t:'Un joueur crie « Quine ! »',
     p:'Ouvrez le contrôle des cartons (touche F3). Le tirage est mis en pause et l’écran public l’indique.',
     done: () => checkOpen, go: async () => { await tourEnsureWin(); openCheck(); } },
@@ -2700,7 +2724,6 @@ function renderDirect() {
   const nb = $('#nextBtn');
   nb.disabled = L.current >= D.steps.length - 1;
   nb.textContent = nb.disabled ? 'Dernière étape' : (isPause ? 'Fin de l’entracte' : 'Étape suivante');
-  { const nm = $('#nextMini'); nm.hidden = nb.disabled; nm.textContent = (isPause ? 'Fin de l’entracte' : 'Étape suivante') + ' →'; nm.title = POSTE.keys.next ? 'Raccourci : ' + keyLabel(POSTE.keys.next) : ''; }
   { const k = $('#ctlKey'); k.textContent = POSTE.keys.focusVerify ? keyLabel(POSTE.keys.focusVerify) : ''; k.hidden = !POSTE.keys.focusVerify; const ob = $('.ctl-open'); ob.disabled = isSpec; }
   updateMiniBar();
   if (checkOpen) { if (isSpec) closeCheckNow(); else { renderCheckLot(); renderPending(); } }
@@ -2728,6 +2751,7 @@ function renderDirect() {
   tickTempo();
 
   if (verifiedCode) runVerify(verifiedCode); else { verifiedView = null; $('#verifyResult').innerHTML = ''; }
+  renderHeat();
   fitDirect();
   updateScrollCues();
   sendPublic();
@@ -4816,7 +4840,7 @@ function normPoste(o) {
     keys,
     wake: o.wake !== false,
     confirmClose: o.confirmClose !== false,
-    boardView: o.boardView === 'preview' ? 'preview' : 'grid',
+    lotExtra: o.lotExtra === 'heat' ? 'heat' : 'preview',
     placeScreen: o.placeScreen !== false,
     rcolOff: o.rcolOff === true,
     theme: o.theme === 'dark' ? 'dark' : 'light'
@@ -5224,7 +5248,64 @@ async function closeCheck() {
 
 /* ---------- Aperçu de l'écran public dans le direct ---------- */
 const PV_W = 1600, PV_H = 900;
-let pvWin = null, pvObs = null;
+let pvWin = null, pvObs = null, lxObs = null;
+/* La zone sous le lot s'efface quand la place manque (petits écrans) */
+function lotExtraFit() {
+  const x = $('#lotExtra'); if (!x) return;
+  x.classList.toggle('tight', window.innerWidth > 1000 && x.clientHeight < 120);
+  if (!$('#pubPreview').hidden) pvFit();
+}
+/* « Ça chauffe ! » : cartons de la base proches du gain pour la condition de l'étape en cours.
+   Indicatif : toute la base est comptée, cartons vendus ou non. Visible seulement par l'organisateur. */
+let heatKey = '';
+function renderHeat(force) {
+  const box = $('#heatBox'); if (!box || POSTE.lotExtra !== 'heat' || !D || !D.steps.length) return;
+  const st = curStep(), L = D.live; if (!st) return;
+  const won = L.winners[st.id] || [];
+  const key = [L.current, st.type, L.draws.join(','), D.cartons.length, won.length].join('|');
+  if (!force && key === heatKey) return;
+  heatKey = key;
+  const sub = $('#lxSub');
+  if (isSpecial(st)) { sub.textContent = ''; box.innerHTML = `<div class="heat-empty">${st.type === 'pause' ? 'Entracte' : 'Annonce'} en cours : pas de tirage.</div>`; return; }
+  if (!D.cartons.length) { sub.textContent = ''; box.innerHTML = '<div class="heat-empty">Aucun carton dans la configuration chargée : « Ça chauffe ! » a besoin de la base de cartons.</div>'; return; }
+  const draws = L.draws, done = new Set(won.map(w => (w.code || '').toLowerCase())), zero = st.type === 'zero';
+  const cnt = [0, 0, 0, 0], near = [];
+  let missed = 0, pool = 0;   /* gagnants sur une boule précédente, pas réclamés : mis de côté pour ce lot (sans doute non vendus) */
+  for (const c of D.cartons) {
+    if (done.has(c.code.toLowerCase())) continue;
+    pool++;
+    const ev = evalCarton(c, st, draws);
+    if (zero) { const h = draws.length ? ev.hits.length : 0; if (h <= 3) cnt[h]++; continue; }
+    if (ev.status === 'early') { missed++; continue; }
+    const m = ev.status === 'ok' ? 0 : ev.missingMin;
+    if (m <= 3) cnt[m]++;
+    if (m === 1) near.push(c);
+  }
+  sub.textContent = zero ? 'loto inversé : cartons encore en jeu' : `cartons proches de « ${ruleTitle(st)} »`;
+  const rows = zero
+    ? [[0, 'aucun numéro sorti', 'var(--ok)'], [1, '1 numéro sorti', '#fdd835'], [2, '2 numéros sortis', '#fb8c00'], [3, '3 numéros sortis', '#e53935']]
+    : [[0, 'gagnants sur cette boule', 'var(--ok)'], [1, 'à 1 numéro', '#e53935'], [2, 'à 2 numéros', '#fb8c00'], [3, 'à 3 numéros', '#fdd835']];
+  /* jauge = part des cartons en jeu ; échelle « racine carrée » pour que les petites parts restent visibles
+     (0,1 % → 3 % de jauge, 1 % → 10 %, 25 % → 50 %, 100 % → pleine) */
+  let h = rows.filter(([k]) => k > 0 || cnt[0] > 0 || zero).map(([k, label, col]) => {
+    const p = pool ? cnt[k] / pool * 100 : 0, w = cnt[k] ? Math.max(3, Math.sqrt(p / 100) * 100) : 0;
+    return `<div class="heat-row${!zero && k === 0 ? ' win' : ''}" title="${cnt[k].toLocaleString('fr-FR')} carton${cnt[k] > 1 ? 's' : ''} sur ${pool.toLocaleString('fr-FR')}"><span>${label}</span><div class="heat-bar"><span style="width:${w}%;background:${col}"></span></div><b>${cnt[k].toLocaleString('fr-FR')}</b></div>`;
+  }).join('');
+  if (!zero && near.length) {
+    /* numéros qui feraient gagner le plus de cartons à la prochaine boule */
+    const by = new Map();
+    for (const c of near.slice(0, 3000)) for (const n of new Set(c.lines.flat())) {
+      if (draws.includes(n) || n > D.maxBall) continue;
+      if (evalCarton(c, st, draws.concat(n)).status === 'ok') by.set(n, (by.get(n) || 0) + 1);
+    }
+    const top = [...by.entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0]).slice(0, 6);
+    if (top.length) h += `<div class="heat-top">Numéros les plus attendus : ${top.map(([n, k]) => `<span class="ball" style="${ballStyle(D, n)}" title="Le ${n} ferait gagner ${k} carton${k > 1 ? 's' : ''}">${n}<small>${k}</small></span>`).join('')}</div>`;
+  }
+  if (!draws.length && !zero) h = '<div class="heat-empty">Aucune boule sortie pour l’instant : les cartons apparaîtront ici en approchant du gain.</div>';
+  if (missed) h += `<div class="heat-note">${missed.toLocaleString('fr-FR')} carton${missed > 1 ? 's' : ''} gagnant${missed > 1 ? 's' : ''} sur une boule précédente sans avoir été réclamé${missed > 1 ? 's' : ''} : mis de côté pour ce lot (sans doute non vendu${missed > 1 ? 's' : ''}). ${missed > 1 ? 'Ils restent' : 'Il reste'} contrôlable${missed > 1 ? 's' : ''} et ${missed > 1 ? 'reviennent' : 'revient'} dans le calcul aux lots suivants.</div>`;
+  h += `<div class="heat-note">Calculé sur les ${D.cartons.length.toLocaleString('fr-FR')} cartons de la base (vendus ou non)${done.size ? ', hors gagnants déjà validés' : ''}. Visible seulement par l’organisateur.</div>`;
+  box.innerHTML = h;
+}
 function pvFit() {
   const box = $('#pubPreview'), fr = $('#pvFrame'); if (!box || !fr || box.hidden) return;
   const r = box.getBoundingClientRect();
@@ -5232,11 +5313,14 @@ function pvFit() {
   fr.style.transform = `scale(${s})`;
   const wrap = $('#pvWrap'); wrap.style.width = PV_W * s + 'px'; wrap.style.height = PV_H * s + 'px';
 }
-function setBoardView(v) {
-  POSTE.boardView = v === 'preview' ? 'preview' : 'grid'; savePoste();
-  const pv = POSTE.boardView === 'preview';
-  $('#board').hidden = pv; $('#pubPreview').hidden = !pv;
-  $$('[data-act=boardView]').forEach(b => { b.classList.toggle('on', b.dataset.v === POSTE.boardView); b.setAttribute('aria-pressed', b.dataset.v === POSTE.boardView ? 'true' : 'false'); });
+function setLotExtra(v) {
+  POSTE.lotExtra = v === 'heat' ? 'heat' : 'preview'; savePoste();
+  const pv = POSTE.lotExtra === 'preview';
+  $('#pubPreview').hidden = !pv; $('#heatBox').hidden = pv;
+  $$('[data-act=lotExtra]').forEach(b => { b.classList.toggle('on', b.dataset.v === POSTE.lotExtra); b.setAttribute('aria-pressed', b.dataset.v === POSTE.lotExtra ? 'true' : 'false'); });
+  if (!lxObs && window.ResizeObserver) { lxObs = new ResizeObserver(lotExtraFit); lxObs.observe($('#lotExtra')); }
+  if (!pv) { $('#lxSub').textContent = ''; renderHeat(true); }
+  else $('#lxSub').textContent = 'ce que voit la salle';
   if (pv) {
     const fr = $('#pvFrame');
     if (!fr.getAttribute('src')) {
@@ -5756,7 +5840,7 @@ function bindEvents() {
       case 'simStop': simStop(); break;
       case 'openCheck': openCheck(); break;
       case 'closeCheck': closeCheck(); break;
-      case 'boardView': setBoardView(d.v); break;
+      case 'lotExtra': setLotExtra(d.v); break;
       case 'rcolToggle': setRcol(!POSTE.rcolOff); break;
       case 'testBip': unlockAudio(); playBip(true); break;
       case 'testNet': testNet(); break;
@@ -5972,7 +6056,7 @@ case 'rsOrient': runOrient = d.val === 'landscape' ? 'landscape' : 'portrait'; u
     e.preventDefault(); e.returnValue = '';
   });
   setInterval(netHeartbeat, 1000);
-  setRcol(POSTE.rcolOff); setBoardView(POSTE.boardView); applyTheme();
+  setRcol(POSTE.rcolOff); setLotExtra(POSTE.lotExtra); applyTheme();
   setTimeout(() => { if (welcomeDue() && $('#dlg').hidden) showWelcome(); }, 400);
   resetReveal();   /* au chargement, les boules déjà sorties sont toutes affichées (même avec un délai d'affichage) */
   window.addEventListener('resize', () => { if (!$('#pubPreview').hidden) pvFit(); });
