@@ -9,7 +9,9 @@
 
 **Gestionnaire de loto pour associations : tirage en direct, contrôle des cartons et écran public, dans un seul fichier HTML.**
 
-OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'organisateur saisit les boules, contrôle les cartons des gagnants et fait défiler les lots. Le tirage s'affiche sur un écran public (vidéoprojecteur, télé) et, si vous le souhaitez, sur les téléphones des joueurs grâce à un petit serveur sur Raspberry Pi.
+OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'organisateur saisit les boules, contrôle les cartons des gagnants et fait défiler les lots. Le tirage s'affiche sur un écran public (vidéoprojecteur, télé) et, si vous le souhaitez, sur les téléphones des joueurs grâce à un petit serveur : un Raspberry Pi, ou directement le PC de l'organisateur.
+
+> 💡 **Projet : un serveur OpenLoto gratuit**, pour diffuser sur les téléphones sans Raspberry ni installation. Il verra le jour si suffisamment de dons permettent de le faire fonctionner : [voir le projet et ses conditions](#projet--un-serveur-openloto-gratuit).
 
 ![Le direct : saisie des boules, grille, déroulé du loto](docs/captures/direct.png)
 
@@ -30,7 +32,7 @@ OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'
 - Sous le lot en cours, au choix : l'**aperçu de l'écran public** (ce que voit la salle) ou **« Ça chauffe ! »** : combien de cartons de la base sont à 1, 2 ou 3 numéros de la condition du lot, et les numéros les plus attendus (visible seulement par l'organisateur ; les cartons gagnants non réclamés sont mis de côté pour le lot en cours).
 - Horloge et durée écoulée depuis le démarrage du loto (en tête de la colonne de droite, ou dans le bloc des boules quand la colonne est rangée).
 - Écran maintenu allumé pendant le loto, confirmation avant de fermer la page.
-- Thème clair ou sombre.
+- Thème clair ou sombre, numéro de version affiché dans le bandeau.
 
 ![Le direct en thème sombre](docs/captures/theme-sombre.png)
 
@@ -71,7 +73,8 @@ Pratique pour répartir la saisie entre plusieurs bénévoles : chacun saisit un
 
 ### L'écran public
 - Fenêtre séparée à placer sur un second écran, ou aperçu dans la page de l'organisateur.
-- Titre et logo de l'association (logo allégé automatiquement), lot en cours et condition.
+- Titre et logo de l'association (logo allégé automatiquement) : à gauche, à droite, des deux côtés ou au-dessus du titre, toujours parfaitement centré. Lot en cours et condition.
+- Logo OpenLoto, au choix : petite signature discrète en bas de l'écran (par défaut), à côté du titre, les deux, ou aucun.
 - Animation de chaque nouvelle boule (désactivable), message d'accueil et de fin, mode démo.
 - **Photo du lot** (facultative, ajoutée dans l'étape) : affichée en grand à l'annonce du lot, elle s'efface dès la première boule tirée.
 - **Partenaires (sponsors)** : leurs logos s'affichent dans des encarts blancs en bas de l'écran, avant le démarrage et pendant les entractes (fixes jusqu'à 4, puis défilement par groupes de 4).
@@ -86,7 +89,7 @@ Pratique pour répartir la saisie entre plusieurs bénévoles : chacun saisit un
 - Les joueurs suivent le tirage sur leur téléphone via un lien, sans application.
 - Le lien s'obtient au choix par un **Raspberry Pi** (ou tout serveur Node.js) ou par le **serveur local** lancé sur le PC de l'organisateur, sur le wifi de la salle.
 - **QR code des joueurs** : affiche A4 à imprimer, image PNG, ou affichage à la demande par-dessus l'écran public (retiré automatiquement au démarrage du loto et à la boule suivante).
-- Grille complète ou dernières boules, plein écran, écran maintenu allumé.
+- Grille complète ou dernières boules (bouton « Grille / Boules »), plein écran avec une marge pour l'appareil photo intégré à l'écran, écran maintenu allumé.
 - Nombre de téléphones connectés affiché chez l'organisateur, avec reconnexion automatique.
 - Données légères : environ 0,6 Mo par heure et par téléphone.
 
@@ -136,14 +139,16 @@ Tout est enregistré dans le navigateur de l'ordinateur. Pensez à **exporter la
 
 ---
 
-## Diffusion sur les téléphones : deux solutions
+## Diffusion sur les téléphones : les solutions
 
-| | Raspberry Pi (ou serveur) | Serveur local sur le PC |
-|---|---|---|
-| Matériel | un Raspberry Pi ou un serveur Node.js | rien de plus que le PC de l'organisateur |
-| Connexion des joueurs | 4G/5G (ou wifi) via internet | **le même wifi** que le PC |
-| Adresse | stable (celle de votre box ou du serveur) | celle du PC sur le wifi, qui peut changer d'un loto à l'autre |
-| Dépend du wifi de la salle | non | **oui** (voir ci-dessous) |
+| | Raspberry Pi (ou serveur) | Serveur local sur le PC | Serveur OpenLoto *(projet)* |
+|---|---|---|---|
+| Matériel | un Raspberry Pi ou un serveur Node.js | rien de plus que le PC de l'organisateur | rien |
+| Installation | une fois, sur le Pi | aucune (un programme à lancer) | aucune |
+| Connexion des joueurs | 4G/5G (ou wifi) via internet | **le même wifi** que le PC | 4G/5G via internet |
+| Internet dans la salle | non (pour le PC) | non | **oui** pour le PC (un partage de connexion suffit) |
+| Dépend du wifi de la salle | non | **oui** (voir ci-dessous) | non |
+| Disponibilité | dès maintenant | dès maintenant | si les dons le permettent ([voir plus bas](#projet--un-serveur-openloto-gratuit)) |
 
 ## Serveur local (sans Raspberry)
 
@@ -222,6 +227,46 @@ Dans OpenLoto : **Réglages → Config réseau (téléphones)**.
 Cliquez sur **Tester la connexion**. Le lien à communiquer aux joueurs s'affiche avec son QR code : affiche à imprimer, image PNG, ou affichage sur l'écran public.
 
 > Pour que les joueurs se connectent depuis la 4G/5G plutôt que le wifi de la salle, le port 8123 doit être redirigé vers le Pi sur votre box. Ne publiez jamais votre clé de diffusion.
+
+---
+
+## Projet : un serveur OpenLoto gratuit
+
+Aujourd'hui, pour que les joueurs suivent le tirage sur leur téléphone, il faut un Raspberry Pi (ou un serveur), ou le serveur local sur le PC de l'organisateur avec un wifi qui couvre toute la salle. C'est souvent la partie la plus compliquée pour une association.
+
+**L'idée :** un serveur OpenLoto hébergé sur internet, mis gratuitement à la disposition des associations.
+
+### Comment ça marcherait
+
+1. Sur le site du projet, vous cliquez sur **« Créer une salle »**. **Aucun compte, aucune adresse e-mail** : vous obtenez simplement un code de diffusion.
+2. Vous collez ce code dans OpenLoto (**Réglages → Config réseau**).
+3. Les joueurs scannent le QR code et suivent le tirage sur leur téléphone, **avec leur propre connexion 4G/5G**.
+
+Plus besoin de Raspberry, de serveur ni du wifi de la salle. Le programme OpenLoto, lui, ne change pas : il reste un simple fichier HTML qui fonctionne sans internet ; seul l'envoi vers les téléphones passe par le serveur.
+
+### Les conditions envisagées
+
+- **Gratuit, sans publicité et sans compte.**
+- **Salles temporaires** : une salle est valable pour la durée d'un loto (par exemple 48 heures), puis elle est supprimée automatiquement avec tout son contenu.
+- **Données minimales** : le serveur ne reçoit que ce qui s'affiche sur les téléphones (titre et logo de l'association, lot en cours, boules sorties, carton contrôlé). Aucune donnée personnelle, aucun fichier de cartons, rien n'est conservé après la suppression de la salle.
+- **Internet nécessaire pour le PC de l'organisateur** : le partage de connexion d'un téléphone suffit, la diffusion consomme très peu.
+- **Service bénévole, sans garantie de disponibilité.** Si le serveur ne répond plus, le loto continue normalement : le direct et l'écran public de la salle ne dépendent pas d'internet, seuls les téléphones ne sont plus mis à jour.
+- **Usage raisonnable** : des limites pourront être fixées (nombre de salles simultanées par organisateur, durée) pour éviter les abus et garder le service ouvert à tous.
+- **Transparence** : les frais du serveur et les dons reçus seront publiés.
+- **Rien n'est imposé** : l'auto-hébergement (Raspberry Pi, serveur local) reste possible et documenté, et le code du serveur sera lui aussi libre.
+
+### Ce qu'il faut pour qu'il voie le jour
+
+Un serveur a un coût : la location du serveur, le nom de domaine, et le temps de maintenance (les lotos ont surtout lieu le samedi soir, il faut que tout tienne au même moment). **Le service ne sera ouvert que si suffisamment de dons permettent de le faire fonctionner dans la durée**, avec une réserve pour couvrir au moins une première année.
+
+Si le service ouvre puis que les dons ne suffisent plus à couvrir les frais, il pourra être arrêté, en prévenant à l'avance.
+
+### Vous êtes intéressé ?
+
+- **Faites-le savoir** dans l'onglet **Issues** du dépôt : nombre de lotos par an, nombre de joueurs, ce qui vous bloque aujourd'hui. C'est ce qui permettra d'évaluer les besoins.
+- **Soutenir le projet** : les liens pour faire un don seront ajoutés ici dès qu'ils seront en place.
+
+> Dans OpenLoto, un petit encart **« Diffuser sans Raspberry ? »** (colonne de droite du direct, et page de configuration) présente ce projet ; le bouton **« En savoir plus »** en donne le détail.
 
 ---
 
