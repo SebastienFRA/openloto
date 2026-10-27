@@ -255,7 +255,7 @@ Plus besoin de Raspberry, de serveur ni du wifi de la salle. Le programme OpenLo
 - **Transparence** : les frais du serveur et les dons reçus seront publiés.
 - **Rien n'est imposé** : l'auto-hébergement (Raspberry Pi, serveur local) reste possible et documenté, et le code du serveur sera lui aussi libre.
 
-### Ce qu'il faut pour qu'il voie le jour
+### Ce qu'il faut pour qu'il voit le jour
 
 Un serveur a un coût : la location du serveur, le nom de domaine, et le temps de maintenance (les lotos ont surtout lieu le samedi soir, il faut que tout tienne au même moment). **Le service ne sera ouvert que si suffisamment de dons permettent de le faire fonctionner dans la durée**, avec une réserve pour couvrir au moins une première année.
 
