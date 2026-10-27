@@ -1,0 +1,31 @@
+OpenLoto - serveur local pour Linux (PC 64 bits)
+================================================
+
+À quoi ça sert ?
+  Les joueurs suivent le tirage sur leur téléphone, sans Raspberry ni internet :
+  le PC de l'organisateur sert lui-même la page, sur le wifi de la salle.
+
+Utilisation
+  1. Connectez le PC au wifi de la salle (ou à votre propre routeur wifi).
+  2. Placez OpenLoto-serveur-linux-x64 (téléchargé depuis les Releases) dans ce dossier.
+  3. Dans un terminal ouvert dans ce dossier :
+         sh lancer-serveur-linux.sh
+     Sans OpenLoto-serveur-linux-x64, le script utilise Node.js s'il est installé
+     (par exemple : sudo apt install nodejs).
+     Si un pare-feu est actif (ufw…), il doit autoriser le port 8123 :
+         sudo ufw allow 8123/tcp
+  4. Ouvrez OpenLoto sur ce même PC :
+     Réglages > Config réseau (téléphones) > « Utiliser le serveur local de ce PC ».
+     Le lien à donner aux joueurs et son QR code s'affichent.
+  5. Laissez le terminal ouvert pendant tout le loto (Ctrl+C pour arrêter le serveur).
+
+Le serveur diffuse le fichier « OpenLoto….html » le plus récent, trouvé dans son dossier
+ou dans le dossier au-dessus (ici : le OpenLoto.html du dossier OpenLoto).
+
+Limites
+  - Le wifi doit permettre aux appareils de communiquer entre eux. Beaucoup de wifi
+    publics ou « invités » l'interdisent (isolation des clients) : dans ce cas, utilisez
+    votre propre routeur wifi (il fonctionne très bien sans internet).
+  - Sur un wifi sans internet, les téléphones affichent « Pas d'accès à internet » :
+    les joueurs doivent rester connectés à ce wifi.
+  - Le PC ne doit pas se mettre en veille.
