@@ -11,6 +11,8 @@
 
 OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'organisateur saisit les boules, contrôle les cartons des gagnants et fait défiler les lots. Le tirage s'affiche sur un écran public (vidéoprojecteur, télé) et, si vous le souhaitez, sur les téléphones des joueurs grâce à un petit serveur : un Raspberry Pi, ou directement le PC de l'organisateur.
 
+> ✉️ **Une question, une suggestion d'amélioration ?** Écrivez-moi à **[openloto@duck.com](mailto:openloto@duck.com)**, ou ouvrez une demande dans l'onglet **Issues** du dépôt. Tous les retours sont les bienvenus !
+
 > 💡 **Projet : un serveur OpenLoto gratuit**, pour diffuser sur les téléphones sans Raspberry ni installation. Il verra le jour si suffisamment de dons permettent de le faire fonctionner : [voir le projet et ses conditions](#projet--un-serveur-openloto-gratuit).
 
 ![Le direct : saisie des boules, grille, déroulé du loto](docs/captures/direct.png)
@@ -255,7 +257,7 @@ Plus besoin de Raspberry, de serveur ni du wifi de la salle. Le programme OpenLo
 - **Transparence** : les frais du serveur et les dons reçus seront publiés.
 - **Rien n'est imposé** : l'auto-hébergement (Raspberry Pi, serveur local) reste possible et documenté, et le code du serveur sera lui aussi libre.
 
-### Ce qu'il faut pour qu'il voit le jour
+### Ce qu'il faut pour qu'il voie le jour
 
 Un serveur a un coût : la location du serveur, le nom de domaine, et le temps de maintenance (les lotos ont surtout lieu le samedi soir, il faut que tout tienne au même moment). **Le service ne sera ouvert que si suffisamment de dons permettent de le faire fonctionner dans la durée**, avec une réserve pour couvrir au moins une première année.
 
@@ -263,7 +265,7 @@ Si le service ouvre puis que les dons ne suffisent plus à couvrir les frais, il
 
 ### Vous êtes intéressé ?
 
-- **Faites-le savoir** dans l'onglet **Issues** du dépôt : nombre de lotos par an, nombre de joueurs, ce qui vous bloque aujourd'hui. C'est ce qui permettra d'évaluer les besoins.
+- **Faites-le savoir** dans l'onglet **Issues** du dépôt, ou par e-mail à **[openloto@duck.com](mailto:openloto@duck.com)** : nombre de lotos par an, nombre de joueurs, ce qui vous bloque aujourd'hui. C'est ce qui permettra d'évaluer les besoins.
 - **Soutenir le projet** : les liens pour faire un don seront ajoutés ici dès qu'ils seront en place.
 
 > Dans OpenLoto, un petit encart **« Diffuser sans Raspberry ? »** (colonne de droite du direct, et page de configuration) présente ce projet ; le bouton **« En savoir plus »** en donne le détail.
@@ -299,6 +301,11 @@ OpenLoto/
 ---
 
 > Les captures d'écran montrent un loto fictif (lots, cartons et association inventés).
+
+## Contact
+
+- Une question, une idée, un bug : l'onglet **Issues** du dépôt (les échanges profitent à tous).
+- Pour un message direct : **[openloto@duck.com](mailto:openloto@duck.com)**.
 
 ## Note sur le développement
 
