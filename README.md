@@ -73,6 +73,10 @@ Pratique pour répartir la saisie entre plusieurs bénévoles : chacun saisit un
 - Fenêtre séparée à placer sur un second écran, ou aperçu dans la page de l'organisateur.
 - Titre et logo de l'association (logo allégé automatiquement), lot en cours et condition.
 - Animation de chaque nouvelle boule (désactivable), message d'accueil et de fin, mode démo.
+- **Photo du lot** (facultative, ajoutée dans l'étape) : affichée en grand à l'annonce du lot, elle s'efface dès la première boule tirée.
+- **Partenaires (sponsors)** : leurs logos s'affichent dans des encarts blancs en bas de l'écran, avant le démarrage et pendant les entractes (fixes jusqu'à 4, puis défilement par groupes de 4).
+- **Confettis** façon feu d'artifice quand un carton gagnant s'affiche, aussi sur les téléphones (désactivable).
+- Photos et logos sont allégés automatiquement et rangés dans le navigateur (IndexedDB) ; ils sont inclus dans les exports de configuration et de sauvegarde. Ils restent sur l'écran public de l'ordinateur : rien de plus n'est envoyé au serveur ni aux téléphones.
 
 ![Écran public pendant le tirage](docs/captures/ecran-public.png)
 
