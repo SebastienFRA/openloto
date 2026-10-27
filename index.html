@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenLoto · le loto de votre association</title>
+<meta name="description" content="OpenLoto gère le tirage, contrôle les cartons et affiche le loto en grand pour la salle et sur les téléphones. Un seul fichier HTML, sans installation, gratuit et libre.">
+<meta property="og:title" content="OpenLoto">
+<meta property="og:description" content="Le loto de votre association, de la première boule au dernier lot. Gratuit et libre.">
+<meta property="og:image" content="docs/logo/openloto-social-preview.png">
+<link rel="icon" href="docs/logo/openloto-icone.svg" type="image/svg+xml">
+<style>
+:root{
+  --salle:#0b2d31;      /* le fond de l'écran public */
+  --teal:#0f5c63;       /* la couleur d'OpenLoto */
+  --teal-2:#147a83;
+  --brume:#e9f2f3;      /* fond des sections claires */
+  --ambre:#f5a300;      /* le lot, les boutons */
+  --encre:#14213d;
+  --gris:#55657c;
+  --trait:#cfdee0;
+  --num:ui-rounded,"Arial Rounded MT Bold","Nunito","Varela Round","Segoe UI",system-ui,sans-serif;
+  --txt:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --sphere:inset -6px -8px 14px rgba(0,0,0,.22),inset 5px 6px 10px rgba(255,255,255,.38),0 6px 14px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;font:17px/1.6 var(--txt);color:var(--encre);background:#fff;-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--teal)}
+:focus-visible{outline:3px solid var(--ambre);outline-offset:3px;border-radius:6px}
+.wrap{width:min(1120px,100% - 32px);margin:0 auto}
+h1,h2,h3{font-family:var(--num);line-height:1.12;margin:0;letter-spacing:-.01em}
+h2{font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:800;max-width:24ch}
+h3{font-size:1.2rem;font-weight:800}
+p{margin:0}
+.lead{font-size:1.12rem;color:var(--gris);max-width:62ch}
+
+/* ---------- barre du haut ---------- */
+.nav{position:absolute;inset:0 0 auto;z-index:5}
+.nav .wrap{display:flex;align-items:center;gap:22px;padding:18px 0}
+.nav .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font:800 1.3rem var(--num);margin-right:auto}
+.nav .brand img{width:38px;height:38px}
+.nav a.l{color:#cfe7e9;text-decoration:none;font-weight:600;font-size:.95rem}
+.nav a.l:hover{color:#fff}
+@media (max-width:720px){.nav a.l{display:none}}
+
+/* ---------- ouverture : la salle ---------- */
+.hero{background:var(--salle);color:#fff;padding:110px 0 70px;position:relative;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(2.2rem,4.8vw,3.7rem);font-weight:800;max-width:15ch}
+.hero .lead{color:#b9d6d9;margin-top:20px;font-size:1.15rem}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:14px;font:800 1.02rem var(--num);text-decoration:none;border:2px solid transparent;cursor:pointer}
+.btn svg{width:20px;height:20px;fill:currentColor;flex:0 0 auto}
+.btn.main{background:var(--ambre);color:#2b1d00}
+.btn.main:hover{background:#ffb623}
+.btn.alt{border-color:#3b7a80;color:#e6f3f4}
+.btn.alt:hover{border-color:#7fb9be;color:#fff}
+.hero .note{margin-top:16px;font-size:.88rem;color:#8fb6ba;max-width:60ch}
+.btn.alt span{display:flex;flex-direction:column;line-height:1.2}
+.btn.alt small{font:500 .78rem var(--txt);color:#9fd0d4;margin-top:3px}
+.cmp{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;border:1.5px solid #2c5f64;border-radius:16px;overflow:hidden;max-width:560px;font-size:.92rem}
+.cmp div{padding:14px 16px}
+.cmp div+div{border-left:1.5px solid #2c5f64}
+.cmp b{display:block;color:#fff;font:800 1rem var(--num);margin-bottom:6px}
+.cmp div:first-child b{color:#ffd166}
+.cmp ul{margin:0;padding-left:18px;color:#b9d6d9}
+.cmp li{margin:2px 0}
+.cmp .non{color:#8fb6ba}
+@media (max-width:520px){.cmp{grid-template-columns:1fr}.cmp div+div{border-left:0;border-top:1.5px solid #2c5f64}}
+
+/* l'écran de la salle, en miniature, qui tire vraiment des boules */
+[hidden]{display:none!important}
+.diapo{margin:0}
+.diapo .vues{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#0e3a40;box-shadow:0 0 0 8px #12262a,0 0 0 9px #2b4a4f,0 30px 70px rgba(0,0,0,.45)}
+.diapo .vues img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s}
+.diapo .vues img.on{opacity:1}
+.diapo figcaption{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px;color:#b9d6d9;font-weight:600;font-size:.95rem}
+.diapo .pts{display:flex;gap:8px}
+.diapo .pts button{width:11px;height:11px;border-radius:50%;border:0;padding:0;background:#3b7a80;cursor:pointer}
+.diapo .pts button.on{background:var(--ambre)}
+@media (prefers-reduced-motion:reduce){.diapo .vues img{transition:none}}
+.ecran{position:relative;container-type:inline-size;border-radius:9px;background:#0b2d31;text-align:center;aspect-ratio:16/9;display:flex;flex-direction:column;justify-content:center;gap:2cqw;padding:3cqw}
+.ecran .club{font:800 5cqw var(--num);color:#fff}
+.ecran .lot{display:flex;justify-content:center;align-items:center;gap:2cqw;font:800 3.4cqw var(--num);color:#ffd166}
+.ecran .lot span{background:var(--ambre);color:#2b1d00;border-radius:1cqw;padding:.2cqw 1.6cqw;font-weight:700}
+.boule{display:grid;place-items:center;border-radius:50%;font-family:var(--num);box-shadow:var(--sphere);color:#fff;line-height:1}
+.ecran .grande{width:20cqw;height:20cqw;margin:1cqw auto 0;font-size:11cqw;outline:.5cqw solid #fff;outline-offset:.5cqw}
+.ecran .grande.pop .n{animation:pop .6s cubic-bezier(.2,.9,.3,1.25)}
+.ecran .n{display:block}
+@keyframes pop{0%{transform:scale(.35)}55%{transform:scale(1.12)}100%{transform:scale(1)}}
+.ecran .prec{display:flex;justify-content:center;align-items:center;gap:2cqw;min-height:7cqw;margin-top:1cqw}
+.ecran .prec .boule{width:7cqw;height:7cqw;font-size:3.4cqw}
+.ecran .prec .boule:nth-child(2){width:6.2cqw;height:6.2cqw;font-size:3cqw}
+.ecran .prec .boule:nth-child(3){width:5.6cqw;height:5.6cqw;font-size:2.7cqw}
+.ecran .prec .boule:nth-child(4){width:5cqw;height:5cqw;font-size:2.4cqw}
+.ecran .sig{position:absolute;right:2cqw;bottom:1.6cqw;display:flex;align-items:center;gap:.8cqw;font:700 1.8cqw var(--txt);color:#cfe7e9;opacity:.6}
+.ecran .sig img{width:2.6cqw;height:2.6cqw}
+.ecran .compte{font-size:2cqw;color:#9fd0d4}
+@media (max-width:900px){.hero .wrap{grid-template-columns:1fr;gap:44px}.hero{padding-top:96px}}
+
+/* ---------- la soirée : avant / pendant / après ---------- */
+.soiree{padding:90px 0;background:#fff}
+.soiree .tete{display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px;align-items:flex-end}
+.temps{display:grid;grid-template-columns:repeat(3,1fr);margin-top:46px;border-top:3px solid var(--encre)}
+.temps section{padding:26px 26px 6px 0}
+.temps section+section{padding-left:26px;border-left:1px solid var(--trait)}
+.temps .h{font:800 1.45rem var(--num);display:flex;align-items:baseline;gap:10px}
+.temps .h small{font:600 .9rem var(--txt);color:var(--gris)}
+.temps ul{list-style:none;margin:16px 0 0;padding:0}
+.temps li{padding:9px 0 9px 26px;position:relative;border-bottom:1px solid #edf3f4}
+.temps li::before{content:"";position:absolute;left:2px;top:17px;width:12px;height:12px;border-radius:50%;background:var(--c,#43a047);box-shadow:inset -2px -2px 3px rgba(0,0,0,.2)}
+.temps li b{font-weight:700}
+@media (max-width:860px){.temps{grid-template-columns:1fr}.temps section+section{padding-left:0;border-left:0;border-top:1px solid var(--trait)}}
+
+/* ---------- visionneuse de captures ---------- */
+.voir{padding:90px 0;background:var(--brume)}
+.onglets{display:flex;flex-wrap:wrap;gap:8px;margin:34px 0 18px}
+.onglets button{font:700 .95rem var(--txt);color:var(--encre);background:#fff;border:1.5px solid var(--trait);border-radius:999px;padding:9px 16px;cursor:pointer}
+.onglets button[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+.cadre{background:#fff;border-radius:16px;padding:10px;box-shadow:0 1px 0 var(--trait),0 18px 40px rgba(15,92,99,.14)}
+.cadre img{border-radius:9px;width:100%;aspect-ratio:16/9;object-fit:cover;background:#dfe9ea}
+.legende{margin-top:14px;color:var(--gris);max-width:70ch}
+
+/* ---------- téléphones ---------- */
+.tel{padding:90px 0}
+.tel .grille{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center;margin-top:10px}
+table{border-collapse:collapse;width:100%;font-size:.96rem}
+th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--trait);vertical-align:top}
+thead th{font:800 1rem var(--num);border-bottom:2px solid var(--encre)}
+tbody th{font-weight:600;color:var(--gris);white-space:nowrap}
+td.pj{color:var(--teal);font-weight:600}
+.tel figure{margin:0}
+.tel figure img{border-radius:16px;box-shadow:0 18px 40px rgba(0,0,0,.18)}
+@media (max-width:900px){.tel .grille{grid-template-columns:1fr}.tab-scroll{overflow-x:auto;margin:0 -16px;padding:0 16px}.tab-scroll table{min-width:560px}}
+
+/* ---------- projet serveur ---------- */
+.projet{background:var(--teal);color:#fff;padding:84px 0;position:relative;overflow:hidden}
+.projet .wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:56px}
+.projet h2{max-width:20ch}
+.projet .lead{color:#d6ecee;margin-top:18px}
+.projet ul{margin:22px 0 0;padding:0;list-style:none}
+.projet li{padding:7px 0 7px 28px;position:relative}
+.projet li::before{content:"";position:absolute;left:0;top:14px;width:14px;height:14px;border-radius:50%;background:var(--ambre);box-shadow:inset -2px -2px 3px rgba(0,0,0,.2)}
+.projet .encart{background:#fff;color:var(--encre);border-radius:20px;padding:28px;align-self:start}
+.projet .encart p{color:var(--gris);margin-top:10px}
+.projet .encart .btn{margin-top:20px}
+.projet .encart a.lien{display:inline-block;margin-top:14px;font-weight:700}
+@media (max-width:900px){.projet .wrap{grid-template-columns:1fr}}
+
+/* ---------- démarrer ---------- */
+.demarrer{padding:90px 0;background:#fff}
+.etapes{counter-reset:e;list-style:none;padding:0;margin:40px 0 0;display:grid;grid-template-columns:repeat(4,1fr);gap:30px}
+.etapes li{counter-increment:e;position:relative;padding-top:66px}
+.etapes li::before{content:counter(e);position:absolute;top:0;left:0;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;font:800 1.5rem var(--num);color:#fff;background:var(--c);box-shadow:var(--sphere)}
+.etapes li:nth-child(1){--c:#e53935}.etapes li:nth-child(2){--c:#fb8c00}.etapes li:nth-child(3){--c:#43a047}.etapes li:nth-child(4){--c:#1e88e5}
+.etapes h3{margin-bottom:8px}
+.etapes p{color:var(--gris)}
+.etapes .astuce{font-size:.9rem;margin-top:8px}
+@media (max-width:900px){.etapes{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.etapes{grid-template-columns:1fr}}
+
+/* ---------- pied de page ---------- */
+footer{background:var(--salle);color:#b9d6d9;padding:56px 0 40px;font-size:.95rem}
+footer .wrap{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:40px}
+footer a{color:#fff}
+footer h3{color:#fff;font-size:1rem;margin-bottom:10px}
+footer .bas{grid-column:1/-1;border-top:1px solid #23474c;padding-top:22px;font-size:.85rem;color:#8fb6ba}
+@media (max-width:760px){footer .wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="docs/logo/openloto-symbole.svg" alt="">OpenLoto</a>
+    <a class="l" href="#soiree">Fonctionnalités</a>
+    <a class="l" href="#voir">Captures</a>
+    <a class="l" href="#telephones">Téléphones</a>
+    <a class="l" href="#demarrer">Démarrer</a>
+    <a class="l" href="https://github.com/SebastienFRA/openloto">GitHub</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <h1>Le loto de votre association, de la première boule au dernier lot.</h1>
+        <p class="lead">OpenLoto gère le tirage, contrôle les cartons des gagnants et affiche tout en grand pour la salle, et sur les téléphones des joueurs si vous le souhaitez. Un seul fichier à ouvrir dans le navigateur : sans installation, sans internet, gratuit et libre.</p>
+        <div class="cta">
+          <a class="btn main" href="OpenLoto.html" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11.2l-4-4-1.4 1.4L12 18l5.4-6.4L16 10.2l-4 4V3zM5 19h14v2H5z"/></svg>Télécharger OpenLoto</a>
+          <a class="btn alt" href="OpenLoto.html#organisateur" target="_blank" rel="noopener"><span>Essayer la démo en ligne<small>pour découvrir le programme</small></span></a>
+        </div>
+        <div class="cmp">
+          <div><b>Le fichier téléchargé</b><ul><li>fonctionne sans internet</li><li>diffusion sur les téléphones</li><li>vos données sur votre ordinateur</li></ul></div>
+          <div><b>La démo en ligne</b><ul><li>rien à télécharger</li><li class="non">internet nécessaire pour l’ouvrir</li><li class="non">pas de diffusion sur les téléphones</li></ul></div>
+        </div>
+        <p class="note">Pour votre loto, téléchargez le fichier : c’est la version complète. Windows, Mac ou Linux, avec Chrome, Edge ou Firefox ; une visite guidée vous accueille à la première ouverture.</p>
+      </div>
+      <figure class="diapo" aria-label="Aperçu d’OpenLoto">
+        <div class="vues">
+          <img src="docs/captures/direct.png" alt="Le direct" class="on">
+          <img src="docs/captures/controle-carton.png" alt="Le contrôle d’un carton">
+          <img src="docs/captures/configuration.png" alt="Le déroulement du loto dans la configuration">
+        </div>
+        <figcaption><span id="diapoTxt">Le direct</span><span class="pts" role="group" aria-label="Choisir la vue"><button type="button" aria-label="Le direct" class="on"></button><button type="button" aria-label="Le contrôle d’un carton"></button><button type="button" aria-label="Le déroulement du loto"></button></span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="soiree" id="soiree">
+    <div class="wrap">
+      <div class="tete">
+        <h2>Tout ce qu’il faut pour la soirée</h2>
+        <p class="lead">Conçu par et pour des bénévoles d’association, testé avec plus de 5 000 cartons.</p>
+      </div>
+      <div class="temps">
+        <section>
+          <div class="h">Avant <small>la préparation</small></div>
+          <ul>
+            <li style="--c:#e53935"><b>Le déroulé</b> : lots, entractes et annonces, dans l’ordre de la soirée.</li>
+            <li style="--c:#fb8c00"><b>Les conditions de gain</b> : une ou deux lignes, carton plein, tour du carton, lignes au choix, loto inversé.</li>
+            <li style="--c:#fdd835"><b>Vos cartons</b> : import d’un fichier ou outil de saisie, avec détection des erreurs de frappe par plaque.</li>
+            <li style="--c:#43a047"><b>L’écran de la salle</b> : logo, photos des lots, partenaires, messages d’accueil et de fin.</li>
+          </ul>
+        </section>
+        <section>
+          <div class="h">Pendant <small>le direct</small></div>
+          <ul>
+            <li style="--c:#00acc1"><b>La saisie des boules</b>, avec annonce vocale et annulation de la dernière boule.</li>
+            <li style="--c:#1e88e5"><b>Le contrôle des cartons</b> : on tape le numéro, OpenLoto dit tout de suite s’il est gagnant, et gère les départages.</li>
+            <li style="--c:#5e35b1"><b>« Ça chauffe ! »</b> : combien de cartons sont à un numéro du gain, pour l’animateur.</li>
+            <li style="--c:#d81b60"><b>L’écran public</b> : grande boule, grille, lot en cours et confettis pour chaque gagnant.</li>
+          </ul>
+        </section>
+        <section>
+          <div class="h">Après <small>le bilan</small></div>
+          <ul>
+            <li style="--c:#6d4c41"><b>Le journal</b> de la soirée : chaque boule, chaque gagnant, chaque changement de lot, avec l’heure.</li>
+            <li style="--c:#e53935"><b>Le bilan imprimable</b> et les exports (CSV, PDF, sauvegarde complète).</li>
+            <li style="--c:#fb8c00"><b>La simulation</b> d’un loto complet, pour s’entraîner et estimer la durée de la soirée.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section class="voir" id="voir">
+    <div class="wrap">
+      <h2>À quoi ça ressemble</h2>
+      <div class="onglets" role="tablist" aria-label="Captures d’écran">
+        <button role="tab" aria-selected="true" data-i="0">Le direct</button>
+        <button role="tab" aria-selected="false" data-i="1">Contrôle d’un carton</button>
+        <button role="tab" aria-selected="false" data-i="2">Écran de la salle</button>
+        <button role="tab" aria-selected="false" data-i="3">Configuration</button>
+        <button role="tab" aria-selected="false" data-i="4">Saisie des cartons</button>
+        <button role="tab" aria-selected="false" data-i="5">Thème sombre</button>
+      </div>
+      <div class="cadre"><img id="capture" src="docs/captures/direct.png" alt="" width="1920" height="1080">
+        <div class="ecran" id="ecranLive" hidden aria-label="L’écran de la salle pendant le tirage (animation)">
+          <div class="club">Club de ping</div>
+          <div class="lot">Panier garni du terroir <span>1 ligne</span></div>
+          <div class="boule grande" id="grande"><span class="n">42</span></div>
+          <div class="prec" id="prec"></div>
+          <div class="compte" id="compte">5 boules sorties</div>
+          <div class="sig"><img src="docs/logo/openloto-symbole.svg" alt="">OpenLoto</div>
+        </div></div>
+      <p class="legende" id="legende"></p>
+    </div>
+  </section>
+
+  <section class="tel" id="telephones">
+    <div class="wrap">
+      <h2>Le tirage aussi sur les téléphones</h2>
+      <p class="lead" style="margin-top:14px">Les joueurs scannent un QR code et suivent le tirage sans application : dernières boules ou grille complète, carton contrôlé, confettis. Il suffit d’un petit serveur pour leur envoyer le loto.</p>
+      <div class="grille">
+        <figure><img src="docs/captures/telephones.jpg" alt="Le tirage suivi sur des téléphones" loading="lazy" width="1920" height="1080"></figure>
+        <div class="tab-scroll">
+          <table>
+            <thead><tr><th></th><th>Raspberry Pi</th><th>PC de l’organisateur</th><th>Serveur OpenLoto</th></tr></thead>
+            <tbody>
+              <tr><th>Matériel</th><td>un Raspberry Pi ou un serveur</td><td>rien de plus</td><td>rien</td></tr>
+              <tr><th>Joueurs</th><td>4G/5G ou wifi</td><td>wifi de la salle</td><td>4G/5G</td></tr>
+              <tr><th>Internet</th><td>non requis pour le PC</td><td>non requis</td><td>requis pour le PC</td></tr>
+              <tr><th>Disponible</th><td>oui</td><td>oui</td><td class="pj">si les dons le permettent</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="projet" id="projet">
+    <div class="wrap">
+      <div>
+        <h2>Bientôt peut-être : un serveur OpenLoto gratuit</h2>
+        <p class="lead">Pour que chaque association puisse diffuser son loto sur les téléphones sans Raspberry ni installation : on crée une salle en un clic, on colle son code dans OpenLoto, et les joueurs suivent avec leur propre connexion.</p>
+        <ul>
+          <li>Gratuit, sans publicité et sans compte.</li>
+          <li>Salles temporaires, supprimées automatiquement après le loto.</li>
+          <li>Aucune donnée personnelle : seulement ce qui s’affiche sur les téléphones.</li>
+          <li>Si le serveur ne répond plus, le loto continue : l’écran de la salle ne dépend pas d’internet.</li>
+        </ul>
+      </div>
+      <div class="encart">
+        <h3>Ce service dépend de vous</h3>
+        <p>Un serveur a un coût : location, nom de domaine, maintenance. Il ne verra le jour que si suffisamment de dons permettent de le faire fonctionner dans la durée. Dites-nous si vous seriez intéressés : nombre de lotos par an, nombre de joueurs.</p>
+        <a class="btn main" href="mailto:openloto@duck.com?subject=Serveur%20OpenLoto">Je suis intéressé</a>
+        <br><a class="lien" href="https://github.com/SebastienFRA/openloto#projet--un-serveur-openloto-gratuit" rel="noopener">Lire les conditions détaillées</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="demarrer" id="demarrer">
+    <div class="wrap">
+      <h2>Démarrer en quatre étapes</h2>
+      <ol class="etapes">
+        <li><h3>Téléchargez</h3><p>Le fichier <a href="OpenLoto.html" download>OpenLoto.html</a>, à garder où vous voulez sur l’ordinateur.</p></li>
+        <li><h3>Ouvrez-le</h3><p>Dans Chrome, Edge ou Firefox. La visite guidée présente l’essentiel en quelques minutes.</p></li>
+        <li><h3>Préparez le loto</h3><p>Titre, logo, déroulé des lots et vos cartons, dans l’onglet Configuration.</p><p class="astuce">Pour saisir vos cartons : <a href="outils/OpenLoto-saisie-cartons.html" download>l’outil de saisie</a>.</p></li>
+        <li><h3>Lancez le direct</h3><p>Ouvrez l’écran public sur la télé ou le vidéoprojecteur, puis démarrez le loto.</p></li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <h3>OpenLoto</h3>
+      <p>Gestionnaire de loto libre et gratuit pour les associations, sous licence MIT. Conçu avec l’aide d’une intelligence artificielle (Claude, d’Anthropic) : chacun est libre de le reprendre et de l’améliorer.</p>
+    </div>
+    <div>
+      <h3>Une question, une idée ?</h3>
+      <p>Écrivez à <a href="mailto:openloto@duck.com">openloto@duck.com</a>, ou ouvrez une demande dans les <a href="https://github.com/SebastienFRA/openloto/issues" rel="noopener">Issues</a> du projet.</p>
+    </div>
+    <div>
+      <h3>Le projet</h3>
+      <p><a href="https://github.com/SebastienFRA/openloto" rel="noopener">Le code sur GitHub</a><br><a href="https://github.com/SebastienFRA/openloto/releases/latest" rel="noopener">Serveurs pour les téléphones</a><br><a href="https://github.com/SebastienFRA/openloto#readme" rel="noopener">Documentation</a></p>
+    </div>
+    <p class="bas">Les captures montrent un loto fictif : lots, cartons et association inventés.</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  /* Visionneuse de captures */
+  const caps = [
+    ['direct.png', 'Le direct : les étapes à gauche, le lot en jeu, la saisie des boules et la grille. L’horloge et les actions sont à droite.'],
+    ['controle-carton.png', 'Le contrôle d’un carton : OpenLoto affiche ses numéros sortis et dit s’il est gagnant pour la condition du lot.'],
+    [null, 'L’écran de la salle, sur la télé ou le vidéoprojecteur : la grande boule, les précédentes et le lot en cours. Les boules sortent ici comme pendant un vrai loto.'],
+    ['configuration.png', 'La configuration : le déroulé des lots, les conditions de gain, les entractes.'],
+    ['saisie-cartons.png', 'L’outil de saisie des cartons, avec l’aperçu du carton réel pour comparer avec le papier.'],
+    ['theme-sombre.png', 'Le direct en thème sombre, plus reposant dans une salle peu éclairée.']
+  ];
+  const img = document.getElementById('capture'), leg = document.getElementById('legende'), tabs = [...document.querySelectorAll('.onglets button')];
+  const live = document.getElementById('ecranLive');
+  const show = i => { const isLive = !caps[i][0]; img.hidden = isLive; live.hidden = !isLive; if (!isLive) { img.src = 'docs/captures/' + caps[i][0]; img.alt = caps[i][1]; } leg.textContent = caps[i][1]; tabs.forEach((t, k) => t.setAttribute('aria-selected', k === i ? 'true' : 'false')); };
+  tabs.forEach((t, i) => t.addEventListener('click', () => show(i)));
+  document.querySelector('.onglets').addEventListener('keydown', e => {
+    const i = tabs.findIndex(t => t.getAttribute('aria-selected') === 'true');
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const j = (i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length; show(j); tabs[j].focus(); }
+  });
+  show(0);
+
+  /* Diaporama de l'ouverture : direct, contrôle d'un carton, déroulement du loto */
+  const vues = [...document.querySelectorAll('.diapo .vues img')], pts = [...document.querySelectorAll('.diapo .pts button')];
+  const noms = ['Le direct', 'Le contrôle d’un carton', 'Le déroulement du loto'];
+  let dv = 0, dTimer = null;
+  const diapo = k => { dv = k; vues.forEach((v, j) => v.classList.toggle('on', j === k)); pts.forEach((b, j) => b.classList.toggle('on', j === k)); document.getElementById('diapoTxt').textContent = noms[k]; };
+  const reduit = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const auto = () => { clearInterval(dTimer); if (!reduit) dTimer = setInterval(() => { if (!document.hidden) diapo((dv + 1) % vues.length); }, 4500); };
+  pts.forEach((b, j) => b.addEventListener('click', () => { diapo(j); auto(); }));
+  auto();
+
+  /* L'écran de la salle tire des boules, aux couleurs du boulier d'OpenLoto */
+  const PAL = ['#e53935','#fb8c00','#fdd835','#43a047','#00acc1','#1e88e5','#5e35b1','#d81b60','#6d4c41'];
+  const col = n => PAL[Math.min(8, Math.floor(n / 10))];
+  const style = (el, n) => { el.style.background = col(n); el.style.color = col(n) === '#fdd835' ? '#2b2200' : '#fff'; };
+  const big = document.getElementById('grande'), prec = document.getElementById('prec'), compte = document.getElementById('compte');
+  let tirees = [7, 33, 61, 18, 42];
+  const peindre = anim => {
+    const last = tirees[tirees.length - 1];
+    big.innerHTML = `<span class="n">${last}</span>`; style(big, last);
+    if (anim) { big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop'); }
+    prec.innerHTML = '';
+    tirees.slice(-5, -1).reverse().forEach(n => { const b = document.createElement('div'); b.className = 'boule'; b.textContent = n; style(b, n); prec.appendChild(b); });
+    compte.textContent = `${tirees.length} boules sorties`;
+  };
+  peindre(false);
+  if (!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+    setInterval(() => {
+      if (document.hidden || live.hidden) return;
+      if (tirees.length >= 30) tirees = tirees.slice(-4);
+      let n; do { n = 1 + Math.floor(Math.random() * 90); } while (tirees.includes(n));
+      tirees.push(n); peindre(true);
+    }, 2600);
+  }
+})();
+</script>
+</body>
+</html>
