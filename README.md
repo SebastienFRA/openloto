@@ -11,6 +11,8 @@
 
 OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'organisateur saisit les boules, contrôle les cartons des gagnants et fait défiler les lots. Le tirage s'affiche sur un écran public (vidéoprojecteur, télé) et, si vous le souhaitez, sur les téléphones des joueurs grâce à un petit serveur : un Raspberry Pi, ou directement le PC de l'organisateur.
 
+> 🌐 **Site du projet :** [sebastienfra.github.io/openloto](https://sebastienfra.github.io/openloto/)
+
 > ✉️ **Une question, une suggestion d'amélioration ?** Écrivez-moi à **[openloto@duck.com](mailto:openloto@duck.com)**, ou ouvrez une demande dans l'onglet **Issues** du dépôt. Tous les retours sont les bienvenus !
 
 > 💡 **Projet : un serveur OpenLoto gratuit**, pour diffuser sur les téléphones sans Raspberry ni installation. Il verra le jour si suffisamment de dons permettent de le faire fonctionner : [voir le projet et ses conditions](#projet--un-serveur-openloto-gratuit).

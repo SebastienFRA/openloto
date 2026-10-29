@@ -73,6 +73,7 @@ function sanitize(msg) {
   out.titre = asStr(msg.titre, 500);
   if (typeof msg.logo === 'string' && LOGO_RE.test(msg.logo)) out.logo = msg.logo;
   out.logoPos = POS.includes(msg.logoPos) ? msg.logoPos : 'left';
+  if (['side', 'sig', 'both', 'none'].includes(msg.olMark)) out.olMark = msg.olMark;   /* logo OpenLoto : à côté du titre, signature, les deux ou aucun */
   if (msg.colors != null) {
     if (!Array.isArray(msg.colors) || msg.colors.length > 200) return null;
     out.colors = msg.colors.map(c => typeof c === 'string' && HEX_RE.test(c) ? c : '#cccccc');
@@ -107,6 +108,7 @@ function sanitize(msg) {
     out.last5 = asIntList(msg.last5, 5);
     if (Array.isArray(msg.drawn)) out.drawn = asIntList(msg.drawn, 200);   /* grille des numéros sur les téléphones */
     if (msg.check === true) out.check = true;                              /* contrôle de carton en cours : grille + carton */
+    if (msg.confetti === false) out.confetti = false;                      /* confettis désactivés par l'organisateur */
     if (msg.carton && typeof msg.carton === 'object' && Array.isArray(msg.carton.lines)) {
       out.carton = {
         code: asStr(msg.carton.code, 60),

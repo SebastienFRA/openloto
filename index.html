@@ -32,10 +32,10 @@ a{color:var(--teal)}
 :focus-visible{outline:3px solid var(--ambre);outline-offset:3px;border-radius:6px}
 .wrap{width:min(1120px,100% - 32px);margin:0 auto}
 h1,h2,h3{font-family:var(--num);line-height:1.12;margin:0;letter-spacing:-.01em}
-h2{font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:800;max-width:24ch}
+h2{font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:800;max-width:40ch;text-wrap:balance}
 h3{font-size:1.2rem;font-weight:800}
 p{margin:0}
-.lead{font-size:1.12rem;color:var(--gris);max-width:62ch}
+.lead{font-size:1.12rem;color:var(--gris);max-width:82ch}
 
 /* ---------- barre du haut ---------- */
 .nav{position:absolute;inset:0 0 auto;z-index:5}
@@ -61,15 +61,26 @@ p{margin:0}
 .hero .note{margin-top:16px;font-size:.88rem;color:#8fb6ba;max-width:60ch}
 .btn.alt span{display:flex;flex-direction:column;line-height:1.2}
 .btn.alt small{font:500 .78rem var(--txt);color:#9fd0d4;margin-top:3px}
-.cmp{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;border:1.5px solid #2c5f64;border-radius:16px;overflow:hidden;max-width:560px;font-size:.92rem}
-.cmp div{padding:14px 16px}
-.cmp div+div{border-left:1.5px solid #2c5f64}
-.cmp b{display:block;color:#fff;font:800 1rem var(--num);margin-bottom:6px}
-.cmp div:first-child b{color:#ffd166}
-.cmp ul{margin:0;padding-left:18px;color:#b9d6d9}
-.cmp li{margin:2px 0}
-.cmp .non{color:#8fb6ba}
-@media (max-width:520px){.cmp{grid-template-columns:1fr}.cmp div+div{border-left:0;border-top:1.5px solid #2c5f64}}
+.atouts{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:9px;color:#b9d6d9;font-size:.98rem}
+.atouts li{position:relative;padding-left:30px}
+.atouts li::before{content:"";position:absolute;left:0;top:.18em;width:19px;height:19px;border-radius:50%;background:#ffd166 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.5 16.2 5.3 12l-1.4 1.4 5.6 5.6L20.1 8.4 18.7 7z' fill='%230f2a2e'/%3E%3C/svg%3E") center/14px no-repeat}
+.atouts b{color:#fff}
+/* présentation : grand diaporama centré qui chevauche la bande suivante */
+.hero{padding:120px 0 0;overflow:visible}
+.hero .wrap{display:flow-root;text-align:center}
+.hero h1{max-width:30ch;margin:0 auto;font-size:clamp(2.1rem,4.4vw,3.6rem);text-wrap:balance}
+.hero .lead{margin:20px auto 0;max-width:80ch;text-wrap:balance}
+.hero .cta{justify-content:center}
+.hero .diapo{margin:48px auto -150px;max-width:1040px;position:relative;z-index:2;text-align:left}
+.hero .diapo figcaption{color:var(--gris)}
+.atouts-band{background:#fff;padding:190px 0 8px}
+.atouts-band .atouts{display:flex;justify-content:center;flex-wrap:wrap;gap:12px 34px;margin:0;color:var(--encre);font-size:1.02rem}
+.atouts-band .atouts b{color:var(--encre)}
+.atouts-band + .soiree{padding-top:64px}
+.atouts-band .note{color:var(--gris);text-align:center;margin:18px auto 0}
+@media (max-width:900px){.hero{padding-top:96px}.hero .diapo{margin-bottom:-70px}.atouts-band{padding-top:104px}}
+@media (max-width:640px){.hero .wrap,.hero h1{text-align:left}.hero .cta{justify-content:flex-start}.atouts-band .atouts{flex-direction:column;align-items:flex-start}.atouts-band .note{text-align:left}}
+
 
 /* l'écran de la salle, en miniature, qui tire vraiment des boules */
 [hidden]{display:none!important}
@@ -122,7 +133,7 @@ p{margin:0}
 .onglets button[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
 .cadre{background:#fff;border-radius:16px;padding:10px;box-shadow:0 1px 0 var(--trait),0 18px 40px rgba(15,92,99,.14)}
 .cadre img{border-radius:9px;width:100%;aspect-ratio:16/9;object-fit:cover;background:#dfe9ea}
-.legende{margin-top:14px;color:var(--gris);max-width:70ch}
+.legende{margin-top:14px;color:var(--gris);max-width:90ch}
 
 /* ---------- téléphones ---------- */
 .tel{padding:90px 0}
@@ -139,7 +150,7 @@ td.pj{color:var(--teal);font-weight:600}
 /* ---------- projet serveur ---------- */
 .projet{background:var(--teal);color:#fff;padding:84px 0;position:relative;overflow:hidden}
 .projet .wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:56px}
-.projet h2{max-width:20ch}
+.projet h2{max-width:30ch}
 .projet .lead{color:#d6ecee;margin-top:18px}
 .projet ul{margin:22px 0 0;padding:0;list-style:none}
 .projet li{padding:7px 0 7px 28px;position:relative}
@@ -187,18 +198,11 @@ footer .bas{grid-column:1/-1;border-top:1px solid #23474c;padding-top:22px;font-
 <main>
   <section class="hero">
     <div class="wrap">
-      <div>
-        <h1>Le loto de votre association, de la première boule au dernier lot.</h1>
-        <p class="lead">OpenLoto gère le tirage, contrôle les cartons des gagnants et affiche tout en grand pour la salle, et sur les téléphones des joueurs si vous le souhaitez. Un seul fichier à ouvrir dans le navigateur : sans installation, sans internet, gratuit et libre.</p>
-        <div class="cta">
-          <a class="btn main" href="OpenLoto.html" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11.2l-4-4-1.4 1.4L12 18l5.4-6.4L16 10.2l-4 4V3zM5 19h14v2H5z"/></svg>Télécharger OpenLoto</a>
-          <a class="btn alt" href="OpenLoto.html#organisateur" target="_blank" rel="noopener"><span>Essayer la démo en ligne<small>pour découvrir le programme</small></span></a>
-        </div>
-        <div class="cmp">
-          <div><b>Le fichier téléchargé</b><ul><li>fonctionne sans internet</li><li>diffusion sur les téléphones</li><li>vos données sur votre ordinateur</li></ul></div>
-          <div><b>La démo en ligne</b><ul><li>rien à télécharger</li><li class="non">internet nécessaire pour l’ouvrir</li><li class="non">pas de diffusion sur les téléphones</li></ul></div>
-        </div>
-        <p class="note">Pour votre loto, téléchargez le fichier : c’est la version complète. Windows, Mac ou Linux, avec Chrome, Edge ou Firefox ; une visite guidée vous accueille à la première ouverture.</p>
+      <h1>Le loto de votre association, de la première boule au dernier lot.</h1>
+      <p class="lead">OpenLoto gère le tirage, contrôle les cartons des gagnants et affiche tout en grand pour la salle, et sur les téléphones des joueurs si vous le souhaitez. Un seul fichier à ouvrir dans le navigateur : sans installation, sans internet, gratuit et libre.</p>
+      <div class="cta">
+        <a class="btn main" href="OpenLoto.html" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11.2l-4-4-1.4 1.4L12 18l5.4-6.4L16 10.2l-4 4V3zM5 19h14v2H5z"/></svg>Télécharger OpenLoto</a>
+        <a class="btn alt" href="https://github.com/SebastienFRA/openloto" target="_blank" rel="noopener"><span>Voir sur GitHub<small>code source, questions, suggestions</small></span></a>
       </div>
       <figure class="diapo" aria-label="Aperçu d’OpenLoto">
         <div class="vues">
@@ -208,6 +212,16 @@ footer .bas{grid-column:1/-1;border-top:1px solid #23474c;padding-top:22px;font-
         </div>
         <figcaption><span id="diapoTxt">Le direct</span><span class="pts" role="group" aria-label="Choisir la vue"><button type="button" aria-label="Le direct" class="on"></button><button type="button" aria-label="Le contrôle d’un carton"></button><button type="button" aria-label="Le déroulement du loto"></button></span></figcaption>
       </figure>
+    </div>
+  </section>
+  <section class="atouts-band">
+    <div class="wrap">
+      <ul class="atouts">
+        <li><b>Un seul fichier</b>, rien à installer</li>
+        <li><b>Sans internet</b>, vos données restent chez vous</li>
+        <li><b>Gratuit et libre</b>, sans compte ni publicité</li>
+      </ul>
+      <p class="note">Windows, Mac ou Linux, avec Chrome, Edge ou Firefox ; une visite guidée vous accueille à la première ouverture.</p>
     </div>
   </section>
 
