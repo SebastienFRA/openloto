@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenLoto · Salle fictive</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b2d31">
+<link rel="icon" href="docs/logo/openloto-icone.svg" type="image/svg+xml">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{display:flex;flex-direction:column;background:#0b2d31;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.demo-band{flex:0 0 auto;background:#fff1cf;color:#5a3d00;border-bottom:1px solid #f0d58f;padding:8px 14px;font-size:.92rem;display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:center;align-items:center;text-align:center}
+.demo-band b{font-weight:800}
+.demo-band a{color:#5a3d00;font-weight:700;white-space:nowrap}
+.code{font:800 .95rem ui-monospace,Menlo,Consolas,monospace;letter-spacing:.1em;background:#fff;border:1px solid #f0d58f;border-radius:6px;padding:1px 7px}
+iframe{flex:1 1 auto;width:100%;border:0;background:#0b2d31;min-height:0}
+:focus-visible{outline:3px solid #f5a300;outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="demo-band" role="note">
+  <span><b>Salle fictive</b> <span class="code" id="code"></span> · le tirage est simulé, rien n’est enregistré.</span>
+  <span><a href="salles.html">Retour aux salles</a> · <a href="index.html#projet">Le projet de serveur gratuit</a></span>
+</div>
+<iframe id="pub" src="OpenLoto.html#public-demo" title="Écran public de la salle fictive"></iframe>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search), c = (q.get('code') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+  document.getElementById('code').textContent = c || 'DEMO';
+  var PAL = ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#00acc1', '#1e88e5', '#8e24aa', '#d81b60', '#6d4c41'];
+  var colors = []; for (var i = 0; i < 90; i++) colors.push(PAL[Math.floor(i / 10)]);
+  var frame = document.getElementById('pub');
+  /* l'écran public d'OpenLoto lance tout seul son tirage de démonstration quand on lui envoie un loto « vide » avec le mode démo activé */
+  function send() {
+    try {
+      frame.contentWindow.postMessage({
+        loto: 'state', t: Date.now(), empty: true, titre: 'Loto de démonstration', colors: colors, logoPos: 'left', olMark: 'sig',
+        pubmsg: { start: '', wait: '', end: '', endTitle: '', demo: 'Salle fictive · tirage simulé', anim: true },
+        demo: { on: true, speed: 2 }, notice: { on: false, title: '', text: '' }
+      }, '*');
+    } catch (e) {}
+  }
+  window.addEventListener('message', function (e) { if (e.data && e.data.loto === 'ready') send(); });
+  frame.addEventListener('load', function () { send(); setTimeout(send, 600); });
+})();
+</script>
+</body>
+</html>
