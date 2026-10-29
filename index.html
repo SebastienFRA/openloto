@@ -658,7 +658,16 @@ footer p+p{margin-top:6px}
     root.getElementById('dcode').textContent = (code || 'DEMO').toUpperCase();
     var box = root.getElementById('frameBox');
     if (FR) return;
-    FR = document.createElement('iframe'); FR.title = 'Écran public de la salle fictive'; FR.src = 'OpenLoto.html?v=20261029b#public-demo';   /* le numéro de version force le navigateur à recharger OpenLoto.html (et non une ancienne copie en cache) */
+    FR = document.createElement('iframe'); FR.title = 'Écran public de la salle fictive'; var SRC = 'OpenLoto.html?v=20261029c';
+    /* Certains bloqueurs de pub masquent les noms .pub-right et #pubHead : on charge la page avec d'autres noms (copie en mémoire, le fichier n'est pas modifié) */
+    var direct = function () { if (FR && !FR.src) FR.src = SRC + '#public-demo'; };
+    if (window.fetch && /^https?:/.test(location.protocol)) {
+      fetch(SRC).then(function (r) { return r.text(); }).then(function (t) {
+        if (!FR) return;
+        t = t.replace(/pub-right/g, 'ol-colonne-d').replace(/pubHead/g, 'ol-entete-pub');
+        FR.src = URL.createObjectURL(new Blob([t], { type: 'text/html' })) + '#public-demo';
+      }).catch(direct);
+    } else direct();   /* le numéro de version force le navigateur à recharger OpenLoto.html (et non une ancienne copie en cache) */
     FR.addEventListener('load', function () { sendDemo(); setTimeout(sendDemo, 600); });
     box.appendChild(FR);
   }
