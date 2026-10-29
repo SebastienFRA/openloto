@@ -245,6 +245,20 @@ textarea{width:100%;resize:vertical;font-family:ui-monospace,Consolas,monospace;
 #tab-config{overflow:auto}
 .cfg-jump{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:820px;margin:0 auto;padding:8px 2px;background:var(--bg)}
 .cfg-jump .btn{padding:6px 12px;font-size:.9rem}
+.cfg-tabbar{justify-content:flex-start;align-items:flex-end;gap:4px;padding:10px 0 0;margin-bottom:0;flex-wrap:wrap}
+@media(max-width:600px){.cfg-tab{padding:8px 10px 9px;font-size:.9rem}}
+.cfg-tab{position:relative;flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;background:color-mix(in srgb,var(--line) 60%,var(--bg));border:1px solid var(--line);border-bottom:0;border-radius:10px 10px 0 0;margin-bottom:-1px;padding:9px 11px 9px;font:600 .9rem var(--body);color:var(--ink);cursor:pointer;white-space:nowrap;box-shadow:inset 0 -6px 8px -8px rgba(0,0,0,.25)}
+.cfg-tab:hover{background:var(--card);color:var(--teal)}
+.cfg-tab[aria-selected=true]{background:var(--card);color:var(--teal);border-top:3px solid var(--teal);padding-top:7px;padding-bottom:10px;margin-bottom:-1px;z-index:2;box-shadow:none;cursor:default}
+html.dark .cfg-tab{background:color-mix(in srgb,var(--line) 70%,var(--bg))}
+html.dark .cfg-tab:hover,html.dark .cfg-tab[aria-selected=true]{background:var(--card)}
+html.dark .cfg-tab[aria-selected=true]{color:#7fd3da;border-top-color:#7fd3da}
+.cfg-tab:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.cfg-main > .cfg-block.on{border-top-left-radius:0}
+.cfg-n{font:700 .75rem var(--body);background:var(--teal-soft);color:var(--teal);border-radius:99px;padding:1px 7px;min-width:20px;text-align:center}
+html.dark .cfg-n{color:#9fe0e5}
+.cfg-n:empty{display:none}
+.cfg-main > .cfg-block:not(.on){display:none}
 .cfg-grid{position:relative;max-width:820px;margin:0 auto;padding-bottom:30px}
 .cfg-main{display:flex;flex-direction:column;gap:16px;min-width:0}
 .cfg-rail{position:absolute;left:100%;top:0;bottom:0;margin-left:16px;width:260px}
@@ -402,11 +416,25 @@ summary{cursor:pointer;font-weight:600;color:var(--teal)}
 
 /* ============ TITRE + LOGO (écran public et aperçu) ============ */
 .tb{display:flex;align-items:center;gap:2vw;justify-content:center}
-.tb.top{flex-direction:column;gap:1.2vh}
+.tb.tb-top{flex-direction:column;gap:1.2vh}
+.tb .tb-s{flex:1 1 0;min-width:0;display:flex;align-items:center}
+.tb .tb-s.r{justify-content:flex-end}
+.tb .tb-s img{max-width:100%}
+.tb .tb-s + .tb-title{flex:0 1 auto}
+.tb img.tb-ol{max-height:calc(var(--tbh,13vh) * .72);max-width:var(--tbw,22vw);opacity:.55;filter:saturate(.85)}
+.pub-sig{position:fixed;right:1.6vw;bottom:1.6vh;display:flex;align-items:center;gap:.6vw;opacity:.6;font-weight:700;font-size:clamp(.9rem,2.5vh,1.45rem);color:#cfe7e9;letter-spacing:.02em;z-index:6;pointer-events:none}
+.pub-sig[hidden]{display:none}
+.pub-sig img{height:4vh;width:4vh;object-fit:contain}
+@media (pointer:coarse){.pub-sig{right:auto;left:50%;transform:translateX(-50%);bottom:calc(2vh + 8px);gap:6px;font-size:.95rem}.pub-sig img{height:22px;width:22px}}
+@media (pointer:coarse) and (orientation:landscape){.pub-sig{left:3vw;transform:none;bottom:calc(var(--u,1vh)*2.5 + 4px)}}
+/* plein écran sur téléphone : marge pour l'appareil photo intégré à l'écran (encoche, poinçon) */
+@media (pointer:coarse) and (orientation:portrait){html.is-fs #pub{padding-top:calc(2vh + max(env(safe-area-inset-top, 0px), 34px))}}
+@media (pointer:coarse) and (orientation:landscape){html.is-fs #pub{padding-left:max(3vw, env(safe-area-inset-left, 0px), 40px);padding-right:max(3vw, env(safe-area-inset-right, 0px), 40px)}}
+
 .tb img{max-height:var(--tbh,13vh);max-width:var(--tbw,22vw);object-fit:contain;flex:0 0 auto}
-.tb.top img{max-height:var(--tbh-top,var(--tbh,15vh))}
+.tb.tb-top img{max-height:var(--tbh-top,var(--tbh,15vh))}
 .tb-title{flex:1 1 auto;text-align:center;white-space:pre-line;font-weight:800;line-height:1.12;font-size:var(--tbs,clamp(1.4rem,6.5vh,4.2rem))}
-.tb.top .tb-title{flex:0 1 auto}
+.tb.tb-top .tb-title{flex:0 1 auto}
 
 /* ============ ÉCRAN PUBLIC ============ */
 body.public{background:#0b2d31;color:#fff;overflow:hidden}
@@ -433,9 +461,35 @@ body.public .top,body.public main{display:none}
 .pb.big{width:min(46vh,34vw);height:min(46vh,34vw);font-size:min(30vh,22vw);outline:.55vh solid #fff;outline-offset:.45vh;padding-bottom:0}
 .pub-prev{display:flex;gap:2vw;align-items:center;justify-content:center;flex-wrap:wrap}
 .pub-prev .pb{width:var(--s);height:var(--s);font-size:calc(var(--s) * .5)}
-.pub-wait{font-size:clamp(1.4rem,5vh,3rem);color:#9fd0d4;text-align:center}
+.pub-wait{font-size:clamp(1.4rem,5vh,3rem);color:#9fd0d4;text-align:center;line-height:1.3}
 .pub-demo-tag{margin-top:.8vh;font-size:clamp(.95rem,2.4vh,1.4rem);color:#9fd0d4;text-align:center;letter-spacing:.02em}
 #pub.mode-end{grid-template-areas:"head head" "right right"}
+/* photo du lot, avant la première boule de l'étape */
+#pub.mode-photo{grid-template-areas:"head head" "lot lot" "left left"}
+#pub.mode-photo .pub-right{display:none}
+#pub.mode-photo .pub-left{min-height:0}
+.pub-photo{height:100%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vh}
+.pub-photo .lab{font-weight:800;font-size:clamp(1rem,3.4vh,2.4rem);color:#ffd166;letter-spacing:.12em;text-transform:uppercase}
+.pub-photo img{min-height:0;max-height:calc(100% - 7vh);max-width:86vw;object-fit:contain;border-radius:2.4vh;box-shadow:0 0 0 .6vh rgba(255,255,255,.92),0 2vh 5vh rgba(0,0,0,.5);animation:phIn .6s ease-out}
+@keyframes phIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+/* partenaires : encarts blancs en bas de l'écran (attente et entracte) */
+.pub-sp{position:fixed;left:0;right:0;bottom:3.6vh;display:flex;flex-direction:column;align-items:center;gap:1.6vh;z-index:5;pointer-events:none}
+.pub-sp[hidden]{display:none}
+.pub-sp h3{margin:0;font-size:clamp(.8rem,2.2vh,1.5rem);font-weight:700;color:rgba(255,255,255,.72);letter-spacing:.14em;text-transform:uppercase}
+.pub-sp .row{display:flex;gap:2vw;justify-content:center;transition:opacity .6s}
+.pub-sp .row.out{opacity:0}
+.pub-sp .tile{width:min(18vw,30vh);height:13vh;background:#fff;border-radius:1.8vh;box-shadow:0 1vh 2.4vh rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;padding:1.3vh 1.2vw;box-sizing:border-box;overflow:hidden}
+.pub-sp .tile img{max-width:100%;max-height:100%;object-fit:contain;display:block;min-width:0;min-height:0}
+.pub-sp .dots{display:flex;gap:.8vh;min-height:1vh}
+.pub-sp .dots i{width:1vh;height:1vh;border-radius:50%;background:rgba(255,255,255,.3)}
+.pub-sp .dots i.on{background:#ffd166}
+#pub.has-sp .pub-pause .name{font-size:clamp(2rem,11vh,7rem)}
+#pub.has-sp .pub-pause .timer{margin-top:3vh;font-size:clamp(2.6rem,26vh,14rem)}
+#pub.has-sp .pub-pause .timer .timer-label{font-size:clamp(1rem,8vh,4rem)}
+#pub.has-sp{padding-bottom:24vh}
+/* numéros centrés verticalement dans les boules, quelle que soit la police (décalage mesuré au démarrage) */
+#pub .pb,#pub .pn,#pub .pg{box-sizing:border-box;padding-top:var(--num-pt,0)!important;padding-bottom:var(--num-pb,0)!important}
+.confetti-cv{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:60}
 #pub.mode-end .pub-lotband,#pub.mode-end .pub-left{display:none}
 .pub-end{text-align:center;padding:0 2vw;max-width:min(1100px,92vw);margin:0 auto}
 .pub-end .name{font-size:clamp(2.2rem,11vh,7rem);font-weight:800;line-height:1.05;color:#ffd36b;margin-bottom:3vh}
@@ -601,7 +655,9 @@ body.public .top,body.public main{display:none}
 /* écran public : connexion, grille, veille */
 .pub-conn{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:20;margin-top:.8vh;padding:6px 14px;border-radius:999px;font:600 clamp(.8rem,1.8vh,1rem)/1.3 var(--body);background:#b87400;color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.35);max-width:92vw;text-align:center}
 .pub-conn.bad{background:#b3302b}
-.pub-gridbtn{position:fixed;right:3vw;bottom:2vh;z-index:6;background:rgba(0,0,0,.35);border:1.5px solid #3b7a80;color:#cfe7ea;border-radius:999px;padding:9px 16px;font:600 .95rem var(--body)}
+.pub-gridbtn{position:fixed;right:3vw;bottom:2vh;z-index:6;background:rgba(0,0,0,.35);border:1.5px solid #3b7a80;color:#cfe7ea;border-radius:999px;padding:7px 12px;font:600 .85rem var(--body);display:flex;align-items:center;gap:6px}
+.pub-gridbtn[hidden]{display:none}
+.pub-gridbtn svg{width:20px;height:20px;fill:currentColor;flex:0 0 auto}
 .pub-wake{position:fixed;left:3vw;bottom:2vh;z-index:6;background:rgba(0,0,0,.35);border:1.5px dashed #3b7a80;color:#9fd0d4;border-radius:999px;padding:8px 14px;font:500 .85rem var(--body);pointer-events:none}
 .pub-gridwrap{display:flex;flex-direction:column;align-items:center;gap:1.4vh;width:100%;max-width:min(96vw,110vh)}
 .pg-head{display:flex;align-items:center;gap:3vw}
@@ -665,7 +721,7 @@ body.public .top,body.public main{display:none}
   #pub.mode-carton .pub-grid{width:min(38vw,calc((var(--u)*100 - 4.5rem - var(--u)*12) * 1.1))}
   #pub.mode-carton .pb.mid{width:calc(var(--u)*18);height:calc(var(--u)*18);font-size:calc(var(--u)*10)}
   .pg{font-size:min(calc(var(--u)*3),1.6vw)}
-  .pub-gridbtn{padding:6px 12px;font-size:.82rem;bottom:calc(var(--u)*2.5)}
+  .pub-gridbtn{padding:5px 10px;font-size:.8rem;bottom:calc(var(--u)*2.5)}
 }
 /* ===== v3 : contrôle des cartons, aperçu public, colonne repliable ===== */
 .lot-card{display:flex;flex-direction:column}
@@ -754,6 +810,39 @@ body.public .top,body.public main{display:none}
 .tour-btns{display:flex;gap:8px;align-items:center}.tour-btns .grow{flex:1}
 #tour.busy .tour-btns .btn{opacity:.6;pointer-events:none}
 html.dark .tour-k{color:#7fd3da}
+/* photos des lots et partenaires (configuration) */
+.ph-f{display:flex;flex-direction:column;gap:5px;font-size:.86rem;font-weight:600;color:var(--muted)}
+.ph-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ph-box img{height:54px;max-width:96px;object-fit:cover;border-radius:8px;box-shadow:0 0 0 1px var(--line)}
+.ph-miss{font-weight:400;color:var(--bad);font-size:.82rem}
+.sp-list{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+.sp-tile{width:170px;display:flex;flex-direction:column;gap:6px}
+.sp-tile .sp-img{height:86px;background:#fff;border-radius:12px;box-shadow:0 0 0 1px var(--line),0 3px 8px rgba(0,0,0,.08);display:grid;place-items:center;padding:8px}
+.sp-tile .sp-img img{max-width:100%;max-height:100%;object-fit:contain}
+.sp-tile .sp-acts{display:flex;gap:4px;justify-content:center}
+.sp-tile .sp-acts .btn{padding:2px 9px}
+/* encart « serveur OpenLoto » (colonne de droite) */
+.ol-promo{margin-top:10px;border-radius:14px;padding:12px 14px;background:linear-gradient(160deg,#e8f5f6,#fff6e0);border:1px solid #cfe3e5;font-size:.84rem;line-height:1.4;color:var(--ink)}
+.ol-promo[hidden]{display:none}
+.ol-promo b{display:block;font-size:.92rem;margin-bottom:4px}
+.cfg-lrail{position:absolute;right:100%;top:0;bottom:0;margin-right:16px;width:260px}
+.cfg-lrail .ol-promo,.cfg-promo-narrow{margin-top:0}
+.cfg-promo-narrow{display:none}
+@media(max-width:1450px){.cfg-lrail{display:none}.cfg-promo-narrow{display:block}}
+.ol-promo .lk{display:inline-block;border:0;background:none;padding:0;margin-top:6px;font:inherit;font-weight:700;color:var(--teal);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+html.dark .ol-promo{background:linear-gradient(160deg,#173c40,#3a3322);border-color:#2e5559}
+html.dark .ol-promo .lk{color:#7fd3da}
+/* démo en ligne : bandeau et encadrés « téléchargez OpenLoto » */
+.demo-band{flex:0 0 auto;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 14px;background:#fff1cf;color:#5a3d00;border-bottom:1px solid #f0d58f;padding:7px 16px;font-size:.92rem;text-align:center}
+.demo-band b{font-weight:800}
+.btn-dl{display:inline-flex;align-items:center;gap:6px;background:var(--amber);border:1.5px solid var(--amber);color:#2b1d00;border-radius:10px;padding:5px 12px;font-weight:800;font-size:.88rem;text-decoration:none;white-space:nowrap}
+.btn-dl:hover{background:#ffb623}
+.btn-dl svg{width:16px;height:16px;fill:currentColor}
+.demo-box{margin:18px 30px 0;padding:14px 18px;border-radius:14px;background:#fff1cf;border:1px solid #f0d58f;display:flex;gap:16px;align-items:center;color:#5a3d00}
+.demo-box b{display:block;font-size:1.02rem;color:#3a2a00}
+@media(max-width:560px){.demo-box{flex-direction:column;align-items:flex-start;margin:16px 16px 0}}
+html.dark .demo-band,html.dark .demo-box{background:#3a3020;color:#f2deb0;border-color:#5c4a22}
+html.dark .demo-box b{color:#ffe3a3}
 /* horloge du direct : en tête de la colonne de droite, ou en haut du bloc des boules quand la colonne est rangée */
 .clk-t{font-family:var(--num);font-weight:800;color:var(--ink);line-height:1;letter-spacing:.02em;font-variant-numeric:tabular-nums}
 .clk-s{font-weight:600;color:var(--muted);font-size:.78rem;line-height:1.2}
@@ -778,7 +867,7 @@ html.dark .tour-k{color:#7fd3da}
 @media (orientation:portrait){#pub.mode-carton .pub-grid{width:100%}#pub.mode-carton .pb.mid{width:min(16vh,22vw);height:min(16vh,22vw);font-size:min(9vh,12vw)}}
 /* téléphones : bouton plein écran discret (masque la barre d'adresse) */
 @media (pointer:coarse){
-  .pub-fs{display:grid!important;place-items:center;top:1.2vh!important;bottom:auto!important;right:2.5vw;width:38px;height:38px;padding:0;font-size:0;border-radius:10px;background:rgba(0,0,0,.25);opacity:.75}
+  .pub-fs{display:flex!important;align-items:center;justify-content:center;line-height:0;top:1.2vh!important;bottom:auto!important;right:2.5vw;width:38px;height:38px;padding:0;font-size:0;border-radius:10px;background:rgba(0,0,0,.25);opacity:.75}
   .pub-fs::before{content:'';width:18px;height:18px;background:currentColor;-webkit-mask:var(--fs-ico) center/contain no-repeat;mask:var(--fs-ico) center/contain no-repeat}
   .pub-fs[hidden]{display:none!important}
 }
@@ -796,7 +885,12 @@ html.dark .tour-k{color:#7fd3da}
   .pub-fs{top:calc(var(--u)*2)!important}
 }
 /* ===== v4 : animation de la nouvelle boule, mode démo sur téléphone ===== */
-@keyframes pbPop{0%{transform:scale(.5);opacity:.2}55%{transform:scale(1.1);opacity:1}100%{transform:scale(1)}}
+/* Arrivée d'une boule : le numéro grandit dans la boule et un halo s'en échappe.
+   Pas de transform ni d'opacité sur la boule : sur certains PC (affichage à 125 %, 150 %…),
+   agrandir une grande boule par le processeur graphique laissait voir une fine croix au milieu. */
+@property --pop{syntax:'<number>';inherits:true;initial-value:1}
+@keyframes pbPop{0%{--pop:.35}55%{--pop:1.12}100%{--pop:1}}
+#pub .pb .pbn{font-size:calc(1em * var(--pop));line-height:1}
 @keyframes pbHalo{0%{box-shadow:var(--sphere),0 0 0 0 rgba(255,255,255,.75)}100%{box-shadow:var(--sphere),0 0 0 calc(var(--u,1vh)*5) rgba(255,255,255,0)}}
 #pub .pb.pop{animation:pbPop .65s cubic-bezier(.2,.9,.3,1.25),pbHalo 1.3s ease-out .35s}
 @media(prefers-reduced-motion:reduce){#pub .pb.pop{animation:none}}
@@ -1107,6 +1201,7 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
       <button class="btn" data-act="openPublic">Ouvrir l’écran public</button>
       <button class="btn qr-pub-btn" data-act="qrPub" title="Afficher par-dessus l’écran public le QR code qui permet aux joueurs de suivre le tirage sur leur téléphone">Afficher le QR code joueurs</button>
       <input class="loader" id="cfgLoader" type="file" accept=".json,application/json" hidden>
+      <div class="ol-promo" id="olPromo"><b>Diffuser sans Raspberry ?</b>Un serveur OpenLoto gratuit pourrait permettre de suivre le loto sur les téléphones sans rien installer. Il verra le jour grâce à vos dons.<br><button type="button" class="lk" data-act="promoInfo">En savoir plus →</button></div>
       <span class="grow"></span>
       <div class="muted small" id="sourceInfo"></div>
     </aside>
@@ -1127,16 +1222,16 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
 
 <!-- ===================== CONFIG ===================== -->
 <section id="tab-config" hidden>
-  <nav class="cfg-jump" aria-label="Aller directement à un bloc de la configuration">
-    <button class="btn sm" data-act="cfgJump" data-jump="cfg-block-params">Titre, logo et paramètres</button>
-    <button class="btn sm" data-act="cfgJump" data-jump="cfg-block-colors">Couleurs des boules</button>
-    <button class="btn sm" data-act="cfgJump" data-jump="cfg-block-deroule">Déroulement du loto</button>
-    <button class="btn sm" data-act="cfgJump" data-jump="cfg-block-cartons">Cartons</button>
+  <nav class="cfg-jump cfg-tabbar" role="tablist" aria-label="Parties de la configuration">
+    <button type="button" class="cfg-tab" role="tab" aria-selected="false" aria-controls="cfg-block-params" data-act="cfgJump" data-jump="cfg-block-params">Titre et paramètres</button>
+    <button type="button" class="cfg-tab" role="tab" aria-selected="false" aria-controls="cfg-block-colors" data-act="cfgJump" data-jump="cfg-block-colors">Couleurs des boules</button>
+    <button type="button" class="cfg-tab" role="tab" aria-selected="false" aria-controls="cfg-block-deroule" data-act="cfgJump" data-jump="cfg-block-deroule">Déroulement du loto<span class="cfg-n" data-cfg-n="steps"></span></button>
+    <button type="button" class="cfg-tab" role="tab" aria-selected="false" aria-controls="cfg-block-sponsors" data-act="cfgJump" data-jump="cfg-block-sponsors">Partenaires<span class="cfg-n" data-cfg-n="sponsors"></span></button>
+    <button type="button" class="cfg-tab" role="tab" aria-selected="false" aria-controls="cfg-block-cartons" data-act="cfgJump" data-jump="cfg-block-cartons">Cartons<span class="cfg-n" data-cfg-n="cartons"></span></button>
   </nav>
   <div class="cfg-grid">
+    <div class="cfg-lrail"><div class="cfg-stack"><div class="ol-promo"><b>Diffuser sans Raspberry ?</b>Un serveur OpenLoto gratuit pourrait permettre de suivre le loto sur les téléphones sans rien installer. Il verra le jour grâce à vos dons.<br><button type="button" class="lk" data-act="promoInfo">En savoir plus →</button></div></div></div>
     <div class="cfg-main">
-
-    <div class="notice">Cette configuration est indépendante du direct. Quand elle est prête, <b>exportez-la</b>, puis chargez le fichier dans l’onglet Direct.</div>
 
     <div class="card cfg-block" id="cfg-block-params">
       <div class="cfg-head"><h2>Titre, logo et paramètres</h2></div>
@@ -1154,11 +1249,21 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
           <label><input type="radio" name="logoPos" value="top"> Au-dessus du titre</label>
         </fieldset>
       </div>
+      <fieldset class="pos" id="olMarkBox" style="margin-top:10px">
+        <legend>Logo OpenLoto sur l’écran public</legend>
+        <label><input type="radio" name="olMark" value="sig"> Signature discrète en bas</label>
+        <label><input type="radio" name="olMark" value="side"> À côté du titre</label>
+        <label><input type="radio" name="olMark" value="both"> Les deux</label>
+        <label><input type="radio" name="olMark" value="none"> Aucun</label>
+      </fieldset>
       <div id="logoInfo"></div>
       <div id="titlePreview" class="tb-preview" aria-label="Aperçu du titre sur l’écran public"></div>
       <div class="inline" style="margin-top:12px">
         <label class="chk2"><input type="checkbox" id="cfgPubLot"> Afficher le lot en cours sur l’écran public</label>
         <label class="chk2"><input type="checkbox" id="cfgPubRule"> avec la règle (1 ligne, carton plein…)</label>
+      </div>
+      <div class="inline" style="margin-top:6px">
+        <label class="chk2"><input type="checkbox" id="cfgConfetti"> Confettis quand un carton gagnant s’affiche (écran public et téléphones)</label>
       </div>
       <div class="inline" style="margin-top:14px">
         <b>Boutons de la fenêtre « Gagnant validé »</b>
@@ -1226,6 +1331,17 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
       </div>
     </div>
 
+    <div class="card cfg-block" id="cfg-block-sponsors">
+      <div class="cfg-head"><h2>Partenaires (sponsors)</h2><span class="muted" id="spCount"></span></div>
+      <p class="muted small" style="margin-top:0">Leurs logos s’affichent en bas de l’écran public de la salle, dans des encarts blancs : jusqu’à 4 logos, ils restent fixes ; au-delà, ils défilent par groupes de 4. Ils ne sont pas envoyés aux téléphones. Les images sont allégées automatiquement.</p>
+      <div class="inline">
+        <label class="chk2"><input type="checkbox" id="cfgSpPause"> Pendant les entractes</label>
+        <label class="chk2"><input type="checkbox" id="cfgSpWait"> Avant le démarrage du loto</label>
+      </div>
+      <div id="spList" class="sp-list"></div>
+      <button class="btn primary" data-act="spAdd">Ajouter des logos…</button>
+    </div>
+
     <div class="card cfg-block" id="cfg-block-cartons">
       <div class="cfg-head">
         <h2>Cartons</h2>
@@ -1265,7 +1381,6 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
     <div class="cfg-stack">
     <aside class="cfg-side cfg-block" id="cfg-block-files">
       <div class="cfg-head" style="margin-bottom:0"><h2>Fichiers</h2></div>
-      <p class="muted small" style="margin:0">La configuration est enregistrée automatiquement dans ce navigateur. Chargez-la directement dans le direct, ou exportez-la pour la transférer ou en garder une copie.</p>
       <button class="btn primary" data-act="loadDirectFromCfg">Charger dans le direct</button>
       <button class="btn" data-act="exportConfig">Exporter la configuration</button>
       <button class="btn" data-act="exportRunSheet">Exporter le déroulé (PDF / CSV)</button>
@@ -1280,10 +1395,9 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
       <button class="btn qr-pub-btn" data-act="qrPub" title="Afficher par-dessus l’écran public le QR code qui permet aux joueurs de suivre le tirage sur leur téléphone">Afficher le QR code joueurs</button>
       <button class="btn" data-act="pubMessages">Messages de l’écran public…</button>
       <button class="btn" data-act="netConfig">Config réseau (téléphones) <span class="net-dot wait" data-net-dot aria-hidden="true"></span></button>
-      <div class="muted small" id="noticeSummary"></div>
-      <div class="muted small" id="pubMsgSummary"></div>
       <div class="inline" style="gap:6px"><span class="net-dot wait" data-net-dot aria-hidden="true"></span><span class="net-status wait" data-net-status>Diffusion réseau non configurée.</span></div>
     </aside>
+    <div class="ol-promo cfg-promo-narrow"><b>Diffuser sans Raspberry ?</b>Un serveur OpenLoto gratuit pourrait permettre de suivre le loto sur les téléphones sans rien installer. Il verra le jour grâce à vos dons.<br><button type="button" class="lk" data-act="promoInfo">En savoir plus →</button></div>
     </div>
     </div>
 
@@ -1312,7 +1426,7 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
   <button id="pubFs" class="pub-fs">Plein écran</button>
   <div id="pubConn" class="pub-conn" role="status" hidden></div>
   <div id="pubSim" class="pub-sim" hidden>SIMULATION</div>
-  <button id="pubGridBtn" class="pub-gridbtn" type="button" hidden>Grille des numéros</button>
+  <button id="pubGridBtn" class="pub-gridbtn" type="button" hidden>Grille</button>
   <div id="pubWake" class="pub-wake" hidden>Touchez l’écran pour qu’il reste allumé</div>
   <div id="pubHead" class="pub-head"></div>
   <div id="pubLot" class="pub-lotband"></div>
@@ -1404,11 +1518,20 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
   try { for (const o in R) { const v = localStorage.getItem(o); if (v == null) continue; if (localStorage.getItem(R[o]) == null) localStorage.setItem(R[o], v); localStorage.removeItem(o); } } catch (e) {}
 })();
 const KEY_C = 'openloto-config', KEY_D = 'openloto-direct', KEY_OLD = 'loto-suivi-v1', TAB_KEY = 'openloto-onglet', KEY_NET = 'openloto-reseau', KEY_NOTICE = 'openloto-accueil', KEY_PUBMSG = 'openloto-messages', KEY_PLATE = 'openloto-plaque';
-const SERVED = location.protocol === 'http:' || location.protocol === 'https:';
-const IS_PUBLIC = SERVED || location.hash === '#public';
+/* Un seul fichier, trois façons de l'ouvrir :
+   - ouvert depuis l'ordinateur (file://) : l'organisateur, version complète ;
+   - servi par un serveur OpenLoto (Raspberry, serveur local) : l'écran des téléphones ;
+   - la démo en ligne (GitHub Pages, ou adresse terminée par #organisateur) : l'organisateur, avec les rappels « démo ».
+   L'écran public ouvert depuis la démo porte #public-demo, pour ne pas se prendre pour un téléphone. */
+const ONLINE = /\.github\.io$/i.test(location.hostname) || location.hash === '#organisateur' || location.hash === '#public-demo';
+const SERVED = (location.protocol === 'http:' || location.protocol === 'https:') && !ONLINE;
+const IS_PUBLIC = SERVED || location.hash === '#public' || location.hash === '#public-demo';
+const ONLINE_ORGA = ONLINE && !IS_PUBLIC;
+const PUB_HASH = ONLINE ? '#public-demo' : '#public';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const uid = () => Math.random().toString(36).slice(2, 9);
+const IMG_ID = /^img-[a-z0-9]{4,20}$/;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pl = (n, a, b) => n + ' ' + (n > 1 ? b : a);
 const time = t => new Date(t).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
@@ -1432,16 +1555,37 @@ const colorOf = (cfg, n) => (cfg.colors && cfg.colors[n - 1]) || defaultColor(n)
 const ballStyle = (cfg, n) => { const c = colorOf(cfg, n); return `background:${c};color:${textOn(c)}`; };
 
 /* ---------- Titre + logo ---------- */
+/* Logo OpenLoto (le même que celui du bandeau) */
+const OL_MARK_SRC = (() => { const e = document.querySelector('.top .ol-mark'); return e ? e.getAttribute('src') : ''; })();
+/* Bloc titre de l'écran public : logo du club (gauche, droite ou au-dessus) et logo OpenLoto selon le réglage
+   « side » : à côté du titre (de l'autre côté du logo du club, ou des deux côtés sans logo de club ;
+   si le logo du club est au-dessus ou des deux côtés, il passe en signature),
+   « sig » : signature discrète en bas de l'écran, « both » : les deux, « none » : aucun. */
 function titleBlock(cfg) {
   const ti = `<div class="tb-title">${esc(cfg.titre || '')}</div>`;
-  if (!logoOk(cfg.logo)) return `<div class="tb">${ti}</div>`;
+  const mark = ['side', 'sig', 'both', 'none'].includes(cfg.olMark) ? cfg.olMark : 'sig';
+  const ol = OL_MARK_SRC && (mark === 'side' || mark === 'both') ? `<img class="tb-ol" src="${OL_MARK_SRC}" alt="OpenLoto" title="OpenLoto">` : '';
+  /* deux côtés de même largeur : le titre reste exactement au centre, quelle que soit la taille des logos */
+  const row = (l, r) => `<div class="tb"><span class="tb-s l">${l}</span>${ti}<span class="tb-s r">${r}</span></div>`;
+  if (!logoOk(cfg.logo)) return ol ? row(ol, ol) : `<div class="tb">${ti}</div>`;
   const img = `<img src="${cfg.logo}" alt="">`;
   switch (cfg.logoPos) {
-    case 'top': return `<div class="tb top">${img}${ti}</div>`;
-    case 'right': return `<div class="tb">${ti}${img}</div>`;
-    case 'both': return `<div class="tb">${img}${ti}${img}</div>`;
-    default: return `<div class="tb">${img}${ti}</div>`;
+    case 'top': return `<div class="tb tb-top">${img}${ti}</div>`;
+    case 'right': return row(ol, img);
+    case 'both': return row(img, img);   /* logo du club des deux côtés : le logo OpenLoto passe en signature */
+    default: return row(img, ol);
   }
+}
+/* Signature « OpenLoto » en bas de l'écran public : réglage « sig », ou « side » quand le logo ne peut pas
+   être à côté du titre (logo du club au-dessus, titre masqué sur téléphone) */
+function paintPubSig(m) {
+  let el = $('#pubSig');
+  const mark = m && ['side', 'sig', 'both', 'none'].includes(m.olMark) ? m.olMark : 'sig';
+  const head = $('#pubHead'), headShown = head && head.offsetParent !== null && head.offsetHeight > 0;
+  const on = !!OL_MARK_SRC && (mark === 'sig' || mark === 'both' || (mark === 'side' && (!headShown || (m && (m.logoPos === 'top' || m.logoPos === 'both') && logoOk(m.logo)))));
+  if (!on) { if (el) el.hidden = true; return; }
+  if (!el) { el = document.createElement('div'); el.id = 'pubSig'; el.className = 'pub-sig'; el.innerHTML = `<img src="${OL_MARK_SRC}" alt="">OpenLoto`; document.body.appendChild(el); }
+  el.hidden = false;
 }
 
 /* ---------- Règles du jeu ---------- */
@@ -1635,6 +1779,7 @@ function normalize(o) {
   s.titre = String(s.titre || 'Loto de l’association');
   s.logo = logoOk(s.logo) ? s.logo : '';
   s.logoPos = POS.includes(s.logoPos) ? s.logoPos : 'left';
+  s.olMark = ['side', 'sig', 'both', 'none'].includes(s.olMark) ? s.olMark : 'sig';
   s.randomDraw = s.randomDraw === true;
   s.rythme = normTempo(s.rythme, 3);
   s.usePaliers = s.usePaliers !== false;
@@ -1665,6 +1810,7 @@ function normalize(o) {
     gagnants: (g => Number.isFinite(g) && g >= 0 ? g : 1)(parseInt(st.gagnants, 10)),
     duree: Math.max(0, parseInt(st.duree, 10) || 0),
     reset: !!st.reset, note: String(st.note || ''),
+    photo: IMG_ID.test(st.photo || '') ? st.photo : '',
     cartonAll: st.cartonAll !== false,
     cartonColors: (Array.isArray(st.cartonColors) ? st.cartonColors : []).map(String).filter(id => palIds.has(id))
   }));
@@ -1672,6 +1818,9 @@ function normalize(o) {
     .filter(c => c && c.code && Array.isArray(c.lines))
     .map(c => { const p = parseInt(c.plate, 10); return { code: String(c.code).trim(), lines: c.lines.map(l => l.map(Number)), ...(p > 0 ? { plate: p } : {}) }; });
   s.pubCarton = s.pubCarton !== false;
+  s.sponsors = [...new Set((Array.isArray(s.sponsors) ? s.sponsors : []).filter(id => IMG_ID.test(id || '')))].slice(0, 40);
+  s.sponsorPause = s.sponsorPause !== false; s.sponsorWait = s.sponsorWait !== false;
+  s.confetti = s.confetti !== false;
   s.source = s.source && typeof s.source === 'object' ? { name: String(s.source.name || ''), at: +s.source.at || 0 } : null;
   { const pc = s.popColors && typeof s.popColors === 'object' ? s.popColors : {}, dp = { next:'#17794a', other:'#1e88e5', cont:'#f09300' };
     s.popColors = {}; for (const k of ['next', 'other', 'cont']) s.popColors[k] = /^#[0-9a-f]{6}$/i.test(pc[k]) ? pc[k] : dp[k]; }
@@ -1751,12 +1900,12 @@ function normPubMsg(o) {
   const s = (v, def) => { const t = String(v == null ? '' : v).replace(/\s*\n\s*/g, ' ').replace(/\s+/g, ' ').trim(); return t ? t.slice(0, 200) : def; };
   const ml = (v, def, max) => { const t = String(v == null ? '' : v).replace(/\r\n?/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim(); return t ? t.slice(0, max) : def; };
   return {
-    start: s(o.start, PUBMSG_DEFAULT_START),
-    wait: s(o.wait, PUBMSG_DEFAULT_WAIT),
+    start: ml(o.start, PUBMSG_DEFAULT_START, 400),
+    wait: ml(o.wait, PUBMSG_DEFAULT_WAIT, 400),
     endTitle: ml(o.endTitle, '', 80),
     end: ml(o.end, PUBMSG_DEFAULT_END, 600),
     demoOn: o.demoOn === true,
-    demoText: s(o.demoText, ''),
+    demoText: ml(o.demoText, '', 200),
     demoSpeed: normDemoSpeed(o.demoSpeed),
     anim: o.anim !== false
   };
@@ -2170,6 +2319,7 @@ function showWelcome() {
   ov.innerHTML = `<div class="wl" role="dialog" aria-modal="true" aria-labelledby="wlTitle">
     <div class="wl-hero">${logo ? `<img src="${logo}" alt="">` : ''}<div><h1 id="wlTitle">Bienvenue dans OpenLoto</h1>
       <p>Le gestionnaire de loto pour les associations : vous saisissez les boules au fil du tirage, la salle suit sur le grand écran et sur les téléphones.</p></div></div>
+    ${ONLINE_ORGA ? `<div class="demo-box"><div style="flex:1"><b>Vous êtes sur la démo en ligne</b>Idéale pour découvrir OpenLoto. Pour votre loto, utilisez le fichier téléchargé : il fonctionne sans internet et permet la diffusion sur les téléphones des joueurs.</div>${demoDlBtn()}</div>` : ''}
     <div class="wl-grid">
       ${card('#e53935', '1', 'Le déroulé du loto', 'Étapes, lots, conditions de gain (ligne, carton plein, tour, au choix, loto inversé) et entractes.')}
       ${card('#fb8c00', '2', 'Un écran public', 'Dernière boule, grille, lot en cours et messages, en grand pour toute la salle.')}
@@ -2238,7 +2388,7 @@ const dlgIs = re => !$('#dlg').hidden && re.test($('#dlgTitle').textContent);
 /* ---------- étapes de la visite ---------- */
 const TOUR_STEPS = [
   { tab:'config', sel:'#cfg-block-params', k:'La configuration', t:'Titre, logo et paramètres',
-    p:'La configuration se prépare à l’avance, dans cet onglet. Le titre (le nom de votre association) et le logo s’affichent en haut de l’écran public ; vous choisissez aussi d’y montrer le lot en cours et sa règle.' },
+    p:'La configuration se prépare à l’avance, dans cet onglet, partie par partie grâce aux onglets juste au-dessus. Le titre (le nom de votre association) et le logo s’affichent en haut de l’écran public ; vous choisissez aussi d’y montrer le lot en cours et sa règle.' },
   { tab:'config', sel:'#cfg-block-deroule .cfg-head', big:'#cfg-block-deroule', k:'La configuration', t:'Le déroulement du loto',
     p:'La liste des lots, dans l’ordre où ils seront joués. Chaque étape a un lot, une condition de gain et un nombre de gagnants. Ajoutez des entractes ou des annonces entre deux lots.' },
   { tab:'config', sel:'#stepList .step-row', k:'La configuration', t:'Une étape',
@@ -2356,8 +2506,10 @@ async function tourGo(i, dir) {
   $('p', tip).textContent = st.p;
   $('[data-tour=prev]', tip).disabled = i === 0;
   $('[data-tour=next]', tip).textContent = st.last ? 'Terminer' : 'Suivant ›';
+  if (st.tab === 'config') cfgTabFor(st.big || st.sel);
   const el = tourEl(st), big = st.big ? $(st.big) : null;
-  if (el) (big || el).scrollIntoView({ block: big ? 'start' : 'center', inline:'nearest' });
+  if (el && el.matches('.cfg-main > .cfg-block')) window.scrollTo(0, 0);
+  else if (el) (big || el).scrollIntoView({ block: big ? 'start' : 'center', inline:'nearest' });
   if (st.enter) st.enter();
   tourLayout();
   if (!st.click) setTimeout(() => { const n = $('#tour [data-tour=next]'); if (n && TOUR && TOUR.i === i) n.focus(); }, 30);
@@ -2395,7 +2547,8 @@ function tourLayout() {
   let r = null;
   if (el) {
     const q = el.getBoundingClientRect(), pad = 6;
-    const x1 = Math.max(4, q.left - pad), y1 = Math.max(4, q.top - pad), x2 = Math.min(vw - 4, q.right + pad), y2 = Math.min(vh - 4, q.bottom + pad);
+    const bar = st.tab === 'config' && !el.closest('.cfg-tabbar') ? $('.cfg-tabbar') : null, top = bar && bar.offsetParent ? bar.getBoundingClientRect().bottom + 4 : 4;
+    const x1 = Math.max(4, q.left - pad), y1 = Math.max(top, q.top - pad), x2 = Math.min(vw - 4, q.right + pad), y2 = Math.min(vh - 4, q.bottom + pad);
     if (x2 > x1 && y2 > y1) r = { left:x1, top:y1, right:x2, bottom:y2, width:x2 - x1, height:y2 - y1 };
   }
   hole.hidden = !r;
@@ -2456,6 +2609,42 @@ function tourEnd() {
   toast('Visite terminée : votre configuration et votre direct sont remis tels qu’ils étaient.');
 }
 
+/* Encart « serveur OpenLoto » : toujours là, sauf quand la colonne de droite manque de place */
+const OPENLOTO_REPO = '';   /* adresse du dépôt GitHub, pour « Page du projet » (à renseigner) */
+function promoFit() {
+  const el = $('#olPromo'), col = $('#actWrap .actions'); if (!el || !col) return;
+  el.hidden = false;
+  if (window.innerWidth > 1000 && col.scrollHeight > col.clientHeight + 1) el.hidden = true;
+}
+async function showPromoInfo() {
+  const btns = [{ label:'Fermer', value:false, primary:true }];
+  if (OPENLOTO_REPO) btns.unshift({ label:'Page du projet', value:'repo' });
+  const r = await ask('Un serveur OpenLoto pour les téléphones', '', btns, false, { tone:'info', wide:true,
+    visual: `<div style="text-align:left;font-size:.95rem;line-height:1.5">
+      <p style="margin:0 0 10px">Aujourd’hui, pour que les joueurs suivent le tirage sur leur téléphone, il faut un Raspberry Pi ou le serveur local sur l’ordinateur de la salle, avec un wifi qui couvre toute la salle.</p>
+      <p style="margin:0 0 10px"><b>Le projet :</b> un serveur OpenLoto sur internet, <b>gratuit et sans compte</b>. Vous créez une salle, vous collez son code dans OpenLoto, et les joueurs scannent le QR code. Ils suivent le tirage avec leur propre connexion 4G/5G : plus besoin du wifi de la salle, ni de rien installer.</p>
+      <p style="margin:0">Ce service a un coût (serveur, nom de domaine, maintenance). <b>Il ne verra le jour que si suffisamment de dons</b> permettent de le faire fonctionner dans la durée. Intéressé ? Faites-le savoir sur la page du projet OpenLoto, ou par e-mail : <a href="mailto:openloto@duck.com"><b>openloto@duck.com</b></a>.</p></div>` });
+  if (r === 'repo' && OPENLOTO_REPO) window.open(OPENLOTO_REPO, '_blank', 'noopener');
+}
+/* ---------- Démo en ligne ---------- */
+const DL_ICO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11.2l-4-4-1.4 1.4L12 18l5.4-6.4L16 10.2l-4 4V3zM5 19h14v2H5z"/></svg>';
+/* le fichier lui-même, tel qu'il est publié : c'est la version à télécharger */
+const demoDlHref = () => location.href.split('#')[0];
+const demoDlBtn = (cls = 'btn-dl') => `<a class="${cls}" href="${demoDlHref()}" download="OpenLoto.html">${DL_ICO}Télécharger OpenLoto</a>`;
+function demoDownload() { const a = document.createElement('a'); a.href = demoDlHref(); a.download = 'OpenLoto.html'; document.body.appendChild(a); a.click(); a.remove(); }
+function demoInit() {
+  if (!ONLINE_ORGA) return;
+  const band = document.createElement('div'); band.className = 'demo-band'; band.setAttribute('role', 'note');
+  band.innerHTML = `<span><b>Version d’essai en ligne.</b> Pour votre loto, téléchargez OpenLoto : il fonctionne sans internet et diffuse sur les téléphones.</span>${demoDlBtn()}`;
+  $('header.top').after(band);
+}
+async function demoNetInfo() {
+  const r = await ask('Config réseau (téléphones)', '', [{ label:'Télécharger OpenLoto', value:'dl', primary:true }, { label:'Fermer', value:false }], false, { tone:'info', wide:true,
+    visual: `<div style="text-align:left;font-size:.95rem;line-height:1.5"><p style="margin:0 0 10px"><b>La diffusion sur les téléphones n’est pas disponible dans la démo en ligne.</b></p>
+      <p style="margin:0 0 10px">Pour que les joueurs suivent le tirage sur leur téléphone, utilisez le fichier OpenLoto téléchargé, avec un Raspberry Pi ou le serveur local de votre PC. Tout est expliqué sur la page du projet.</p>
+      <p style="margin:0">Votre configuration se récupère facilement : <b>Configuration → Exporter la configuration</b>, puis importez-la dans le fichier téléchargé.</p></div>` });
+  if (r === 'dl') demoDownload();
+}
 /* Horloge du direct : heure actuelle + durée depuis le démarrage du loto */
 function clockTick() {
   const hhmm = t => new Date(t).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
@@ -2572,8 +2761,19 @@ async function jumpStep(i) {
   toast(back ? `Retour à l’étape ${i + 1}.` : `Étape ${i + 1} : ${tgtName}.`);
 }
 function prevStep() { if (D.live.current > 0) jumpStep(D.live.current - 1); }
-function startLoto() {
+async function startLoto() {
   if (!D.steps.length || D.live.started) return;
+  if (ONLINE_ORGA && !tourOn()) {
+    let seen = false; try { seen = localStorage.getItem('openloto-demo-rappel') === '1'; } catch (e) {}
+    if (!seen) {
+      const r = await ask('Vous lancez un loto sur la démo en ligne', 'Ça fonctionne, mais si la connexion internet coupe, vous ne pourrez pas rouvrir cette page, et les téléphones des joueurs ne peuvent pas suivre le tirage.\n\nPour un vrai loto, le fichier téléchargé est plus sûr : il fonctionne sans internet.',
+        [{ label:'Télécharger OpenLoto', value:'dl', primary:true }, { label:'Continuer quand même', value:'go' }], false, { tone:'warn', note:'Ce rappel ne s’affiche qu’une fois.' });
+      try { localStorage.setItem('openloto-demo-rappel', '1'); } catch (e) {}
+      if (r === 'dl') { demoDownload(); return; }
+      if (r !== 'go') return;
+      if (!D.steps.length || D.live.started) return;
+    }
+  }
   D.live.started = true;
   if (D.live.ended) D.live.ended = false;
   const hadQr = pubQrOn; pubQrOn = false; syncQrBtns();   /* le QR code des joueurs laisse la place au tirage */
@@ -2752,6 +2952,7 @@ function renderDirect() {
 
   if (verifiedCode) runVerify(verifiedCode); else { verifiedView = null; $('#verifyResult').innerHTML = ''; }
   renderHeat();
+  promoFit();
   fitDirect();
   updateScrollCues();
   sendPublic();
@@ -2864,19 +3065,20 @@ function doVerify() {
 
 /* ---------- Écran public ---------- */
 function buildPublic() {
-  const base = { loto:'state', t:Date.now(), titre:D.titre, logo:D.logo, logoPos:D.logoPos, colors:D.colors,
+  const base = { loto:'state', t:Date.now(), titre:D.titre, logo:D.logo, logoPos:D.logoPos, olMark:(D.steps.length ? D : C).olMark, colors:D.colors,
     notice:{ on:NOTICE.on, title:NOTICE.title, text:NOTICE.text },
     pubmsg:{ start:PUBMSG.start, wait:PUBMSG.wait, end:PUBMSG.end, endTitle:PUBMSG.endTitle, demo:PUBMSG.demoText, anim:PUBMSG.anim !== false },
     demo:{ on:PUBMSG.demoOn === true, speed:PUBMSG.demoSpeed }, ...(simOn() ? { sim:true } : tourOn() ? { sim:true, simLabel:'DÉMONSTRATION' } : {}),
     ...(pubQrOn && playerUrl() ? { qr:{ url:playerUrl(), wifi:(NET.wifi || '').trim() } } : {}) };
   if (!D.steps.length) return Object.assign(base, { empty:true });
   const st = curStep(), L = D.live;
+  const spIds = D.sponsors.filter(id => IMG.has(id));
   if (L.ended) return Object.assign(base, { ended:true });
-  if (!L.started) return Object.assign(base, { waiting:true });
+  if (!L.started) return Object.assign(base, { waiting:true }, D.sponsorWait && spIds.length ? { sponsors: spIds } : {});
   if (st.type === 'annonce')
     return Object.assign(base, { annonce:{ name: st.lot || '' } });
   if (st.type === 'pause')
-    return Object.assign(base, { pause:{ name: st.lot || 'Entracte', end: st.duree ? (L.stepAt || Date.now()) + st.duree * 60000 : null } });
+    return Object.assign(base, { pause:{ name: st.lot || 'Entracte', end: st.duree ? (L.stepAt || Date.now()) + st.duree * 60000 : null } }, D.sponsorPause && spIds.length ? { sponsors: spIds } : {});
   let d = L.draws;
   if (L.reveal > 0 && pubRevealed < d.length && !checkOpen) d = d.slice(0, pubRevealed);
   return Object.assign(base, {
@@ -2884,11 +3086,32 @@ function buildPublic() {
     last5: [...d].reverse().slice(0, 5),
     drawn: d.slice(),
     ...(checkOpen ? { check: true } : {}),
-    carton: (verifiedView && D.pubCarton) ? { code:verifiedView.code, last:verifiedView.last, lines:verifiedView.lines, verdict:verifiedView.verdict } : null
+    carton: (verifiedView && D.pubCarton) ? { code:verifiedView.code, last:verifiedView.last, lines:verifiedView.lines, verdict:verifiedView.verdict } : null,
+    confetti: D.confetti !== false,
+    ...(st.photo && IMG.has(st.photo) && !checkOpen && !ballSinceStep(st) ? { photo: st.photo } : {})
   });
+}
+/* Une boule a-t-elle été tirée depuis le début de l'étape ? (la photo du lot s'efface alors) */
+function ballSinceStep(st) {
+  const j = D.live.journal || []; let n = 0;
+  for (let k = j.length - 1; k >= 0; k--) {
+    const e = j[k];
+    if (e.type === 'ball') n++; else if (e.type === 'undo') n--;
+    else if ((e.type === 'step' && e.stepId === st.id) || e.type === 'partie') return n > 0;
+  }
+  return D.live.draws.length > 0;
+}
+/* Images envoyées aux écrans publics de cet ordinateur (fenêtre et aperçu), jamais au serveur */
+let pubAssetsKey = '', pvAssetsKey = '';
+function sendAssets() {
+  const ids = [...new Set(imgIdsOf(D))].filter(id => IMG.has(id)), key = IMGVER + ':' + ids.join(',');
+  const imgs = () => Object.fromEntries(ids.map(id => [id, IMG.get(id)]));
+  if (pubWin && pubAssetsKey !== key) { try { pubWin.postMessage({ loto:'assets', imgs: imgs() }, '*'); pubAssetsKey = key; } catch (e) {} }
+  if (pvWin && pvAssetsKey !== key) { try { pvWin.postMessage({ loto:'assets', imgs: imgs() }, '*'); pvAssetsKey = key; } catch (e) {} }
 }
 function sendPublic() {
   if (IS_PUBLIC) return;
+  sendAssets();
   const msg = buildPublic();
   if (pubWin) { try { if (pubWin.closed) pubWin = null; else pubWin.postMessage(msg, '*'); } catch (e) {} }
   if (pvWin) { try { pvWin.postMessage(msg, '*'); } catch (e) {} }
@@ -3214,6 +3437,7 @@ function bindNetFields(root) {
   renderNet();
 }
 async function showNetConfig() {
+  if (ONLINE_ORGA) return demoNetInfo();
   await ask('Diffusion réseau (téléphones)', 'Renseignez l’adresse et la clé fournies par le serveur, puis testez la connexion. Ces informations sont enregistrées uniquement sur cet appareil.',
     [{ label:'Fermer', value:true, primary:true }], true, {
       visual: netFieldsHtml(),
@@ -3292,8 +3516,8 @@ async function showPubMsgConfig() {
         <h4 class="pm-sec">Pendant le tirage</h4>
         <label class="chk2"><input type="checkbox" data-pm-anim${PUBMSG.anim !== false ? ' checked' : ''}> Animer l’arrivée de chaque nouvelle boule (écran public et téléphones)</label>
         <h4 class="pm-sec">Loto chargé, pas encore démarré</h4>
-        <label class="f">Le loto va commencer<textarea data-pm-start maxlength="200" rows="2" style="min-height:44px"></textarea></label>
-        <label class="f">En attente de configuration<textarea data-pm-wait maxlength="200" rows="2" style="min-height:44px"></textarea></label>
+        <label class="f">Le loto va commencer<textarea data-pm-start maxlength="400" rows="3" style="min-height:64px"></textarea></label>
+        <label class="f">En attente de configuration<textarea data-pm-wait maxlength="400" rows="3" style="min-height:64px"></textarea></label>
         <h4 class="pm-sec">Loto terminé</h4>
         <label class="f">Titre (facultatif)<input type="text" data-pm-endtitle maxlength="80" autocomplete="off"></label>
         <label class="f">Message de fin<textarea data-pm-end maxlength="600" rows="4"></textarea></label>
@@ -3383,7 +3607,7 @@ async function showPalierConfig() {
     });
 }
 function openPublic() {
-  const w = window.open(location.href.split('#')[0] + '#public', 'openloto-public', 'width=1280,height=720');
+  const w = window.open(location.href.split('#')[0] + PUB_HASH, 'openloto-public', 'width=1280,height=720');
   if (!w) return toast('Fenêtre bloquée : autorisez les popups pour ce fichier, puis réessayez.');
   pubWin = w; w.focus();
   setTimeout(sendPublic, 400);
@@ -3465,6 +3689,10 @@ function sanitizePublic(m) {
     nums: Array.isArray(l && l.nums) ? l.nums.slice(0, 12).map(PUB_INT).filter(n => n != null) : [],
     miss: Array.isArray(l && l.miss) ? l.miss.slice(0, 12).map(PUB_INT).filter(n => n != null) : []
   })) });
+  o.photo = typeof o.photo === 'string' && IMG_ID.test(o.photo) ? o.photo : '';
+  o.olMark = ['side', 'sig', 'both', 'none'].includes(o.olMark) ? o.olMark : 'sig';
+  o.sponsors = Array.isArray(o.sponsors) ? o.sponsors.filter(id => typeof id === 'string' && IMG_ID.test(id)).slice(0, 40) : [];
+  o.confetti = o.confetti !== false;
   o.qr = (o.qr && typeof o.qr === 'object' && /^https?:\/\/[^\s"<>]{3,190}$/.test(o.qr.url || '')) ? { url: o.qr.url, wifi: String(o.qr.wifi || '').slice(0, 60) } : null;
   if (o.pubmsg && typeof o.pubmsg === 'object') o.pubmsg = { start: String(o.pubmsg.start || ''), wait: String(o.pubmsg.wait || ''), end: String(o.pubmsg.end || ''), endTitle: String(o.pubmsg.endTitle || ''), demo: String(o.pubmsg.demo || ''), anim: o.pubmsg.anim !== false };
   if (o.demo && typeof o.demo === 'object') o.demo = { on: o.demo.on === true, speed: normDemoSpeed(o.demo.speed) };
@@ -3558,9 +3786,9 @@ function startPubDemo(m){
     const pub = $('#pub'); if (!pub) return;
     const step = PUB_DEMO_STEPS[st.i];
     pub.className = 'mode-balls'; pubEnd = null;
-    var demoHead = { titre: 'MODE DÉMO', logo: m.logo || '', logoPos: m.logoPos || 'left' };
+    var demoHead = { titre: 'MODE DÉMO', logo: m.logo || '', logoPos: m.logoPos || 'left', olMark: m.olMark };
     $('#pubHead').innerHTML = titleBlock(demoHead);
-    $('#pubLot').innerHTML = `<div class="pub-lot"><span class="lot">${esc(step.lot)}</span><span class="rule">${esc(ruleTitle(step))}</span><span class="pub-cartons">${step.colors.map(c => `<span class="cc" style="--c:${esc(c)}">${CARTON_GLYPH}</span>`).join('')}</span></div><div class="pub-demo-flag">MODE DÉMO</div>${demoText ? `<div class="pub-demo-tag">${esc(demoText)}</div>` : ''}`;
+    $('#pubLot').innerHTML = `<div class="pub-lot"><span class="lot">${esc(step.lot)}</span><span class="rule">${esc(ruleTitle(step))}</span><span class="pub-cartons">${step.colors.map(c => `<span class="cc" style="--c:${esc(c)}">${CARTON_GLYPH}</span>`).join('')}</span></div><div class="pub-demo-flag">MODE DÉMO</div>${demoText ? `<div class="pub-demo-tag">${esc(nbspFr(demoText)).replace(/\n/g, '<br>')}</div>` : ''}`;
     const cfg = { colors: step.colors };
     if (st.win){
       const c = demoCarton(step, st.balls);
@@ -3591,9 +3819,121 @@ function startPubDemo(m){
   };
   tick();
 }
+/* ---------- Écran public : images reçues de l'organisateur, partenaires, confettis ---------- */
+const PUB_IMGS = new Map();
+let pubSpOn = false, pubSpKey = '', pubSpTimer = null, pubSpGroup = 0, pubConfettiKey = '';
+/* Confettis « feu d'artifice » : explosion depuis un point, puis pluie qui retombe sur tout l'écran.
+   Canvas plein écran, sans bibliothèque. confettiBurst(x, y, couleurs) ; respecte prefers-reduced-motion. */
+const Confetti = (() => {
+  let cv = null, ctx = null, parts = [], raf = 0, last = 0, manual = false;
+  function ensure() {
+    if (cv) return;
+    cv = document.createElement('canvas');
+    cv.className = 'confetti-cv';
+    cv.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(cv);
+    ctx = cv.getContext('2d');
+  }
+  function fit() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  /* r : zone du carton { left, top, width, height } — les confettis partent de toute la zone, pas d'un point */
+  function burst(r, colors, opt) {
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    ensure(); fit();
+    const o = Object.assign({ n: 280, power: 1 }, opt || {});
+    const scale = Math.min(innerWidth, innerHeight) / 900;      /* même rendu sur télé et téléphone */
+    const cols = colors && colors.length ? colors : ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#ffffff'];
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    for (let i = 0; i < o.n; i++) {
+      const x = r.left + Math.random() * r.width, y = r.top + Math.random() * r.height;
+      /* direction : depuis le centre du carton vers le point de départ, avec un peu de hasard */
+      const a = Math.atan2((y - cy) / Math.max(1, r.height), (x - cx) / Math.max(1, r.width)) + (Math.random() - .5) * 1.4;
+      const sp = (250 + Math.random() * 900) * scale * o.power;
+      parts.push({
+        x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - (200 + Math.random() * 250) * scale,   /* projetés vers le haut, puis pluie */
+        w: (7 + Math.random() * 8) * scale, h: (11 + Math.random() * 12) * scale,
+        r: Math.random() * Math.PI, vr: (Math.random() - .5) * 14,
+        wob: Math.random() * Math.PI * 2, vw: 6 + Math.random() * 8,
+        c: cols[i % cols.length], fall: 150 + Math.random() * 160, life: 0, max: 3.4 + Math.random() * 1.8
+      });
+    }
+    if (!raf && !manual) { last = performance.now(); raf = requestAnimationFrame(loop); }
+  }
+  function step(dt) {
+    const g = 900 * Math.min(innerWidth, innerHeight) / 900;
+    for (const p of parts) {
+      p.life += dt;
+      const drag = p.life < 0.45 ? 2.2 : 3.4;                     /* l'explosion freine vite, puis pluie lente */
+      p.vx -= p.vx * drag * dt; p.vy -= p.vy * drag * dt;
+      p.vy += g * dt * (p.life < 0.45 ? 0.35 : 1);
+      if (p.life > 0.45) p.vy = Math.min(p.vy, p.fall * g / 900);   /* ensuite, chute lente et variée, comme du papier */
+      p.wob += p.vw * dt;
+      p.x += (p.vx + Math.sin(p.wob) * 40) * dt; p.y += p.vy * dt;
+      p.r += p.vr * dt;
+    }
+    parts = parts.filter(p => p.life < p.max && p.y < innerHeight + 40);
+  }
+  function draw() {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    for (const p of parts) {
+      const fade = Math.min(1, (p.max - p.life) / 0.6);
+      ctx.save(); ctx.globalAlpha = fade; ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.scale(1, Math.abs(Math.cos(p.wob)) * .8 + .2);         /* le papier tourne sur lui-même */
+      ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    }
+  }
+  function loop(t) {
+    const dt = Math.min(0.05, (t - last) / 1000); last = t;
+    step(dt); draw();
+    if (parts.length) raf = requestAnimationFrame(loop); else { raf = 0; ctx.clearRect(0, 0, innerWidth, innerHeight); }
+  }
+  /* pour les tests et les captures : avance le temps à la main */
+  function manualStep(dt) { manual = true; ensure(); step(dt); draw(); return parts.length; }
+  return { burst, manualStep };
+})();
+
+function paintSponsors(m) {
+  const ids = (m && Array.isArray(m.sponsors) ? m.sponsors : []).filter(id => PUB_IMGS.has(id));
+  let el = $('#pubSp');
+  const key = ids.join(',');
+  pubSpOn = ids.length > 0;
+  if (key === pubSpKey) return; pubSpKey = key;
+  clearInterval(pubSpTimer); pubSpTimer = null; pubSpGroup = 0;
+  if (!ids.length) { if (el) el.hidden = true; return; }
+  if (!el) { el = document.createElement('div'); el.id = 'pubSp'; el.className = 'pub-sp'; el.innerHTML = '<h3>Merci à nos partenaires</h3><div class="row"></div><div class="dots"></div>'; $('#pub').appendChild(el); }
+  el.hidden = false;
+  const groups = []; for (let k = 0; k < ids.length; k += 4) groups.push(ids.slice(k, k + 4));
+  const show = g => {
+    $('.row', el).innerHTML = groups[g].map(id => `<div class="tile"><img src="${PUB_IMGS.get(id)}" alt=""></div>`).join('');
+    $('.dots', el).innerHTML = groups.length > 1 ? groups.map((_, k) => `<i${k === g ? ' class="on"' : ''}></i>`).join('') : '';
+  };
+  show(0);
+  if (groups.length > 1) pubSpTimer = setInterval(() => {
+    const row = $('.row', el); row.classList.add('out');
+    setTimeout(() => { pubSpGroup = (pubSpGroup + 1) % groups.length; show(pubSpGroup); row.classList.remove('out'); }, 600);
+  }, 8000);
+}
+function pubConfetti(m) {
+  const c = m && m.carton;
+  if (!c || c.verdict !== 'ok' || m.confetti === false) { if (!c) pubConfettiKey = ''; return; }
+  const key = c.code + '|' + c.last;
+  if (key === pubConfettiKey) return; pubConfettiKey = key;
+  requestAnimationFrame(() => {
+    const els = $$('#pubPanel .pub-code, #pubPanel .pub-verdict, #pubPanel .pub-lines').map(e => e.getBoundingClientRect()).filter(r => r.width);
+    if (!els.length) return;
+    const L = Math.min(...els.map(r => r.left)), T = Math.min(...els.map(r => r.top)), R = Math.max(...els.map(r => r.right)), B = Math.max(...els.map(r => r.bottom));
+    const cols = [...new Set((m.colors || []).filter(Boolean))].slice(0, 9).concat('#ffffff');
+    Confetti.burst({ left:L, top:T, width:R - L, height:B - T }, cols);
+  });
+}
 function paintPub(m){
   const pub = $('#pub'), panel = $('#pubPanel');
   pubEnd = null; $('#pubLot').innerHTML = '';
+  paintSponsors(m && (m.waiting || m.pause) ? m : null);
   if (!m || m.empty) {
     pub.className = 'mode-wait';
     $('#pubHead').innerHTML = m ? titleBlock(m) : '';
@@ -3633,6 +3973,15 @@ function paintPub(m){
     $('#pubLot').innerHTML = `<div class="pub-lot">${m.lot.name ? `<span class="lot">${esc(m.lot.name)}</span>` : ''}${m.lot.rule ? `<span class="rule">${esc(m.lot.rule)}</span>` : ''}${(m.lot.colors && m.lot.colors.length) ? `<span class="pub-cartons">${m.lot.colors.map(c => `<span class="cc" style="--c:${esc(c)}">${CARTON_GLYPH}</span>`).join('')}</span>` : ''}</div>`;
   const cfg = { colors: m.colors };
   const sizes = [15, 13, 11.5, 10];
+  if (m.photo && PUB_IMGS.has(m.photo) && !m.carton && m.check !== true) {
+    pub.className = 'mode-photo';
+    /* on ne recrée l'image que si la photo change : sinon elle « clignote » à chaque message de l'organisateur */
+    const cur = $('#pubBalls .pub-photo img');
+    if (!cur || cur.dataset.id !== m.photo)
+      $('#pubBalls').innerHTML = `<div class="pub-photo"><div class="lab">À gagner</div><img src="${PUB_IMGS.get(m.photo)}" data-id="${m.photo}" alt=""></div>`;
+    panel.innerHTML = ''; pubConfettiKey = '';
+    return;
+  }
   const checking = m.check === true && Array.isArray(m.drawn);
   const gridOn = checking || (SERVED && pubGrid && Array.isArray(m.drawn));
   $('#pubBalls').innerHTML = gridOn ? pubGridHtml(m) : m.last5.length
@@ -3648,17 +3997,18 @@ function paintPub(m){
         const hit = !l.miss.includes(n);
         return `<span class="pn${hit ? ' hit' : ''}${n === c.last ? ' last' : ''}" style="${hit ? ballStyle(cfg, n) : ''}">${n}</span>`;
       }).join('')}<span class="pub-ok">${l.done ? '✔' : ''}</span></div>`).join('')}</div>`;
+    pubConfetti(m);
   } else if (checking) {
-    pub.className = 'mode-carton';
+    pub.className = 'mode-carton'; pubConfettiKey = '';
     panel.innerHTML = '<div class="pub-wait pub-check">Vérification d’un carton…</div>';
   } else {
-    pub.className = 'mode-balls'; panel.innerHTML = '';
+    pub.className = 'mode-balls'; panel.innerHTML = ''; pubConfettiKey = '';
   }
   pub.classList.toggle('grid-on', gridOn);
   pub.classList.toggle('mode-check', checking);
   { const top = m.last5[0];
     const fresh = top != null && pubPrevLast !== null && top !== pubPrevLast[0] && !pubPrevLast.includes(top);
-    if (fresh && !(m.pubmsg && m.pubmsg.anim === false)) { const b = $('#pubBalls .pb.big, #pubBalls .pb.mid'); if (b) b.classList.add('pop'); }
+    if (fresh && !(m.pubmsg && m.pubmsg.anim === false)) { const b = $('#pubBalls .pb.big, #pubBalls .pb.mid'); if (b) { b.innerHTML = `<span class="pbn">${esc(b.textContent)}</span>`; b.classList.add('pop'); } }
     pubPrevLast = m.last5.slice(); }
 }
 function renderPublic(m) {
@@ -3669,14 +4019,17 @@ function renderPublic(m) {
   if (m && m.empty && m.demo && m.demo.on) {
     const key = pubDemoKey(m);
     { const gb = $('#pubGridBtn'); if (gb) gb.hidden = true; }
-    if (pubDemoRunning && pubDemoKeyLast === key) return;
-    startPubDemo(m);
+    paintSponsors(null);
+    if (pubDemoRunning && pubDemoKeyLast === key) { paintPubSig(m); return; }
+    startPubDemo(m); paintPubSig(m);
     return;
   }
   stopPubDemo();
   pubLastMsg = m;
   { const sb = $('#pubSim'); if (sb) { sb.hidden = !(m && m.sim); if (m && m.sim) sb.textContent = m.simLabel || 'SIMULATION'; } }
   paintPub(m);
+  $('#pub').classList.toggle('has-sp', pubSpOn);
+  paintPubSig(m);
   updatePubGridBtn(m);
   updatePubConn();
 }
@@ -3691,12 +4044,45 @@ function paintPubQr(q) {
     <div class="q">${QR.svg(q.url)}</div><div class="u">${esc(q.url.replace(/\/$/, ''))}</div></div>`;
   el.hidden = false;
 }
+/* Les chiffres n'ont pas de jambage : avec une hauteur de ligne de 1, ils paraissent trop bas dans la boule.
+   On mesure la police réellement utilisée par le navigateur et on compense. */
+function centerDigits() {
+  try {
+    /* position réelle de la ligne de base dans une boîte de 100 px (hauteur de ligne 1) */
+    const probe = document.createElement('div'); probe.className = 'pb';
+    probe.style.cssText = 'position:absolute;left:-9999px;top:0;display:block;visibility:hidden;font-size:100px;line-height:1;height:auto;width:auto;padding:0!important;aspect-ratio:auto';
+    probe.innerHTML = '0<span style="display:inline-block;width:0;height:0;vertical-align:baseline"></span>';
+    $('#pub').appendChild(probe);
+    const top = probe.getBoundingClientRect().top, base = probe.lastChild.getBoundingClientRect().top - top, hBox = probe.getBoundingClientRect().height;
+    const cs = getComputedStyle(probe), ctx = document.createElement('canvas').getContext('2d');
+    ctx.font = `${cs.fontStyle} ${cs.fontWeight} 100px ${cs.fontFamily}`;
+    probe.remove();
+    const m = ctx.measureText('0123456789');
+    if (!(m.actualBoundingBoxAscent > 0) || !(hBox > 0)) return;
+    /* centre réel des chiffres, comparé au centre de la boîte (en em) */
+    const s = (base - (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2 - hBox / 2) / 100;
+    const d = Math.max(-.3, Math.min(.3, 2 * s));
+    document.documentElement.style.setProperty('--num-pb', d > 0 ? d.toFixed(3) + 'em' : '0');
+    document.documentElement.style.setProperty('--num-pt', d < 0 ? (-d).toFixed(3) + 'em' : '0');
+  } catch (e) {}
+}
 function initPublic() {
   document.body.classList.add('public');
+  centerDigits(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(centerDigits);
+  window.addEventListener('load', () => setTimeout(centerDigits, 300));
   $('#pub').hidden = false; document.title = 'Écran public';
   renderPublic(null);
   setTimeout(maybeShowPubNotice, 800);
-  window.addEventListener('message', e => { if (e.data && e.data.loto === 'state') renderPublic(e.data); });
+  window.addEventListener('message', e => {
+    if (!e.data) return;
+    if (e.data.loto === 'state') renderPublic(e.data);
+    else if (e.data.loto === 'assets' && e.data.imgs && typeof e.data.imgs === 'object') {
+      PUB_IMGS.clear();
+      for (const [id, v] of Object.entries(e.data.imgs)) if (IMG_ID.test(id) && typeof v === 'string' && IMG_DATA.test(v)) PUB_IMGS.set(id, v);
+      pubSpKey = '_';
+      if (pubLastMsg) renderPublic(pubLastMsg);
+    }
+  });
   if (SERVED) {
     pubConnect();
     setInterval(updatePubConn, 1000);
@@ -3720,7 +4106,7 @@ function initPublic() {
   fs.setAttribute('aria-label', 'Plein écran'); fs.title = 'Plein écran';
   fs.hidden = inFrame || !fsReq;
   fs.addEventListener('click', () => { try { const r = fsReq.call(root); if (r && r.catch) r.catch(() => {}); } catch (e) {} });
-  const fsSync = () => { fs.hidden = inFrame || !fsReq || !!fsEl(); };
+  const fsSync = () => { fs.hidden = inFrame || !fsReq || !!fsEl(); root.classList.toggle('is-fs', !!fsEl()); };
   document.addEventListener('fullscreenchange', fsSync); document.addEventListener('webkitfullscreenchange', fsSync);
 }
 
@@ -3730,8 +4116,9 @@ function renderConfig() {
   $('#cfgRandom').checked = C.randomDraw; $('#cfgTempo').value = C.rythme.toFixed(1);
   $('#cfgPcNext').value = C.popColors.next; $('#cfgPcOther').value = C.popColors.other; $('#cfgPcCont').value = C.popColors.cont;
   $('#cfgPubLot').checked = C.pubLot; $('#cfgPubRule').checked = C.pubRule; renderPaliers(); $('#cfgMax').value = C.maxBall; $('#cfgPerLine').value = C.perLine; $('#cfgNbLines').value = C.nbLines;
-  renderColors(); renderCartonColors(); renderSteps(); renderNoticeSummary(); renderPubMsgSummary();
-  renderCartons();
+  $('#cfgConfetti').checked = C.confetti;
+  renderColors(); renderCartonColors(); renderSteps(); renderSponsors(); renderNoticeSummary(); renderPubMsgSummary();
+  renderCartons(); cfgTabCounts();
 }
 function renderCartonColors() {
   const box = $('#cartonColorList');
@@ -3749,6 +4136,7 @@ function renderCartonColors() {
 function renderTitleParams() {
   if (document.activeElement !== $('#cfgTitre')) $('#cfgTitre').value = C.titre;
   $$('input[name=logoPos]').forEach(r => r.checked = r.value === C.logoPos);
+  $$('input[name=olMark]').forEach(r => r.checked = r.value === C.olMark);
   const has = logoOk(C.logo);
   $('#logoClear').hidden = !has; $('#logoPosBox').hidden = !has;
   $('#titlePreview').innerHTML = titleBlock(C);
@@ -3775,7 +4163,7 @@ function addStepAndFocus(step) {
   const rows = $$('#stepList .step-row'), row = rows[rows.length - 1];
   if (row) { row.scrollIntoView({ block:'center', behavior:'smooth' }); const inp = $('input[data-f=lot]', row); if (inp) inp.focus(); }
 }
-function renderSteps() {
+function renderSteps() { setTimeout(cfgTabCounts);
   const box = $('#stepList');
   if (!C.steps.length) { box.innerHTML = '<p class="muted">Aucune étape pour l’instant. Ajoutez-en une ou chargez un exemple.</p>'; return; }
   box.innerHTML = C.steps.map((st, i) => {
@@ -3789,7 +4177,7 @@ function renderSteps() {
       <div class="step-sum"><b>${esc(st.lot || (a ? 'Annonce' : p ? 'Entracte' : '(sans nom)'))}</b>
         <span class="tag${sp ? ' ' + kind : ''}">${esc(ruleTitle(st))}</span>
         ${!sp && st.reset ? '<span class="tag reset">nouvelle partie</span>' : ''}${!sp && st.gagnants === 0 ? '<span class="tag">gagnants illimités</span>' : ''}
-        ${!sp && stepCartonColors(C, st).length ? `<span class="lot-cartons">${cartonIcons(C, st)}</span>` : ''}</div>
+        ${!sp && stepCartonColors(C, st).length ? `<span class="lot-cartons">${cartonIcons(C, st)}</span>` : ''}${!sp && st.photo ? '<span class="tag">photo</span>' : ''}</div>
       <div class="row-actions"><button class="btn sm" data-act="toggleStep" aria-label="Déplier cette étape">▾ Déplier</button>${upDown}</div>
     </div>`;
     return `
@@ -3812,6 +4200,7 @@ function renderSteps() {
       <label class="chk2"${sp ? ' hidden' : ''}><input type="checkbox" data-f="reset"${st.reset ? ' checked' : ''}> Nouvelle partie (boules à zéro)</label>
       <div class="row-actions"><button class="btn sm" data-act="toggleStep" aria-label="Replier cette étape">▴ Replier</button>${upDown}</div>
       <label class="f" style="flex:1 1 100%">Note affichée pendant le jeu (facultatif)<input type="text" data-f="note" value="${esc(st.note)}"></label>
+      ${sp ? '' : `<div class="ph-f" title="Affichée en grand sur l’écran public de la salle à l’annonce du lot, jusqu’à la première boule tirée (pas sur les téléphones)">Photo du lot (facultatif)<div class="ph-box">${st.photo ? (IMG.has(st.photo) ? `<img src="${IMG.get(st.photo)}" alt="">` : '<span class="ph-miss">image manquante</span>') : ''}<button type="button" class="btn sm" data-act="stepPhoto">${st.photo ? 'Changer' : 'Ajouter une photo'}</button>${st.photo ? '<button type="button" class="btn sm danger" data-act="stepPhotoDel">Retirer</button>' : ''}</div></div>`}
       ${sp || !C.cartonColors.length ? '' : `<div class="cc-chips">
         <label class="chk2"><input type="checkbox" data-f="cartonAll"${st.cartonAll !== false ? ' checked' : ''}> Toutes les couleurs de carton</label>
         ${C.cartonColors.map(c => `<span class="cc-chip${(st.cartonAll === false && (st.cartonColors || []).includes(c.id)) ? ' on' : ''}" data-act="toggleStepColor" data-id="${c.id}" title="${esc(c.name)}">${cartonIcon(c)}${esc(c.name)}</span>`).join('')}
@@ -4393,7 +4782,7 @@ async function showPlates(only) {
   await ask(only ? `Plaque ${only}` : 'Contrôler les plaques', `${pl(list.length, 'plaque', 'plaques')} enregistrée(s).`,
     [{ label:'Fermer', value:true, primary:true }], true, { tone:'info', wide:true, visual:body });
 }
-function renderCartons() {
+function renderCartons() { setTimeout(cfgTabCounts);
   const total = C.cartons.length;
   $('#cartonCount').textContent = pl(total, 'carton enregistré', 'cartons enregistrés');
   const q = $('#cartonSearch').value.trim().toLowerCase();
@@ -4484,6 +4873,134 @@ function loadLogo(file) {
   rd.readAsDataURL(file);
 }
 
+/* ---------- Photos des lots et logos des partenaires ----------
+   Rangées à part, dans la base IndexedDB du navigateur (bien plus grande que le stockage local) ;
+   la configuration ne garde que leur identifiant. Les exports .json les contiennent. */
+const IMG = new Map();
+let IMGVER = 0;
+const IMG_DATA = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+\/=]+$/;
+const IMGDB = (() => {
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((res, rej) => {
+    if (!window.indexedDB) return rej(new Error('IndexedDB indisponible'));
+    const r = indexedDB.open('openloto-images', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('img');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  }));
+  const run = (mode, fn) => open().then(db => new Promise((res, rej) => {
+    const t = db.transaction('img', mode), rq = fn(t.objectStore('img'));
+    t.oncomplete = () => res(rq ? rq.result : undefined); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
+  }));
+  return { get: id => run('readonly', st => st.get(id)), put: (id, v) => run('readwrite', st => st.put(v, id)),
+           del: id => run('readwrite', st => st.delete(id)), keys: () => run('readonly', st => st.getAllKeys()) };
+})();
+const imgIdsOf = o => o ? [...(o.steps || []).map(st => st.photo).filter(Boolean), ...(o.sponsors || [])] : [];
+async function imgStore(id, data) {
+  IMG.set(id, data); IMGVER++;
+  try { await IMGDB.put(id, data); } catch (e) { toast('Image gardée pour cette session seulement : le navigateur refuse de l’enregistrer (' + e.message + ').'); }
+}
+/* au démarrage : charge les images utilisées, efface celles qui ne servent plus */
+async function imgBoot() {
+  if (IS_PUBLIC) return;
+  try {
+    const used = new Set([...imgIdsOf(C), ...imgIdsOf(D)]);
+    const keys = await IMGDB.keys();
+    for (const k of keys) {
+      if (!used.has(k)) { if (!tourOn()) IMGDB.del(k).catch(() => {}); continue; }
+      const v = await IMGDB.get(k); if (typeof v === 'string' && IMG_DATA.test(v)) IMG.set(k, v);
+    }
+  } catch (e) {}
+  IMGVER++;
+  if (!$('#tab-config').hidden) { renderSteps(); renderSponsors(); }
+  sendPublic();
+}
+/* Redimensionne et choisit le plus léger entre WebP et JPEG (fond blanc) */
+/* Rogne les marges vides (transparentes ou blanches) d'un logo, en gardant un petit bord */
+function trimImage(img) {
+  const W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;
+  const sc = Math.min(1, 1600 / Math.max(W, H)), cv = document.createElement('canvas');
+  cv.width = Math.max(1, Math.round(W * sc)); cv.height = Math.max(1, Math.round(H * sc));
+  const cx = cv.getContext('2d'); cx.drawImage(img, 0, 0, cv.width, cv.height);
+  let d; try { d = cx.getImageData(0, 0, cv.width, cv.height).data; } catch (e) { return null; }
+  let x0 = cv.width, y0 = cv.height, x1 = -1, y1 = -1;
+  for (let y = 0; y < cv.height; y++) for (let x = 0; x < cv.width; x++) {
+    const i = (y * cv.width + x) * 4;
+    if (d[i + 3] > 16 && !(d[i] > 244 && d[i + 1] > 244 && d[i + 2] > 244)) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  }
+  if (x1 < 0) return null;
+  const m = Math.round(Math.max(x1 - x0, y1 - y0) * .04);
+  x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(cv.width - 1, x1 + m); y1 = Math.min(cv.height - 1, y1 + m);
+  if (x1 - x0 > cv.width * .97 && y1 - y0 > cv.height * .97) return null;
+  const out = document.createElement('canvas'); out.width = x1 - x0 + 1; out.height = y1 - y0 + 1;
+  out.getContext('2d').drawImage(cv, x0, y0, out.width, out.height, 0, 0, out.width, out.height);
+  return out;
+}
+async function optimizeImage(src, max, target, trim) {
+  let img = await loadImg(src);
+  if (trim) { const t = trimImage(img); if (t) img = t; }
+  const w0 = img.naturalWidth || img.width || 800, h0 = img.naturalHeight || img.height || 600;
+  let best = null;
+  for (const m of [max, Math.round(max * .8), Math.round(max * .64)]) {
+    const sc = Math.min(1, m / Math.max(w0, h0));
+    const cv = document.createElement('canvas');
+    cv.width = Math.max(1, Math.round(w0 * sc)); cv.height = Math.max(1, Math.round(h0 * sc));
+    const cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); cx.drawImage(img, 0, 0, cv.width, cv.height);
+    for (const q of [.84, .74]) {
+      const cands = [cv.toDataURL('image/jpeg', q)];
+      const wp = cv.toDataURL('image/webp', q); if (/^data:image\/webp/.test(wp)) cands.push(wp);
+      const pick = cands.filter(x => IMG_DATA.test(x)).sort((a, b) => a.length - b.length)[0];
+      if (pick && (!best || pick.length < best.length)) best = pick;
+      if (best && best.length * 3 / 4 <= target) return best;
+    }
+  }
+  if (!best) throw new Error('format non pris en charge');
+  return best;
+}
+const readAsData = file => new Promise((res, rej) => { const rd = new FileReader(); rd.onload = () => res(String(rd.result)); rd.onerror = () => rej(new Error('fichier illisible')); rd.readAsDataURL(file); });
+function pickFiles(multiple) {
+  return new Promise(res => {
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = !!multiple; inp.hidden = true;
+    inp.addEventListener('change', () => { res([...inp.files]); inp.remove(); });
+    document.body.appendChild(inp); inp.click();
+  });
+}
+async function addImageFile(file, kind) {
+  if (!/^image\//.test(file.type || 'image/')) throw new Error('ce n’est pas une image');
+  const src = await readAsData(file);
+  const out = kind === 'photo' ? await optimizeImage(src, 1280, 180 * 1024) : await optimizeImage(src, 520, 60 * 1024, true);
+  const id = 'img-' + uid() + uid().slice(0, 3);
+  await imgStore(id, out);
+  return id;
+}
+/* images utilisées par une configuration, pour les exports */
+function imagesOf(o) { const out = {}; imgIdsOf(o).forEach(id => { if (IMG.has(id)) out[id] = IMG.get(id); }); return out; }
+async function importImages(data) {
+  const im = data && data.images && typeof data.images === 'object' ? data.images : null; if (!im) return;
+  for (const [id, v] of Object.entries(im)) if (IMG_ID.test(id) && typeof v === 'string' && IMG_DATA.test(v) && v.length < 4e6) await imgStore(id, v);
+}
+const pubImgHint = () => D.steps.length ? ' Rechargez la configuration dans le direct pour l’écran public.' : '';
+async function stepPhotoAdd(i) {
+  const st = C.steps[i]; if (!st) return;
+  const [f] = await pickFiles(false); if (!f) return;
+  try { st.photo = await addImageFile(f, 'photo'); saveC(); renderSteps(); toast(`Photo ajoutée (${logoKo(IMG.get(st.photo))} Ko).` + pubImgHint()); }
+  catch (e) { toast('Image illisible : ' + e.message); }
+}
+function renderSponsors() { setTimeout(cfgTabCounts);
+  const box = $('#spList'); if (!box) return;
+  $('#cfgSpPause').checked = C.sponsorPause; $('#cfgSpWait').checked = C.sponsorWait;
+  $('#spCount').textContent = C.sponsors.length ? pl(C.sponsors.length, 'logo', 'logos') : '';
+  box.innerHTML = C.sponsors.length ? C.sponsors.map((id, k) => `<div class="sp-tile" data-id="${id}"><div class="sp-img">${IMG.has(id) ? `<img src="${IMG.get(id)}" alt="">` : '<span class="ph-miss">image manquante</span>'}</div>
+    <div class="sp-acts"><button type="button" class="btn sm" data-act="spLeft" aria-label="Avancer"${k === 0 ? ' disabled' : ''}>←</button><button type="button" class="btn sm" data-act="spRight" aria-label="Reculer"${k === C.sponsors.length - 1 ? ' disabled' : ''}>→</button><button type="button" class="btn sm danger" data-act="spDel" aria-label="Retirer">✕</button></div></div>`).join('')
+    : '<p class="muted" style="margin:0">Aucun partenaire pour l’instant.</p>';
+}
+async function sponsorsAdd() {
+  const files = await pickFiles(true); if (!files.length) return;
+  let ok = 0;
+  for (const f of files) { if (C.sponsors.length >= 40) { toast('40 logos au maximum.'); break; } try { C.sponsors.push(await addImageFile(f, 'logo')); ok++; } catch (e) { toast(`« ${f.name} » : ${e.message}`); } }
+  saveC(); renderSponsors();
+  if (ok) toast(`${pl(ok, 'logo ajouté', 'logos ajoutés')}.` + pubImgHint());
+}
+
 /* ---------- Export / import ---------- */
 function download(name, text, type = 'application/json') {
   const a = document.createElement('a');
@@ -4492,10 +5009,11 @@ function download(name, text, type = 'application/json') {
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
 }
 const stamp = () => new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
-const cfgFields = o => ({ titre:o.titre, logo:o.logo, logoPos:o.logoPos, perLine:o.perLine, nbLines:o.nbLines, randomDraw:o.randomDraw, popColors:o.popColors, rythme:o.rythme, paliers:o.paliers, usePaliers:o.usePaliers, pubLot:o.pubLot, pubRule:o.pubRule,
-  maxBall:o.maxBall, colors:o.colors, cartonColors:o.cartonColors, steps:o.steps, cartons:o.cartons });
+const cfgFields = o => ({ titre:o.titre, logo:o.logo, logoPos:o.logoPos, olMark:o.olMark, perLine:o.perLine, nbLines:o.nbLines, randomDraw:o.randomDraw, popColors:o.popColors, rythme:o.rythme, paliers:o.paliers, usePaliers:o.usePaliers, pubLot:o.pubLot, pubRule:o.pubRule,
+  maxBall:o.maxBall, colors:o.colors, cartonColors:o.cartonColors, steps:o.steps, cartons:o.cartons,
+  sponsors:o.sponsors, sponsorPause:o.sponsorPause, sponsorWait:o.sponsorWait, confetti:o.confetti });
 function exportConfig() {
-  download(`openloto-config-${stamp()}.json`, JSON.stringify(Object.assign({ type:'loto-configuration', v:4 }, cfgFields(C)), null, 1));
+  download(`openloto-config-${stamp()}.json`, JSON.stringify(Object.assign({ type:'loto-configuration', v:4 }, cfgFields(C), { images: imagesOf(C) }), null, 1));
 }
 
 /* ---------- Déroulé du loto : aperçu, impression, CSV ---------- */
@@ -4718,7 +5236,7 @@ function exportRunCsv() {
 }
 function exportSave() {
   if (!D.steps.length) return toast('Aucune configuration chargée dans le direct.');
-  download(`openloto-sauvegarde-${stamp()}.json`, JSON.stringify(Object.assign({ type:'loto-sauvegarde-complete', v:4 }, cfgFields(D), { live:D.live }), null, 1));
+  download(`openloto-sauvegarde-${stamp()}.json`, JSON.stringify(Object.assign({ type:'loto-sauvegarde-complete', v:4 }, cfgFields(D), { live:D.live, images: imagesOf(D) }), null, 1));
 }
 async function readJson(file) {
   try { return JSON.parse(await file.text()); } catch (e) { return null; }
@@ -4737,6 +5255,7 @@ async function loadIntoDirect(file) {
     if (r === 'cancel') return;
     keep = r === 'resume';
   }
+  await importImages(data);
   const prevJournal = D.live.journal || [];
   D = normalize(Object.assign({}, cfgFields(data), { live: keep ? data.live : undefined, pubCarton: D.pubCarton, bip: D.bip, bipSon: D.bipSon, source:{ name:file.name, at:Date.now() } }));
   if (!keep) D.live.journal = prevJournal;
@@ -4766,6 +5285,7 @@ async function importIntoEditor(file) {
   const data = await readJson(file);
   if (!data || (!Array.isArray(data.steps) && !Array.isArray(data.cartons))) return toast('Fichier non reconnu : choisissez un export de ce programme (.json).');
   if (!(await yes('Importer dans l’éditeur', `Importer « ${file.name} » remplace la configuration en cours d’édition. Le direct n’est pas touché.`, { ok:'Importer', tone:'warn' }))) return;
+  await importImages(data);
   const f = cfgFields(data), cur = cfgFields(C);
   C = normalize(Object.fromEntries(Object.keys(cur).map(k => [k, f[k] ?? cur[k]])));
   editingCode = null; saveC(); renderConfig(); toast('Import terminé dans l’éditeur. Pensez à lancer « Contrôler tous les cartons ».');
@@ -4777,6 +5297,24 @@ function toast(msg) {
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(tT); tT = setTimeout(() => t.classList.remove('show'), 3400);
 }
+const CFG_TAB_KEY = 'openloto-cfg-onglet';
+function cfgTab(id, user) {
+  const blocks = $$('.cfg-main > .cfg-block');
+  if (!blocks.some(b => b.id === id)) id = blocks[0] && blocks[0].id;
+  blocks.forEach(b => b.classList.toggle('on', b.id === id));
+  $$('.cfg-tab').forEach(t => t.setAttribute('aria-selected', t.dataset.jump === id));
+  const at = $('.cfg-tab[aria-selected=true]'); if (at) { const bar = at.parentElement; bar.scrollLeft = at.offsetLeft - (bar.clientWidth - at.offsetWidth) / 2; }
+  try { localStorage.setItem(CFG_TAB_KEY, id); } catch (e) {}
+  if (user) { const top = $('#tab-config').getBoundingClientRect().top + scrollY; if (scrollY > top) window.scrollTo(0, top); }
+}
+function cfgTabFor(sel) {
+  const el = sel && $(sel), b = el && el.closest('.cfg-main > .cfg-block');
+  if (b && !b.classList.contains('on')) cfgTab(b.id);
+}
+function cfgTabCounts() {
+  const n = { steps: C.steps.length, sponsors: C.sponsors.length, cartons: C.cartons.length };
+  $$('[data-cfg-n]').forEach(e => { const v = n[e.dataset.cfgN]; e.textContent = v ? v.toLocaleString('fr-FR') : ''; });
+}
 function showTab(name) {
   $$('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name));
   $('#tab-direct').hidden = name !== 'direct';
@@ -4784,7 +5322,7 @@ function showTab(name) {
   $('#tab-journal').hidden = name !== 'journal';
   try { localStorage.setItem(TAB_KEY, name); } catch (e) {}
   if (name !== 'direct') { closeCheckNow(); wakeSync(); }
-  if (name === 'config') { renderConfig(); updateTitle(); } else if (name === 'journal') { renderJournal(); updateTitle(); } else renderDirect();
+  if (name === 'config') { if (!$('.cfg-main > .cfg-block.on')) { let k = ''; try { k = localStorage.getItem(CFG_TAB_KEY) || ''; } catch (e) {} cfgTab(k); } renderConfig(); updateTitle(); } else if (name === 'journal') { renderJournal(); updateTitle(); } else renderDirect();
   window.scrollTo(0, 0);
 }
 function exampleSteps() {
@@ -5120,14 +5658,34 @@ async function showVoiceConfig() {
 
 /* ---------- Téléphones : état de la connexion (affiché seulement en cas de problème) ---------- */
 let pubEs = null, pubLastMsgAt = 0, pubPingSeen = false, pubAge = 0, pubAgeAt = 0, pubLastMsg = null, pubEsRetry = null;
+/* Veille : le serveur garde le dernier état indéfiniment. Sans aucun signe de vie du direct depuis 12 h
+   (le « ping » donne l'âge du dernier état reçu), l'écran public revient à l'attente au lieu d'afficher
+   « Plus de nouvelles du tirage depuis … » : mode démo si l'organisateur l'a activé, sinon écran d'attente.
+   Dès que le direct redonne signe de vie, l'écran retrouve le dernier état. */
+const PUB_IDLE_MS = 12 * 3600 * 1000;
+let pubIdle = false, pubIdleBase = null;
+function pubIdleCheck() {
+  const idle = pubPingSeen && pubAge >= PUB_IDLE_MS;
+  if (idle === pubIdle) return;
+  pubIdle = idle;
+  if (idle) {
+    if (!pubLastMsg) return;
+    pubIdleBase = pubLastMsg;
+    renderPublic(Object.assign({}, pubLastMsg, { empty: true }));
+  } else if (pubIdleBase) {
+    const m = pubIdleBase; pubIdleBase = null;
+    renderPublic(m);
+  }
+}
 function pubConnect() {
   try { if (pubEs) pubEs.close(); } catch (e) {}
   const es = pubEs = new EventSource('events');
   es.onopen = () => { pubLastMsgAt = Date.now(); updatePubConn(); };
-  es.onmessage = e => { pubLastMsgAt = Date.now(); try { renderPublic(JSON.parse(e.data)); } catch (err) {} updatePubConn(); };
+  es.onmessage = e => { pubLastMsgAt = Date.now(); pubIdle = false; pubIdleBase = null; try { renderPublic(JSON.parse(e.data)); } catch (err) {} updatePubConn(); };
   es.addEventListener('ping', e => {
     pubLastMsgAt = Date.now(); pubPingSeen = true;
     try { const o = JSON.parse(e.data); pubAge = Number.isFinite(+o.age) ? +o.age : -1; pubAgeAt = Date.now(); } catch (err) {}
+    pubIdleCheck();
     updatePubConn();
   });
   es.onerror = () => {
@@ -5143,7 +5701,7 @@ function updatePubConn() {
   if (!navigator.onLine) { txt = 'Pas de connexion internet sur ce téléphone'; cls = 'bad'; }
   else if (!pubEs || pubEs.readyState !== 1) { txt = 'Connexion perdue · reconnexion…'; cls = 'bad'; }
   else if (pubPingSeen && now - pubLastMsgAt > 40000) txt = 'Connexion instable · l’affichage peut être en retard';
-  else if (pubPingSeen && pubAge > 60000 && now - pubAgeAt < 40000 && pubLastMsg && (pubLastMsg.last5 || pubLastMsg.pause || pubLastMsg.annonce)) {
+  else if (!pubIdle && pubPingSeen && pubAge > 60000 && now - pubAgeAt < 40000 && pubLastMsg && (pubLastMsg.last5 || pubLastMsg.pause || pubLastMsg.annonce)) {
     const min = Math.floor(pubAge / 60000);
     txt = `Plus de nouvelles du tirage depuis ${min >= 1 ? min + ' min' : Math.round(pubAge / 1000) + ' s'} · l’affichage peut être en retard`;
   }
@@ -5166,7 +5724,14 @@ function updatePubGridBtn(m) {
   const b = $('#pubGridBtn'); if (!b) return;
   const can = SERVED && !!m && Array.isArray(m.drawn) && Array.isArray(m.last5) && !m.pause && !m.annonce && !m.check;
   b.hidden = !can;
-  b.textContent = pubGrid ? 'Dernières boules' : 'Grille des numéros';
+  /* icône + mot court : le bouton ne déborde plus sur la signature */
+  const ico = pubGrid
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="6.5"/><circle cx="5" cy="19" r="3"/><circle cx="12" cy="20" r="2.6"/><circle cx="19" cy="19" r="3"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true">' + [3, 9.5, 16].map(y => [3, 9.5, 16].map(x => `<rect x="${x}" y="${y}" width="5" height="5" rx="1.2"/>`).join('')).join('') + '</svg>';
+  const key = pubGrid ? 'b' : 'g';
+  if (b.dataset.k !== key) { b.innerHTML = ico + (pubGrid ? 'Boules' : 'Grille'); b.dataset.k = key; }
+  b.title = pubGrid ? 'Revenir aux dernières boules' : 'Afficher la grille des numéros';
+  b.setAttribute('aria-label', b.title);
   b.setAttribute('aria-pressed', pubGrid ? 'true' : 'false');
 }
 
@@ -5325,7 +5890,7 @@ function setLotExtra(v) {
     const fr = $('#pvFrame');
     if (!fr.getAttribute('src')) {
       fr.addEventListener('load', () => { pvWin = fr.contentWindow; sendPublic(); });
-      fr.src = location.href.split('#')[0] + '#public';
+      fr.src = location.href.split('#')[0] + PUB_HASH;
     }
     if (!pvObs && window.ResizeObserver) { pvObs = new ResizeObserver(pvFit); pvObs.observe($('#pubPreview')); }
     requestAnimationFrame(pvFit);
@@ -5830,6 +6395,7 @@ function bindEvents() {
       case 'voiceConfig': showVoiceConfig(); break;
       case 'settings': showSettings(); break;
       case 'welcome': showWelcome(); break;
+      case 'promoInfo': showPromoInfo(); break;
       case 'theme': POSTE.theme = POSTE.theme === 'dark' ? 'light' : 'dark'; savePoste(); applyTheme(); break;
       case 'holdWin': holdWinner(d.code); break;
       case 'tieKeep': keepTie(+d.i); break;
@@ -5936,6 +6502,15 @@ function bindEvents() {
         C.steps.forEach(st => { st.cartonColors = (st.cartonColors || []).filter(id => ids.has(id)); });
         saveC(); renderCartonColors(); renderSteps(); break;
       }
+      case 'stepPhoto': stepPhotoAdd(+b.closest('.step-row').dataset.i); break;
+      case 'stepPhotoDel': { const st = C.steps[+b.closest('.step-row').dataset.i]; if (st) { st.photo = ''; saveC(); renderSteps(); } break; }
+      case 'spAdd': sponsorsAdd(); break;
+      case 'spDel': case 'spLeft': case 'spRight': {
+        const id = b.closest('.sp-tile').dataset.id, k = C.sponsors.indexOf(id); if (k < 0) break;
+        if (d.act === 'spDel') C.sponsors.splice(k, 1);
+        else { const j = d.act === 'spLeft' ? k - 1 : k + 1; if (j >= 0 && j < C.sponsors.length) [C.sponsors[k], C.sponsors[j]] = [C.sponsors[j], C.sponsors[k]]; }
+        saveC(); renderSponsors(); break;
+      }
       case 'toggleStepColor': {
         const row = b.closest('.step-row'), i = +row.dataset.i, st = C.steps[i]; if (!st) break;
         st.cartonAll = false;
@@ -5971,7 +6546,7 @@ function bindEvents() {
       case 'delAllCartons':
         if (C.cartons.length && await yes('Supprimer tous les cartons', `Les ${C.cartons.length} cartons de la configuration seront supprimés.`, { ok:'Tout supprimer', danger:true })) { C.cartons = []; editingCode = null; saveC(); renderCartons(); }
         break;
-      case 'cfgJump': { const t = document.getElementById(d.jump); if (t) t.scrollIntoView({ block:'start', behavior:'smooth' }); break; }
+      case 'cfgJump': { cfgTab(d.jump, true); break; }
       case 'exportConfig': exportConfig(); break;
       case 'exportRunSheet': openRunSheet(); break;
       case 'rsClose': closeRunSheet(); break;
@@ -6028,10 +6603,14 @@ case 'rsOrient': runOrient = d.val === 'landscape' ? 'landscape' : 'portrait'; u
   $('#cfgTitre').addEventListener('input', e => { C.titre = e.target.value.replace(/\n{3,}/g, '\n\n'); $('#titlePreview').innerHTML = titleBlock(C); });
   $('#cfgTitre').addEventListener('change', e => { C.titre = e.target.value.trim() || 'Loto de l’association'; saveC(); renderTitleParams(); updateTitle(); });
   $$('input[name=logoPos]').forEach(r => r.addEventListener('change', () => { C.logoPos = r.value; saveC(); renderTitleParams(); }));
+  $$('input[name=olMark]').forEach(r => r.addEventListener('change', () => { C.olMark = r.value; saveC(); renderTitleParams(); }));
   $('#logoFile').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) loadLogo(f); });
   $('#cfgRandom').addEventListener('change', e => { C.randomDraw = e.target.checked; saveC(); });
   $('#cfgPubLot').addEventListener('change', e => { C.pubLot = e.target.checked; saveC(); });
   $('#cfgPubRule').addEventListener('change', e => { C.pubRule = e.target.checked; saveC(); });
+  $('#cfgConfetti').addEventListener('change', e => { C.confetti = e.target.checked; saveC(); });
+  $('#cfgSpPause').addEventListener('change', e => { C.sponsorPause = e.target.checked; saveC(); });
+  $('#cfgSpWait').addEventListener('change', e => { C.sponsorWait = e.target.checked; saveC(); });
   [['#cfgPcNext', 'next'], ['#cfgPcOther', 'other'], ['#cfgPcCont', 'cont']].forEach(([sel, k]) => $(sel).addEventListener('change', e => { C.popColors[k] = e.target.value; saveC(); }));
   $('#palierList').addEventListener('change', e => {
     const row = e.target.closest('[data-i]'); if (!row) return;
@@ -6057,9 +6636,11 @@ case 'rsOrient': runOrient = d.val === 'landscape' ? 'landscape' : 'portrait'; u
   });
   setInterval(netHeartbeat, 1000);
   setRcol(POSTE.rcolOff); setLotExtra(POSTE.lotExtra); applyTheme();
+  demoInit();
   setTimeout(() => { if (welcomeDue() && $('#dlg').hidden) showWelcome(); }, 400);
+  imgBoot();
   resetReveal();   /* au chargement, les boules déjà sorties sont toutes affichées (même avec un délai d'affichage) */
-  window.addEventListener('resize', () => { if (!$('#pubPreview').hidden) pvFit(); });
+  window.addEventListener('resize', () => { if (!$('#pubPreview').hidden) pvFit(); promoFit(); });
   document.addEventListener('fullscreenchange', () => { $('#fsBtn').textContent = document.fullscreenElement ? 'Quitter le plein écran' : 'Plein écran'; });
   $('#cfgMax').addEventListener('change', e => {
     const n = parseInt(e.target.value, 10);
@@ -6090,7 +6671,7 @@ case 'rsOrient': runOrient = d.val === 'landscape' ? 'landscape' : 'portrait'; u
 
   /* l'écran public réclame l'état dès qu'il est prêt */
   window.addEventListener('message', e => {
-    if (e.data && e.data.loto === 'ready') { const fr = $('#pvFrame'); if (fr && e.source === fr.contentWindow) pvWin = e.source; else pubWin = e.source; sendPublic(); }
+    if (e.data && e.data.loto === 'ready') { const fr = $('#pvFrame'); if (fr && e.source === fr.contentWindow) { pvWin = e.source; pvAssetsKey = ''; } else { pubWin = e.source; pubAssetsKey = ''; } sendPublic(); }
   });
   /* si le direct est modifié depuis un autre onglet, on se resynchronise */
   window.addEventListener('storage', e => {
