@@ -553,7 +553,7 @@ footer p+p{margin-top:6px}
 
 <div class="bar"><div class="top">
   <a class="brand" href="#" aria-label="OpenLoto, retour au site"><img src="docs/logo/openloto-icone.svg" alt="" width="38" height="38">OpenLoto</a>
-  <a class="tab opt" href="#projet">Le projet</a>
+  <a class="tab" href="#">Retour</a>
   <a class="tab" href="#salles" aria-current="page">Salles</a>
   <a class="tab opt" href="https://github.com/SebastienFRA/openloto">GitHub</a>
 </div></div>
@@ -631,6 +631,12 @@ footer p+p{margin-top:6px}
     root = host.attachShadow({ mode: 'open' });
     root.appendChild(document.getElementById('tpl-salles').content.cloneNode(true));
     init(root);
+    /* « Retour » et le logo ramènent tout en haut de la page, comme à l'ouverture du site */
+    root.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href="#"]'); if (!a) return;
+      e.preventDefault(); history.pushState(null, '', location.pathname + location.search); route();
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    });
     root.getElementById('frameBox');
   }
   function sendDemo() {
