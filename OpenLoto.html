@@ -3319,6 +3319,11 @@ const NET_BEAT_MS = 20000, NET_RETRY = [2, 5, 10, 20];
 let netClients = null;   /* téléphones connectés au serveur (si le serveur le communique) */
 let netTimer = null, netRetryTimer = null, netFail = 0, netLastOk = 0, netLastSend = 0, netErr = '', netRetryAt = 0, netSeq = 0;
 const netOn = () => !!(NET.url && NET.url.trim() && NET.key && NET.key.trim());
+/* Config réseau absente : les messages restent pris en compte par l'écran public de cet ordinateur, mais aucun téléphone ne les recevra.
+   Il faut le dire clairement, sinon l'organisateur croit que « Diffuser » a tout envoyé. */
+const netWarn = () => !netOn() && !ONLINE_ORGA;
+const NET_WARN_NOTE = 'Diffusion réseau NON configurée : ce réglage sera pris en compte par l’écran public de cet ordinateur uniquement. Les téléphones des joueurs ne le recevront pas. Configurez-la dans Réglages → Config réseau (téléphones).';
+const NET_WARN_TOAST = 'Enregistré pour l’écran public de cet ordinateur seulement. Diffusion réseau NON configurée : les téléphones ne recevront rien (Réglages → Config réseau).';
 function pushNet(msg) {
   if (!netOn() || simOn() || tourOn()) { updateHdrNet(); return; }
   clearTimeout(netTimer);
@@ -3463,9 +3468,9 @@ function renderPubMsgSummary() {
 async function showNoticeConfig() {
   const draft = { on: NOTICE.on, title: NOTICE.title, text: NOTICE.text };
   const r = await ask('Message d’accueil (écran public en ligne)',
-    'Ce message s’affiche à l’arrivée sur la page publique en ligne : une fois par visiteur, puis masqué automatiquement après 10 secondes. « Valider et diffuser » enregistre le message sur cet appareil et l’envoie immédiatement au serveur.',
-    [{ label:'Valider et diffuser', value:'send', primary:true }, { label:'Annuler', value:'cancel' }], 'cancel', {
-      tone:'info', wide:true,
+    'Ce message s’affiche à l’arrivée sur la page publique en ligne : une fois par visiteur, puis masqué automatiquement après 10 secondes. ' + (netWarn() ? '« Valider » enregistre le message sur cet appareil.' : '« Valider et diffuser » enregistre le message sur cet appareil et l’envoie immédiatement au serveur.'),
+    [{ label: netWarn() ? 'Valider' : 'Valider et diffuser', value:'send', primary:true }, { label:'Annuler', value:'cancel' }], 'cancel', {
+      tone: netWarn() ? 'warn' : 'info', note: netWarn() ? NET_WARN_NOTE : undefined, wide:true,
       visual: `<div class="noticedlg">
         <label class="chk2"><input type="checkbox" data-nt-on${NOTICE.on ? ' checked' : ''}> Afficher le message sur l’écran public en ligne</label>
         <label class="f">Titre (facultatif)<input type="text" data-nt-title maxlength="80" autocomplete="off"></label>
@@ -3484,7 +3489,7 @@ async function showNoticeConfig() {
   saveNotice();
   renderNoticeSummary();
   sendPublic();
-  toast('Message d’accueil enregistré et diffusé.');
+  if (netWarn()) toast(NET_WARN_TOAST, 7000); else toast('Message d’accueil enregistré et diffusé.');
 }
 /* Choix du message à configurer */
 async function showPubMessages() {
@@ -3504,9 +3509,9 @@ async function showPubMessages() {
 async function showPubMsgConfig() {
   const draft = { anim: PUBMSG.anim !== false, start: PUBMSG.start, wait: PUBMSG.wait, demoOn: PUBMSG.demoOn, demoText: PUBMSG.demoText, demoSpeed: PUBMSG.demoSpeed, endTitle: PUBMSG.endTitle, end: PUBMSG.end };
   const r = await ask('Messages et mode démo de l’écran public',
-    'Ces réglages sont utilisés par l’écran public, y compris sur les téléphones. « Enregistrer et diffuser » les enregistre sur cet appareil et les envoie immédiatement au serveur.',
-    [{ label:'Enregistrer et diffuser', value:'save', primary:true }, { label:'Annuler', value:'cancel' }], 'cancel', {
-      tone:'info', wide:true,
+    'Ces réglages sont utilisés par l’écran public, y compris sur les téléphones. ' + (netWarn() ? '« Enregistrer » les enregistre sur cet appareil.' : '« Enregistrer et diffuser » les enregistre sur cet appareil et les envoie immédiatement au serveur.'),
+    [{ label: netWarn() ? 'Enregistrer' : 'Enregistrer et diffuser', value:'save', primary:true }, { label:'Annuler', value:'cancel' }], 'cancel', {
+      tone: netWarn() ? 'warn' : 'info', note: netWarn() ? NET_WARN_NOTE : undefined, wide:true,
       visual: `<div class="noticedlg">
         <h4 class="pm-sec">Aucun loto chargé</h4>
         <label class="chk2"><input type="checkbox" data-pm-demo${PUBMSG.demoOn ? ' checked' : ''}> Mode démo : diffuser un faux loto en boucle</label>
@@ -3546,7 +3551,7 @@ async function showPubMsgConfig() {
   savePubMsg();
   renderPubMsgSummary();
   sendPublic();
-  toast('Réglages de l’écran public enregistrés et diffusés.');
+  if (netWarn()) toast(NET_WARN_TOAST, 7000); else toast('Réglages de l’écran public enregistrés et diffusés.');
 }
 function updatePalierUI() {
   const w = $('#palierChkWrap'); if (w) w.hidden = !(D && D.paliers.length);
@@ -5293,9 +5298,9 @@ async function importIntoEditor(file) {
 
 /* ---------- Divers ---------- */
 let tT;
-function toast(msg) {
+function toast(msg, ms) {
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(tT); tT = setTimeout(() => t.classList.remove('show'), 3400);
+  clearTimeout(tT); tT = setTimeout(() => t.classList.remove('show'), ms || 3400);
 }
 const CFG_TAB_KEY = 'openloto-cfg-onglet';
 function cfgTab(id, user) {
