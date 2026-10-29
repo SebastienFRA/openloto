@@ -718,8 +718,8 @@ footer p+p{margin-top:6px}
   $('create').addEventListener('click', function () {
     var c = fakeCode();
     var rs = $('rslots'); buildSlots(rs); paint(rs, c, false);
-    $('rLink').textContent = 'https://salles.exemple.org/salle/' + c;
-    $('rUrl').textContent = 'https://salles.exemple.org/r/' + c;
+    $('rLink').textContent = 'https://salles.openloto.org/salle/' + c;
+    $('rUrl').textContent = 'https://salles.openloto.org/r/' + c;
     $('rKey').textContent = fakeKey();
     $('rMeta').textContent = 'Expire dans 12 h 00 min si vous ne diffusez plus';
     $('intro').hidden = true; $('result').hidden = false;
