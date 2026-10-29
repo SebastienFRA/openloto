@@ -658,7 +658,7 @@ footer p+p{margin-top:6px}
     root.getElementById('dcode').textContent = (code || 'DEMO').toUpperCase();
     var box = root.getElementById('frameBox');
     if (FR) return;
-    FR = document.createElement('iframe'); FR.title = 'Écran public de la salle fictive'; FR.src = 'OpenLoto.html#public-demo';
+    FR = document.createElement('iframe'); FR.title = 'Écran public de la salle fictive'; FR.src = 'OpenLoto.html?v=20261029b#public-demo';   /* le numéro de version force le navigateur à recharger OpenLoto.html (et non une ancienne copie en cache) */
     FR.addEventListener('load', function () { sendDemo(); setTimeout(sendDemo, 600); });
     box.appendChild(FR);
   }
