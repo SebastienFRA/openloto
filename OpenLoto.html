@@ -2112,11 +2112,12 @@ function ask(title, text, buttons, escValue, opts = {}) {
       if (b.color) { el.style.background = b.color; el.style.borderColor = b.color; el.style.color = textOn(b.color); }
       el.addEventListener('click', () => close(b.value));
       box.appendChild(el);
-      if (i === focusIdx) setTimeout(() => el.focus(), 0);
+      if (i === focusIdx) setTimeout(() => { el.focus({ preventScroll:true }); $('#dlgBox').scrollTop = 0; }, 0);
     });
     document.addEventListener('keydown', onKey, true);
     if (opts.bind) opts.bind($('#dlgVisual'), close);
     ov.hidden = false;
+    $('#dlgBox').scrollTop = 0;   /* une fenêtre haute s'ouvre toujours sur son titre (le focus du bouton du bas la faisait défiler) */
   }));
   dlgQueue = p.catch(() => {});
   return p;
@@ -5306,7 +5307,9 @@ const CFG_TAB_KEY = 'openloto-cfg-onglet';
 function cfgTab(id, user) {
   const blocks = $$('.cfg-main > .cfg-block');
   if (!blocks.some(b => b.id === id)) id = blocks[0] && blocks[0].id;
+  const prevOn = blocks.find(b => b.classList.contains('on'));
   blocks.forEach(b => b.classList.toggle('on', b.id === id));
+  if (!prevOn || prevOn.id !== id) { const tc = $('#tab-config'); if (tc) tc.scrollTop = 0; }   /* un autre onglet de réglages s'ouvre sur son titre */
   $$('.cfg-tab').forEach(t => t.setAttribute('aria-selected', t.dataset.jump === id));
   const at = $('.cfg-tab[aria-selected=true]'); if (at) { const bar = at.parentElement; bar.scrollLeft = at.offsetLeft - (bar.clientWidth - at.offsetWidth) / 2; }
   try { localStorage.setItem(CFG_TAB_KEY, id); } catch (e) {}
@@ -5329,6 +5332,7 @@ function showTab(name) {
   if (name !== 'direct') { closeCheckNow(); wakeSync(); }
   if (name === 'config') { if (!$('.cfg-main > .cfg-block.on')) { let k = ''; try { k = localStorage.getItem(CFG_TAB_KEY) || ''; } catch (e) {} cfgTab(k); } renderConfig(); updateTitle(); } else if (name === 'journal') { renderJournal(); updateTitle(); } else renderDirect();
   window.scrollTo(0, 0);
+  $('#tab-config').scrollTop = 0; $('#tab-journal').scrollTop = 0;   /* ces onglets défilent dans leur propre cadre */
 }
 function exampleSteps() {
   return [
