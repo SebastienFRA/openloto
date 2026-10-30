@@ -638,9 +638,17 @@ body.public .top,body.public main{display:none}
 }
 /* ===== Ajouts v2 : diffusion, annonce vocale, raccourcis, téléphones ===== */
 .hdr-net{display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;white-space:nowrap;border-radius:9px;padding:4px 9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#cfe7ea;cursor:pointer}
-.hdr-upd{cursor:pointer}
-.hdr-upd::before{background:#5fd99a!important}
-.hdr-net::before{content:'';width:8px;height:8px;border-radius:50%;background:#c9a24a;flex:0 0 auto}
+.top .ol-ver{position:relative}
+.top .ol-ver.upd{cursor:pointer}
+.top .ol-ver.upd:hover{background:rgba(255,255,255,.28)}
+.top .ol-ver.upd::after{content:'';position:absolute;top:-4px;right:-4px;width:11px;height:11px;border-radius:50%;background:#e5342b;border:2px solid #0f5e66;box-sizing:border-box}
+.upd-notes{max-height:38vh;overflow:auto;background:rgba(0,0,0,.04);border-radius:10px;padding:10px 14px;font-size:.92rem;line-height:1.45;text-align:left}
+.upd-notes h4{margin:10px 0 4px;font-size:.95rem}
+.upd-notes h4:first-child{margin-top:0}
+.upd-notes ul{margin:4px 0 4px 18px;padding:0}
+.upd-notes p{margin:4px 0}
+html.dark .upd-notes{background:rgba(255,255,255,.07)}
+.upd-h{font-weight:700;margin:0 0 8px;text-align:left}.hdr-net::before{content:'';width:8px;height:8px;border-radius:50%;background:#c9a24a;flex:0 0 auto}
 .hdr-net.ok::before{background:#5fd99a}
 .hdr-net.err{background:rgba(255,60,50,.22);border-color:rgba(255,180,170,.55);color:#ffc4bd}
 .hdr-net.err::before{background:#ff6b5e;animation:hdrWaitPulse 1.2s ease-in-out infinite}
@@ -1103,7 +1111,6 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
     <button class="tab" role="tab" data-tab="journal" aria-selected="false">Journal</button>
   </div>
   <div class="hdr-wait" id="hdrWait" hidden title="Diffusion en attente : cliquez sur « Démarrer le loto » quand le loto commence."><span id="hdrWaitTxt">Diffusion en attente</span></div>
-  <button type="button" class="hdr-net hdr-upd" id="hdrUpd" data-act="updInfo" hidden title="Une nouvelle version d’OpenLoto est disponible"><span id="hdrUpdTxt">Mise à jour</span></button>
   <button type="button" class="hdr-net" id="hdrNet" data-act="netConfig" hidden><span id="hdrNetTxt">Téléphones</span><span class="hdr-cnt" id="hdrNetCnt"></span></button>
   <div class="save" id="saveStatus" title="Sauvegarde automatique active">Sauvegarde auto</div>
   <button class="hdr-btn hdr-help" id="helpBtn" data-act="welcome" type="button" title="Présentation d’OpenLoto et visite guidée">?</button>
@@ -6718,15 +6725,30 @@ let UPD = null;   // { v:'1.2.0', url:'https://github.com/…' } quand une versi
 const verNum = t => { const m = /(\d+)\.(\d+)(?:\.(\d+))?/.exec(String(t || '')); return m ? [+m[1], +m[2], +(m[3] || 0)] : null; };
 const verNewer = (a, b) => { const x = verNum(a), y = verNum(b); if (!x || !y) return false; for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] > y[i]; return false; };
 function updShow() {
-  const b = $('#hdrUpd'); if (!b) return;
-  let ign = ''; try { ign = (JSON.parse(localStorage.getItem(KEY_UPD) || '{}') || {}).ignore || ''; } catch (e) {}
-  b.hidden = !(UPD && ign !== UPD.v);
-  if (UPD) $('#hdrUpdTxt').textContent = 'Version ' + UPD.v + ' disponible';
+  const b = document.querySelector('.ol-ver'); if (!b) return;
+  if (UPD) {
+    b.classList.add('upd'); b.setAttribute('data-act', 'updInfo'); b.setAttribute('role', 'button'); b.tabIndex = 0;
+    b.title = 'Version ' + UPD.v + ' disponible : cliquez pour voir les nouveautés';
+    if (!b._updKey) { b._updKey = true; b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showUpdate(); } }); }
+  } else { b.classList.remove('upd'); b.removeAttribute('data-act'); b.removeAttribute('role'); b.removeAttribute('tabindex'); b.title = 'Version d’OpenLoto'; }
+}
+/* Notes de version (texte Markdown simple de la release) → HTML sûr : titres, listes à puces, paragraphes */
+function updNotesHtml(md) {
+  const lines = String(md || '').replace(/\r/g, '').split('\n'); let out = '', ul = false;
+  const inl = t => esc(t).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>');
+  for (const raw of lines) {
+    const l = raw.trim(), li = /^[-*•]\s+(.*)$/.exec(l), h = /^#{1,6}\s+(.*)$/.exec(l);
+    if (li) { if (!ul) { out += '<ul>'; ul = true; } out += '<li>' + inl(li[1]) + '</li>'; continue; }
+    if (ul) { out += '</ul>'; ul = false; }
+    if (h) out += '<h4>' + inl(h[1]) + '</h4>'; else if (l) out += '<p>' + inl(l) + '</p>';
+  }
+  if (ul) out += '</ul>';
+  return out;
 }
 async function checkUpdate() {
   if (IS_PUBLIC || ONLINE || !navigator.onLine) return;   // la version en ligne est déjà la dernière
   let st = {}; try { st = JSON.parse(localStorage.getItem(KEY_UPD) || '{}') || {}; } catch (e) {}
-  const fresh = st.t && Date.now() - st.t < 24 * 3600 * 1000;
+  const fresh = st.t && typeof st.notes === 'string' && Date.now() - st.t < 24 * 3600 * 1000;
   if (!fresh) {
     try {
       const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 6000);
@@ -6736,25 +6758,25 @@ async function checkUpdate() {
         const j = await r.json();
         st.v = String(j.tag_name || '').replace(/^v/i, '');
         st.url = UPD_URL_OK.test(j.html_url || '') ? j.html_url : 'https://github.com/SebastienFRA/openloto/releases/latest';
-      } else { st.v = ''; st.url = ''; }   // dépôt privé ou aucune version publiée : on réessaiera demain
+        st.notes = String(j.body || '').slice(0, 6000);
+        st.date = String(j.published_at || '').slice(0, 10);
+      } else { st.v = ''; st.url = ''; st.notes = ''; st.date = ''; }   // dépôt privé ou aucune version publiée : on réessaiera demain
       st.t = Date.now();
       try { localStorage.setItem(KEY_UPD, JSON.stringify(st)); } catch (e) {}
     } catch (e) { return; }   // pas de réseau : silence
   }
-  if (st.v && verNewer(st.v, OL_VERSION)) { UPD = { v: st.v, url: st.url || 'https://github.com/SebastienFRA/openloto/releases/latest' }; updShow(); }
+  if (st.v && verNewer(st.v, OL_VERSION)) { UPD = { v: st.v, url: st.url || 'https://github.com/SebastienFRA/openloto/releases/latest', notes: st.notes || '', date: st.date || '' }; updShow(); }
 }
+/* Un clic sur le numéro de version (pastille rouge) rouvre cette fenêtre, autant de fois qu'on veut, tant qu'une mise à jour existe */
 async function showUpdate() {
   if (!UPD) return;
-  const r = await ask('Nouvelle version disponible',
-    `OpenLoto ${UPD.v} est publié (vous utilisez la version ${OL_VERSION}).\n\nTéléchargez la nouvelle version depuis la page de publication, puis ouvrez-la à la place de l’ancienne. Pensez à exporter votre configuration avant (onglet Configuration) pour ne rien perdre.`,
-    [{ label:'Voir la nouvelle version', value:'go', primary:true }, { label:'Plus tard', value:'later' }, { label:'Ignorer cette version', value:'ign' }],
-    'later', { tone:'info' });
+  const when = UPD.date ? ' (publiée le ' + UPD.date.split('-').reverse().join('/') + ')' : '';
+  const visual = `<p class="upd-h">OpenLoto ${esc(UPD.v)}${esc(when)} — vous utilisez la version ${esc(OL_VERSION)}.</p>` +
+    `<div class="upd-notes">${UPD.notes.trim() ? updNotesHtml(UPD.notes) : '<p>Aucune note de version n’a été publiée.</p>'}</div>`;
+  const r = await ask('Nouvelle version disponible', '',
+    [{ label:'Voir la nouvelle version', value:'go', primary:true }, { label:'Fermer', value:'close' }],
+    'close', { tone:'info', visual, note:'Téléchargez la nouvelle version depuis la page de publication, puis ouvrez-la à la place de l’ancienne. Pensez à exporter votre configuration avant (onglet Configuration).' });
   if (r === 'go') window.open(UPD.url, '_blank', 'noopener');
-  else if (r === 'ign') {
-    let st = {}; try { st = JSON.parse(localStorage.getItem(KEY_UPD) || '{}') || {}; } catch (e) {}
-    st.ignore = UPD.v; try { localStorage.setItem(KEY_UPD, JSON.stringify(st)); } catch (e) {}
-    updShow();
-  }
 }
 
 /* ---------- Démarrage ---------- */
