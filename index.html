@@ -177,6 +177,27 @@ td.pj{color:var(--teal);font-weight:600}
 @media (max-width:900px){.etapes{grid-template-columns:1fr 1fr}}
 @media (max-width:560px){.etapes{grid-template-columns:1fr}}
 
+/* ---------- soutenir ---------- */
+.soutien{padding:90px 0;background:var(--brume)}
+.soutien .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:start}
+.soutien .lead{margin-top:16px}
+.soutien .regles{margin:22px 0 26px;padding:0;list-style:none}
+.soutien .regles li{padding:6px 0 6px 28px;position:relative;color:var(--encre)}
+.soutien .regles li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border-radius:50%;background:var(--ambre);box-shadow:inset -2px -2px 3px rgba(0,0,0,.2)}
+.soutien .compteur{background:#fff;border-radius:20px;padding:28px;box-shadow:0 8px 24px rgba(20,33,61,.08)}
+.soutien .compteur h3 span{color:var(--teal)}
+.soutien .ligne{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-top:18px;color:var(--gris)}
+.soutien .ligne b{font:800 1.5rem var(--num);color:var(--encre);white-space:nowrap}
+.soutien .ligne small{display:block;font-size:.85rem}
+.soutien .barre{height:14px;border-radius:8px;background:var(--trait);overflow:hidden;margin-top:10px}
+.soutien .barre i{display:block;height:100%;width:0;border-radius:8px;background:var(--ambre);transition:width .8s ease}
+.soutien .frais{margin:10px 0 0;padding:0;list-style:none;font-size:.92rem;color:var(--gris)}
+.soutien .frais li{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
+.soutien .solde{margin-top:20px;padding-top:16px;border-top:1px solid var(--trait)}
+.soutien .maj{margin-top:16px;font-size:.82rem;color:var(--gris)}
+@media (max-width:900px){.soutien .wrap{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.soutien .barre i{transition:none}}
+
 /* ---------- pied de page ---------- */
 footer{background:var(--salle);color:#b9d6d9;padding:56px 0 40px;font-size:.95rem}
 footer .wrap{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:40px}
@@ -196,6 +217,7 @@ footer .bas{grid-column:1/-1;border-top:1px solid #23474c;padding-top:22px;font-
     <a class="l" href="#telephones">Téléphones</a>
     <a class="l" href="#demarrer">Démarrer</a>
     <a class="l keep" href="#salles">Salles</a>
+    <a class="l keep" href="#soutenir">Soutenir</a>
     <a class="l" href="https://github.com/SebastienFRA/openloto">GitHub</a>
   </div>
 </header>
@@ -329,6 +351,7 @@ footer .bas{grid-column:1/-1;border-top:1px solid #23474c;padding-top:22px;font-
         <p>Un serveur a un coût : location, nom de domaine, maintenance. Il ne verra le jour que si suffisamment de dons permettent de le faire fonctionner dans la durée. Dites-nous si vous seriez intéressés : nombre de lotos par an, nombre de joueurs.</p>
         <a class="btn main" href="mailto:openloto@duck.com?subject=Serveur%20OpenLoto">Je suis intéressé</a>
         <br><a class="lien" href="#salles">Essayer une salle de démonstration</a>
+        <br><a class="lien" href="#soutenir">Soutenir OpenLoto</a>
         <br><a class="lien" href="https://github.com/SebastienFRA/openloto#projet--un-serveur-openloto-gratuit" rel="noopener">Lire les conditions détaillées</a>
       </div>
     </div>
@@ -345,6 +368,24 @@ footer .bas{grid-column:1/-1;border-top:1px solid #23474c;padding-top:22px;font-
       </ol>
     </div>
   </section>
+  <section class="soutien" id="soutenir">
+    <div class="wrap">
+      <div>
+        <h2>Soutenir OpenLoto</h2>
+        <p class="lead">OpenLoto est gratuit, libre et sans publicité. Vos dons paient le nom de domaine et, si le projet grandit, un petit serveur pour proposer des salles en ligne aux associations.</p>
+        <ul class="regles">
+          <li>Don libre, <b>sans contrepartie</b> : aucune fonction n’est réservée aux donateurs.</li>
+          <li>Au-delà de l’objectif, les dons sont conservés pour la pérennité du service.</li>
+          <li>Les chiffres ci-contre sont publics et mis à jour à la main.</li>
+        </ul>
+        <a class="btn main" href="https://github.com/sponsors/SebastienFRA" rel="noopener">Soutenir sur GitHub</a>
+      </div>
+      <div class="compteur" id="compteur" aria-live="polite">
+        <h3>Financement <span id="cptAnnee"></span></h3>
+        <div id="cptCorps"><p style="margin-top:14px;color:var(--gris)">Les chiffres s’afficheront ici.</p></div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
@@ -359,7 +400,7 @@ footer .bas{grid-column:1/-1;border-top:1px solid #23474c;padding-top:22px;font-
     </div>
     <div>
       <h3>Le projet</h3>
-      <p><a href="https://github.com/SebastienFRA/openloto" rel="noopener">Le code sur GitHub</a><br><a href="https://github.com/SebastienFRA/openloto/releases/latest" rel="noopener">Serveurs pour les téléphones</a><br><a href="https://github.com/SebastienFRA/openloto#readme" rel="noopener">Documentation</a></p>
+      <p><a href="https://github.com/SebastienFRA/openloto" rel="noopener">Le code sur GitHub</a><br><a href="https://github.com/SebastienFRA/openloto/releases/latest" rel="noopener">Serveurs pour les téléphones</a><br><a href="#soutenir">Soutenir OpenLoto</a><br><a href="https://github.com/SebastienFRA/openloto#readme" rel="noopener">Documentation</a></p>
     </div>
     <p class="bas">Les captures montrent un loto fictif : lots, cartons et association inventés.</p>
   </div>
@@ -419,6 +460,27 @@ footer .bas{grid-column:1/-1;border-top:1px solid #23474c;padding-top:22px;font-
       tirees.push(n); peindre(true);
     }, 2600);
   }
+})();
+</script>
+
+<script>
+/* Compteur de financement : lit financement.json (mis à jour à la main) ; sans lui, la section garde son texte et son bouton. */
+(() => {
+  const $ = id => document.getElementById(id);
+  const fr = n => { const v = Math.round(Math.abs(n) * 100) / 100; return (n < 0 ? '−' : '') + String(v % 1 ? v.toFixed(2) : v).replace('.', ',') + '\u00a0$'; };
+  const row = (label, val, small) => { const d = document.createElement('div'); d.className = 'ligne'; const l = document.createElement('span'); l.textContent = label; if (small) { const s = document.createElement('small'); s.textContent = small; l.appendChild(s); } const b = document.createElement('b'); b.textContent = val; d.append(l, b); return d; };
+  if (!window.fetch || !/^https?:/.test(location.protocol)) return;
+  fetch('financement.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : Promise.reject()).then(j => {
+    const obj = +j.objectif_annuel > 0 ? +j.objectif_annuel : 0, dons = +j.dons_recus || 0, report = +j.report || 0;
+    const dep = (Array.isArray(j.depenses) ? j.depenses : []).filter(x => x && isFinite(+x.montant));
+    const totDep = dep.reduce((a, x) => a + (+x.montant), 0), solde = report + dons - totDep;
+    const box = $('cptCorps'); box.textContent = ''; if (j.annee) $('cptAnnee').textContent = j.annee;
+    box.appendChild(row('Dons reçus', fr(dons), obj ? 'sur un objectif annuel de ' + fr(obj) : ''));
+    if (obj) { const bar = document.createElement('div'); bar.className = 'barre'; bar.setAttribute('role', 'progressbar'); bar.setAttribute('aria-valuemin', '0'); bar.setAttribute('aria-valuemax', '100'); const pct = Math.min(100, Math.round(dons / obj * 100)); bar.setAttribute('aria-valuenow', pct); bar.setAttribute('aria-label', 'Objectif annuel atteint à ' + pct + ' %'); const i = document.createElement('i'); bar.appendChild(i); box.appendChild(bar); requestAnimationFrame(() => requestAnimationFrame(() => { i.style.width = pct + '%'; })); }
+    if (dep.length) { box.appendChild(row('Dépenses', fr(totDep))); const ul = document.createElement('ul'); ul.className = 'frais'; dep.forEach(x => { const li = document.createElement('li'); const a = document.createElement('span'); a.textContent = String(x.libelle || 'Dépense'); const b = document.createElement('span'); b.textContent = fr(+x.montant); li.append(a, b); ul.appendChild(li); }); box.appendChild(ul); }
+    const sl = row('Solde disponible', fr(solde), solde < 0 ? 'frais avancés par le développeur' : (report ? 'report de l’année précédente inclus' : '')); sl.classList.add('solde'); box.appendChild(sl);
+    if (j.maj && /^\d{4}-\d{2}-\d{2}$/.test(j.maj)) { const m = document.createElement('p'); m.className = 'maj'; m.textContent = 'Chiffres mis à jour le ' + j.maj.split('-').reverse().join('/') + '.'; box.appendChild(m); }
+  }).catch(() => {});
 })();
 </script>
 
@@ -612,6 +674,7 @@ footer p+p{margin-top:6px}
 
 <footer><div class="foot">
   <p>OpenLoto est gratuit et libre (licence MIT). Dans le futur service : aucune donnée personnelle conservée, les salles n’existent qu’en mémoire.</p>
+  <p>Ce futur service dépend des dons : <a href="#soutenir">soutenir OpenLoto</a>.</p>
   <p><a href="https://github.com/SebastienFRA/openloto">Code source et téléchargement sur GitHub</a></p>
 </div></footer>
 
@@ -619,7 +682,7 @@ footer p+p{margin-top:6px}
 <div class="demo" id="demo" hidden>
   <div class="dband" role="note">
     <span><b>Salle fictive</b> <span class="dcode" id="dcode"></span> · le tirage est simulé, rien n’est enregistré.</span>
-    <span><a href="#salles">Retour aux salles</a> · <a href="#projet">Le projet de serveur gratuit</a></span>
+    <span><a href="#salles">Retour aux salles</a> · <a href="#projet">Le projet de serveur gratuit</a> · <a href="#soutenir">Soutenir OpenLoto</a></span>
   </div>
   <div id="frameBox" style="flex:1 1 auto;display:flex;min-height:0"></div>
 </div>

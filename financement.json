@@ -1,0 +1,14 @@
+{
+  "annee": 2026,
+  "devise": "$",
+  "objectif_annuel": 120,
+  "report": 0,
+  "dons_recus": 0,
+  "depenses": [
+    {
+      "libelle": "Nom de domaine openloto.org (1re année)",
+      "montant": 8.5
+    }
+  ],
+  "maj": "2026-10-30"
+}
