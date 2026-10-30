@@ -1275,6 +1275,16 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
       <div class="inline" style="margin-top:6px">
         <label class="chk2"><input type="checkbox" id="cfgConfetti"> Confettis quand un carton gagnant s’affiche (écran public et téléphones)</label>
       </div>
+      <div class="inline" style="margin-top:6px">
+        <label class="f" style="flex:1 1 100%">Sur le téléphone des joueurs, afficher
+          <select id="cfgPhoneView">
+            <option value="last1">la dernière boule seulement</option>
+            <option value="last5">les 5 dernières boules</option>
+            <option value="grid">la grille de tous les numéros sortis (au choix du joueur)</option>
+          </select>
+        </label>
+        <small style="flex:1 1 100%;opacity:.75">Sans la grille, le bouton « Grille » n’apparaît pas sur les téléphones et la grille n’est pas montrée pendant la vérification d’un carton. L’écran public de la salle n’est pas modifié.</small>
+      </div>
       <div class="inline" style="margin-top:14px">
         <b>Boutons de la fenêtre « Gagnant validé »</b>
         <label class="f">Étape suivante<input type="color" id="cfgPcNext" style="width:56px;height:36px;padding:2px"></label>
@@ -1831,6 +1841,7 @@ function normalize(o) {
   s.sponsors = [...new Set((Array.isArray(s.sponsors) ? s.sponsors : []).filter(id => IMG_ID.test(id || '')))].slice(0, 40);
   s.sponsorPause = s.sponsorPause !== false; s.sponsorWait = s.sponsorWait !== false;
   s.confetti = s.confetti !== false;
+  s.phoneView = ['last1', 'last5', 'grid'].includes(s.phoneView) ? s.phoneView : 'grid';   /* ce que voient les joueurs sur leur téléphone */
   s.source = s.source && typeof s.source === 'object' ? { name: String(s.source.name || ''), at: +s.source.at || 0 } : null;
   { const pc = s.popColors && typeof s.popColors === 'object' ? s.popColors : {}, dp = { next:'#17794a', other:'#1e88e5', cont:'#f09300' };
     s.popColors = {}; for (const k of ['next', 'other', 'cont']) s.popColors[k] = /^#[0-9a-f]{6}$/i.test(pc[k]) ? pc[k] : dp[k]; }
@@ -3340,6 +3351,17 @@ function pushNet(msg) {
   clearTimeout(netTimer);
   netTimer = setTimeout(() => netSend(msg), 60);
 }
+/* Ce que les téléphones reçoivent : l'organisateur choisit de ne leur montrer que la dernière boule, les 5 dernières, ou la grille.
+   Le filtrage se fait ici, avant l'envoi : le serveur et les téléphones n'ont rien à changer, et les numéros retirés ne quittent même pas l'ordinateur.
+   (L'écran public de la salle reçoit l'état complet, par une autre voie.) */
+function forPhones(msg) {
+  const v = (D && D.phoneView) || 'grid';
+  if (v === 'grid' || !msg || typeof msg !== 'object' || msg.loto !== 'state') return msg;
+  const m = Object.assign({}, msg);
+  delete m.drawn;
+  if (v === 'last1' && Array.isArray(m.last5)) m.last5 = m.last5.slice(0, 1);
+  return m;
+}
 async function netSend(msg) {
   if (!netOn() || simOn() || tourOn()) return;
   clearTimeout(netRetryTimer); netRetryAt = 0;
@@ -3351,7 +3373,7 @@ async function netSend(msg) {
     const r = await fetch(NET.url.trim().replace(/\/+$/, '') + '/ingest', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Loto-Key': NET.key.trim() },
-      body: JSON.stringify(msg),
+      body: JSON.stringify(forPhones(msg)),
       signal: ctl.signal
     });
     ok = r.ok;
@@ -4132,7 +4154,7 @@ function renderConfig() {
   $('#cfgRandom').checked = C.randomDraw; $('#cfgTempo').value = C.rythme.toFixed(1);
   $('#cfgPcNext').value = C.popColors.next; $('#cfgPcOther').value = C.popColors.other; $('#cfgPcCont').value = C.popColors.cont;
   $('#cfgPubLot').checked = C.pubLot; $('#cfgPubRule').checked = C.pubRule; renderPaliers(); $('#cfgMax').value = C.maxBall; $('#cfgPerLine').value = C.perLine; $('#cfgNbLines').value = C.nbLines;
-  $('#cfgConfetti').checked = C.confetti;
+  $('#cfgConfetti').checked = C.confetti; $('#cfgPhoneView').value = C.phoneView;
   renderColors(); renderCartonColors(); renderSteps(); renderSponsors(); renderNoticeSummary(); renderPubMsgSummary();
   renderCartons(); cfgTabCounts();
 }
@@ -5027,7 +5049,7 @@ function download(name, text, type = 'application/json') {
 const stamp = () => new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
 const cfgFields = o => ({ titre:o.titre, logo:o.logo, logoPos:o.logoPos, olMark:o.olMark, perLine:o.perLine, nbLines:o.nbLines, randomDraw:o.randomDraw, popColors:o.popColors, rythme:o.rythme, paliers:o.paliers, usePaliers:o.usePaliers, pubLot:o.pubLot, pubRule:o.pubRule,
   maxBall:o.maxBall, colors:o.colors, cartonColors:o.cartonColors, steps:o.steps, cartons:o.cartons,
-  sponsors:o.sponsors, sponsorPause:o.sponsorPause, sponsorWait:o.sponsorWait, confetti:o.confetti });
+  sponsors:o.sponsors, sponsorPause:o.sponsorPause, sponsorWait:o.sponsorWait, confetti:o.confetti, phoneView:o.phoneView });
 function exportConfig() {
   download(`openloto-config-${stamp()}.json`, JSON.stringify(Object.assign({ type:'loto-configuration', v:4 }, cfgFields(C), { images: imagesOf(C) }), null, 1));
 }
@@ -6629,6 +6651,7 @@ case 'rsOrient': runOrient = d.val === 'landscape' ? 'landscape' : 'portrait'; u
   $('#cfgPubLot').addEventListener('change', e => { C.pubLot = e.target.checked; saveC(); });
   $('#cfgPubRule').addEventListener('change', e => { C.pubRule = e.target.checked; saveC(); });
   $('#cfgConfetti').addEventListener('change', e => { C.confetti = e.target.checked; saveC(); });
+  $('#cfgPhoneView').addEventListener('change', e => { C.phoneView = e.target.value; saveC(); });
   $('#cfgSpPause').addEventListener('change', e => { C.sponsorPause = e.target.checked; saveC(); });
   $('#cfgSpWait').addEventListener('change', e => { C.sponsorWait = e.target.checked; saveC(); });
   [['#cfgPcNext', 'next'], ['#cfgPcOther', 'other'], ['#cfgPcCont', 'cont']].forEach(([sel, k]) => $(sel).addEventListener('change', e => { C.popColors[k] = e.target.value; saveC(); }));
