@@ -13,7 +13,11 @@ OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'
 
 > 🌐 **Site du projet :** [openloto.org](https://openloto.org/)
 
+> 🧭 **Sommaire :** [Fonctionnalités](#fonctionnalités) · [Démarrage rapide](#démarrage-rapide-sans-serveur) · [Diffusion sur les téléphones](#diffusion-sur-les-téléphones--les-solutions) · [Serveur local](#serveur-local-sans-raspberry) · [Raspberry Pi](#diffusion-sur-les-téléphones-raspberry-pi) · [Serveur gratuit](#projet--un-serveur-openloto-gratuit) · [Soutenir](#soutenir-openloto) · [Structure du dépôt](#structure-du-dépôt) · [Contact](#contact) · [Licence](#licence)
+
 > ✉️ **Une question, une suggestion d'amélioration ?** Écrivez-moi à **[openloto@duck.com](mailto:openloto@duck.com)**, ou ouvrez une demande dans l'onglet **Issues** du dépôt. Tous les retours sont les bienvenus !
+
+> ❤️ **OpenLoto est gratuit et le restera.** Si le projet vous est utile, vous pouvez le [soutenir](#soutenir-openloto) : les dons paient le nom de domaine et, si le projet grandit, un petit serveur.
 
 > 💡 **Projet : un serveur OpenLoto gratuit**, pour diffuser sur les téléphones sans Raspberry ni installation. Il verra le jour si suffisamment de dons permettent de le faire fonctionner : [voir le projet et ses conditions](#projet--un-serveur-openloto-gratuit).
 
@@ -269,9 +273,28 @@ Si le service ouvre puis que les dons ne suffisent plus à couvrir les frais, il
 ### Vous êtes intéressé ?
 
 - **Faites-le savoir** dans l'onglet **Issues** du dépôt, ou par e-mail à **[openloto@duck.com](mailto:openloto@duck.com)** : nombre de lotos par an, nombre de joueurs, ce qui vous bloque aujourd'hui. C'est ce qui permettra d'évaluer les besoins.
-- **Soutenir le projet** : les liens pour faire un don seront ajoutés ici dès qu'ils seront en place.
+- **Soutenir le projet** : voir la section [Soutenir OpenLoto](#soutenir-openloto) ci-dessous.
 
 > Dans OpenLoto, un petit encart **« Diffuser sans Raspberry ? »** (colonne de droite du direct, et page de configuration) présente ce projet ; le bouton **« En savoir plus »** en donne le détail.
+
+---
+
+## Soutenir OpenLoto
+
+OpenLoto est **gratuit, libre (licence MIT) et sans publicité**. Il est développé sur mon temps libre et n'a qu'une dépense aujourd'hui : le nom de domaine [openloto.org](https://openloto.org/). Si le projet vous est utile, un don aide à le faire durer, et à financer un jour le [serveur gratuit pour les associations](#projet--un-serveur-openloto-gratuit).
+
+<p align="center">
+  <a href="https://github.com/sponsors/SebastienFRA"><img src="https://img.shields.io/badge/%E2%9D%A4%EF%B8%8F%20Soutenir%20OpenLoto-GitHub%20Sponsors-ea4aaa?style=for-the-badge" alt="Soutenir OpenLoto sur GitHub Sponsors"></a>
+</p>
+
+**Comment ça se passe**
+
+- Le don se fait sur **[GitHub Sponsors](https://github.com/sponsors/SebastienFRA)**, en une fois ou chaque mois, du montant que vous voulez.
+- **C'est un don libre, sans contrepartie** : aucune fonction d'OpenLoto n'est réservée aux donateurs.
+- **Au-delà de l'objectif annuel**, les dons sont conservés pour la pérennité du service.
+- **Transparence** : le total des dons, les dépenses et le solde disponible sont publiés sur la section [Soutenir du site](https://openloto.org/#soutenir).
+
+Pas de don possible ou envie d'aider autrement ? Parler du projet à d'autres associations, signaler un problème ou proposer une idée dans les [Issues](https://github.com/SebastienFRA/openloto/issues) est tout aussi précieux.
 
 ---
 
