@@ -638,6 +638,8 @@ body.public .top,body.public main{display:none}
 }
 /* ===== Ajouts v2 : diffusion, annonce vocale, raccourcis, téléphones ===== */
 .hdr-net{display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;white-space:nowrap;border-radius:9px;padding:4px 9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#cfe7ea;cursor:pointer}
+.hdr-upd{cursor:pointer}
+.hdr-upd::before{background:#5fd99a!important}
 .hdr-net::before{content:'';width:8px;height:8px;border-radius:50%;background:#c9a24a;flex:0 0 auto}
 .hdr-net.ok::before{background:#5fd99a}
 .hdr-net.err{background:rgba(255,60,50,.22);border-color:rgba(255,180,170,.55);color:#ffc4bd}
@@ -1101,6 +1103,7 @@ html.dark .cell.pale:not(.on){background:#1c2934;border-color:#4a5a69;box-shadow
     <button class="tab" role="tab" data-tab="journal" aria-selected="false">Journal</button>
   </div>
   <div class="hdr-wait" id="hdrWait" hidden title="Diffusion en attente : cliquez sur « Démarrer le loto » quand le loto commence."><span id="hdrWaitTxt">Diffusion en attente</span></div>
+  <button type="button" class="hdr-net hdr-upd" id="hdrUpd" data-act="updInfo" hidden title="Une nouvelle version d’OpenLoto est disponible"><span id="hdrUpdTxt">Mise à jour</span></button>
   <button type="button" class="hdr-net" id="hdrNet" data-act="netConfig" hidden><span id="hdrNetTxt">Téléphones</span><span class="hdr-cnt" id="hdrNetCnt"></span></button>
   <div class="save" id="saveStatus" title="Sauvegarde automatique active">Sauvegarde auto</div>
   <button class="hdr-btn hdr-help" id="helpBtn" data-act="welcome" type="button" title="Présentation d’OpenLoto et visite guidée">?</button>
@@ -6556,6 +6559,7 @@ function bindEvents() {
         if (C.cartons.length && await yes('Supprimer tous les cartons', `Les ${C.cartons.length} cartons de la configuration seront supprimés.`, { ok:'Tout supprimer', danger:true })) { C.cartons = []; editingCode = null; saveC(); renderCartons(); }
         break;
       case 'cfgJump': { cfgTab(d.jump, true); break; }
+      case 'updInfo': showUpdate(); break;
       case 'exportConfig': exportConfig(); break;
       case 'exportRunSheet': openRunSheet(); break;
       case 'rsClose': closeRunSheet(); break;
@@ -6701,6 +6705,58 @@ case 'rsOrient': runOrient = d.val === 'landscape' ? 'landscape' : 'portrait'; u
   setInterval(tickPause, 200);
 }
 
+/* ---------- Mise à jour : prévient quand une version plus récente est publiée sur GitHub ----------
+   Une seule requête, au plus une fois par jour, depuis l'ordinateur de l'organisateur (jamais depuis un téléphone ni l'écran public).
+   Elle ne transmet aucune donnée du loto : seulement la demande publique « dernière version publiée ».
+   Sans internet, ou tant que le dépôt est privé, il ne se passe rien : aucun message d'erreur. */
+const OL_VERSION = '1.0.0';   /* SEUL endroit à changer pour une nouvelle version : le badge « v… » de l'en-tête et la comparaison en dépendent */
+{ const vb = document.querySelector('.ol-ver'); if (vb) vb.textContent = 'v' + OL_VERSION; }
+const UPD_API = 'https://api.github.com/repos/SebastienFRA/openloto/releases/latest';
+const UPD_URL_OK = /^https:\/\/github\.com\/SebastienFRA\/openloto\//;
+const KEY_UPD = 'openloto-maj';
+let UPD = null;   // { v:'1.2.0', url:'https://github.com/…' } quand une version plus récente existe
+const verNum = t => { const m = /(\d+)\.(\d+)(?:\.(\d+))?/.exec(String(t || '')); return m ? [+m[1], +m[2], +(m[3] || 0)] : null; };
+const verNewer = (a, b) => { const x = verNum(a), y = verNum(b); if (!x || !y) return false; for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] > y[i]; return false; };
+function updShow() {
+  const b = $('#hdrUpd'); if (!b) return;
+  let ign = ''; try { ign = (JSON.parse(localStorage.getItem(KEY_UPD) || '{}') || {}).ignore || ''; } catch (e) {}
+  b.hidden = !(UPD && ign !== UPD.v);
+  if (UPD) $('#hdrUpdTxt').textContent = 'Version ' + UPD.v + ' disponible';
+}
+async function checkUpdate() {
+  if (IS_PUBLIC || ONLINE || !navigator.onLine) return;   // la version en ligne est déjà la dernière
+  let st = {}; try { st = JSON.parse(localStorage.getItem(KEY_UPD) || '{}') || {}; } catch (e) {}
+  const fresh = st.t && Date.now() - st.t < 24 * 3600 * 1000;
+  if (!fresh) {
+    try {
+      const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 6000);
+      const r = await fetch(UPD_API, { signal: ctl.signal, headers: { 'Accept': 'application/vnd.github+json' }, cache: 'no-store' });
+      clearTimeout(to);
+      if (r.ok) {
+        const j = await r.json();
+        st.v = String(j.tag_name || '').replace(/^v/i, '');
+        st.url = UPD_URL_OK.test(j.html_url || '') ? j.html_url : 'https://github.com/SebastienFRA/openloto/releases/latest';
+      } else { st.v = ''; st.url = ''; }   // dépôt privé ou aucune version publiée : on réessaiera demain
+      st.t = Date.now();
+      try { localStorage.setItem(KEY_UPD, JSON.stringify(st)); } catch (e) {}
+    } catch (e) { return; }   // pas de réseau : silence
+  }
+  if (st.v && verNewer(st.v, OL_VERSION)) { UPD = { v: st.v, url: st.url || 'https://github.com/SebastienFRA/openloto/releases/latest' }; updShow(); }
+}
+async function showUpdate() {
+  if (!UPD) return;
+  const r = await ask('Nouvelle version disponible',
+    `OpenLoto ${UPD.v} est publié (vous utilisez la version ${OL_VERSION}).\n\nTéléchargez la nouvelle version depuis la page de publication, puis ouvrez-la à la place de l’ancienne. Pensez à exporter votre configuration avant (onglet Configuration) pour ne rien perdre.`,
+    [{ label:'Voir la nouvelle version', value:'go', primary:true }, { label:'Plus tard', value:'later' }, { label:'Ignorer cette version', value:'ign' }],
+    'later', { tone:'info' });
+  if (r === 'go') window.open(UPD.url, '_blank', 'noopener');
+  else if (r === 'ign') {
+    let st = {}; try { st = JSON.parse(localStorage.getItem(KEY_UPD) || '{}') || {}; } catch (e) {}
+    st.ignore = UPD.v; try { localStorage.setItem(KEY_UPD, JSON.stringify(st)); } catch (e) {}
+    updShow();
+  }
+}
+
 /* ---------- Démarrage ---------- */
 if (IS_PUBLIC) {
   initPublic();
@@ -6712,6 +6768,7 @@ if (IS_PUBLIC) {
   let startTab = 'direct';
   try { startTab = localStorage.getItem(TAB_KEY) || 'direct'; } catch (e) {}
   showTab(startTab === 'config' || startTab === 'journal' ? startTab : 'direct');
+  setTimeout(checkUpdate, 4000);
   if (!hasCrypto) ask('Tirage aléatoire désactivé',
     'Ce navigateur ne fournit pas de générateur de nombres aléatoires cryptographique (crypto.getRandomValues).\n\nLe bouton « Aléatoire » du direct est donc désactivé. La saisie manuelle des numéros et tout le reste du programme fonctionnent normalement.',
     [{ label:'J’ai compris', value:true, primary:true, danger:true }], undefined, { tone:'danger' });
