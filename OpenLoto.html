@@ -6765,7 +6765,30 @@ async function checkUpdate() {
       try { localStorage.setItem(KEY_UPD, JSON.stringify(st)); } catch (e) {}
     } catch (e) { return; }   // pas de réseau : silence
   }
-  if (st.v && verNewer(st.v, OL_VERSION)) { UPD = { v: st.v, url: st.url || 'https://github.com/SebastienFRA/openloto/releases/latest', notes: st.notes || '', date: st.date || '' }; updShow(); }
+  if (st.v && verNewer(st.v, OL_VERSION)) { UPD = { v: st.v, url: st.url || 'https://github.com/SebastienFRA/openloto/releases/latest', notes: st.notes || '', date: st.date || '' }; updShow(); updAuto(); }
+}
+/* La fenêtre s'ouvre d'elle-même UNE fois par version, jamais pendant un loto en cours (ni pendant la visite guidée, une simulation, la présentation ou une autre fenêtre) :
+   on réessaie toutes les 20 s jusqu'à ce que le moment soit calme. La pastille rouge, elle, reste et rouvre la fenêtre à la demande. */
+let updAutoTimer = 0;
+function updBusy() {
+  const lotoOn = !!(D && D.live && D.live.started && !D.live.ended);
+  const dlg = $('#dlg'), w = $('#welcome');
+  return lotoOn || simOn() || tourOn() || (dlg && !dlg.hidden) || (w && !w.hidden && getComputedStyle(w).display !== 'none');
+}
+function updAuto() {
+  if (!UPD || updAutoTimer) return;
+  const seen = () => { try { return (JSON.parse(localStorage.getItem(KEY_UPD) || '{}') || {}).shown === UPD.v; } catch (e) { return false; } };
+  if (seen()) return;
+  const tick = () => {
+    if (!UPD || seen()) { clearInterval(updAutoTimer); return; }
+    if (updBusy()) return;
+    clearInterval(updAutoTimer);
+    let st = {}; try { st = JSON.parse(localStorage.getItem(KEY_UPD) || '{}') || {}; } catch (e) {}
+    st.shown = UPD.v; try { localStorage.setItem(KEY_UPD, JSON.stringify(st)); } catch (e) {}
+    showUpdate();
+  };
+  updAutoTimer = setInterval(tick, 20000);
+  setTimeout(tick, 1500);
 }
 /* Un clic sur le numéro de version (pastille rouge) rouvre cette fenêtre, autant de fois qu'on veut, tant qu'une mise à jour existe */
 async function showUpdate() {
