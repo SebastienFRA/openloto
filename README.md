@@ -36,7 +36,7 @@ OpenLoto s'ouvre dans un navigateur, sans installation ni connexion internet. L'
 - Sous le lot en cours, au choix : l'**aperçu de l'écran public** (ce que voit la salle) ou **« Ça chauffe ! »** : combien de cartons de la base sont à 1, 2 ou 3 numéros de la condition du lot, et les numéros les plus attendus (visible seulement par l'organisateur ; les cartons gagnants non réclamés sont mis de côté pour le lot en cours).
 - Horloge et durée écoulée depuis le démarrage du loto (en tête de la colonne de droite, ou dans le bloc des boules quand la colonne est rangée).
 - Écran maintenu allumé pendant le loto, confirmation avant de fermer la page.
-- Thème clair ou sombre, numéro de version affiché dans le bandeau.
+- Thème clair ou sombre, numéro de version affiché dans le bandeau. Une **pastille rouge** sur ce numéro signale qu'une nouvelle version est publiée : un clic ouvre ses nouveautés. OpenLoto le vérifie au plus une fois par jour quand l'ordinateur a internet ; la page ne fait que lire la dernière version publiée, rien du loto n'est envoyé, et sans internet il ne se passe rien.
 
 ![Le direct en thème sombre](docs/captures/theme-sombre.png)
 
@@ -93,7 +93,8 @@ Pratique pour répartir la saisie entre plusieurs bénévoles : chacun saisit un
 - Les joueurs suivent le tirage sur leur téléphone via un lien, sans application.
 - Le lien s'obtient au choix par un **Raspberry Pi** (ou tout serveur Node.js) ou par le **serveur local** lancé sur le PC de l'organisateur, sur le wifi de la salle.
 - **QR code des joueurs** : affiche A4 à imprimer, image PNG, ou affichage à la demande par-dessus l'écran public (retiré automatiquement au démarrage du loto et à la boule suivante).
-- Grille complète ou dernières boules (bouton « Grille / Boules »), plein écran avec une marge pour l'appareil photo intégré à l'écran, écran maintenu allumé.
+- **L'organisateur choisit ce que voient les joueurs** (Configuration) : la dernière boule seulement, les 5 dernières, ou la grille complète (bouton « Grille / Boules », au choix du joueur). Sans la grille, elle n'est pas non plus montrée sur les téléphones pendant la vérification d'un carton. Le réglage est filtré par OpenLoto avant l'envoi : les serveurs n'ont rien à changer.
+- Plein écran avec une marge pour l'appareil photo intégré à l'écran, écran maintenu allumé.
 - Nombre de téléphones connectés affiché chez l'organisateur, avec reconnexion automatique.
 - Données légères : environ 0,6 Mo par heure et par téléphone.
 
@@ -132,7 +133,7 @@ Vous utilisez des cartons d'un autre fournisseur ? Dites-nous, via l'onglet **Is
 
 ## Démarrage rapide (sans serveur)
 
-1. Téléchargez `OpenLoto.html`.
+1. Téléchargez `OpenLoto.html` depuis la page des [Releases](../../releases/latest).
 2. Ouvrez-le avec un navigateur récent (Chrome, Edge ou Firefox). La page d'accueil propose une visite guidée pour découvrir le programme.
 3. Dans l'onglet **Configuration**, renseignez le titre, le logo, le déroulé et vos cartons.
 4. Cliquez sur **Charger dans le direct**, ouvrez l'écran public et lancez le loto.
@@ -160,10 +161,10 @@ Le PC de l'organisateur sert lui-même la page aux téléphones, sans internet.
 
 1. Connectez le PC au wifi de la salle, ou à votre propre routeur wifi.
 2. Lancez le serveur, à télécharger dans les [Releases](../../releases/latest) du dépôt. Il diffuse le fichier `OpenLoto….html` le plus récent qu'il trouve dans son dossier ou dans le dossier au-dessus.
-   - **Windows** : placez `OpenLoto-serveur.exe` dans `serveur-local-windows/` et double-cliquez dessus.
+   - **Windows** : extrayez `serveur-local-windows.7z` (avec [7-Zip](https://www.7-zip.org/)), puis double-cliquez sur `OpenLoto-serveur.exe`. L'archive contient déjà `OpenLoto.html`.
    - Windows peut afficher « Windows a protégé votre ordinateur » (programme non signé) : *Informations complémentaires* → *Exécuter quand même*.
    - Le pare-feu demande une autorisation au premier lancement : acceptez au moins les réseaux privés.
-   - **Linux (PC)** : placez `OpenLoto-serveur-linux-x64` dans `serveur-local-linux/`, puis dans un terminal ouvert dans ce dossier : `sh lancer-serveur-linux.sh`. Sans ce fichier, le script utilise Node.js s'il est installé (`sudo apt install nodejs`).
+   - **Linux (PC)** : extrayez `serveur-local-linux.7z`, puis dans un terminal ouvert dans ce dossier : `sh lancer-serveur-linux.sh`. L'archive contient déjà `OpenLoto.html` et le programme `OpenLoto-serveur-linux-x64`. Sans ce fichier, le script utilise Node.js s'il est installé (`sudo apt install nodejs`).
    - **Mac**, ou si l'exécutable est bloqué : installez [Node.js](https://nodejs.org), puis lancez `node serveur-local-windows/openloto-serveur.js`.
 3. Dans OpenLoto, sur ce PC : **Réglages → Config réseau → Utiliser le serveur local de ce PC**. L'adresse et la clé se remplissent seules (une nouvelle clé est créée à chaque lancement et récupérée automatiquement).
 4. Donnez le lien aux joueurs : QR code, affiche à imprimer ou affichage sur l'écran public.
@@ -176,7 +177,7 @@ Le dossier `raspberry/` contient un petit serveur **Node.js sans dépendance**. 
 
 ### Installation
 
-Sur le Raspberry Pi (Raspberry Pi OS) :
+Les Releases contiennent l'archive `serveur-raspberry.7z`, avec `OpenLoto.html` et un `LISEZMOI.txt` qui détaille toutes les étapes (installation, vérification, mise à jour, dépannage). En résumé, sur le Raspberry Pi (Raspberry Pi OS) :
 
 ```bash
 # Node.js
@@ -204,9 +205,9 @@ sudo systemctl enable --now openloto
 
 Le service écoute sur le port **8123**. Après chaque modification de la clé : `sudo systemctl restart openloto`.
 
-Pour mettre OpenLoto à jour, il suffit de remplacer `/opt/openloto/OpenLoto.html` par la nouvelle version (les téléphones la chargent à leur prochaine connexion).
+Pour mettre OpenLoto à jour, remplacez `/opt/openloto/OpenLoto.html` par la nouvelle version, **puis redémarrez le service** : `sudo systemctl restart openloto`. Le serveur garde le fichier en mémoire ; les téléphones chargent la nouvelle version à leur prochaine connexion.
 
-> Installation antérieure (dossier `/opt/loto`, service `loto`) : elle continue de fonctionner telle quelle. Copiez simplement la nouvelle version sous le nom `/opt/loto/Loto.html`.
+> Installation antérieure (dossier `/opt/loto`, service `loto`) : elle continue de fonctionner telle quelle. Copiez simplement la nouvelle version sous le nom `/opt/loto/Loto.html`, puis redémarrez le service : `sudo systemctl restart loto`.
 
 ### Changer le port d'écoute
 
@@ -291,6 +292,7 @@ OpenLoto/
 │   ├── LISEZMOI.txt           Mode d'emploi (+ OpenLoto-serveur-linux-x64 des Releases)
 │   └── CONSTRUIRE.md          Fabriquer le programme à partir du script
 ├── raspberry/
+│   ├── LISEZMOI.txt           Mode d'emploi complet pour le Raspberry
 │   ├── openloto-server.js     Serveur de diffusion (Node.js, sans dépendance)
 │   ├── openloto.service       Service systemd
 │   └── openloto.env.example   Modèle du fichier de clé

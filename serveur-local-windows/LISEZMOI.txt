@@ -18,7 +18,7 @@ Utilisation
   4. Laissez la fenêtre du serveur ouverte pendant tout le loto.
 
 Le serveur diffuse le fichier « OpenLoto….html » le plus récent, trouvé dans son dossier
-ou dans le dossier au-dessus (ici : le OpenLoto.html du dossier OpenLoto).
+ou dans le dossier au-dessus (ici : le OpenLoto.html placé à côté du serveur).
 Le nom du fichier diffusé s'affiche dans sa fenêtre.
 
 Limites

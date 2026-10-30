@@ -1,0 +1,191 @@
+OpenLoto - serveur pour Raspberry Pi
+====================================
+
+À quoi ça sert ?
+  Les joueurs suivent le tirage sur leur téléphone. Le Raspberry Pi sert la page aux
+  téléphones et leur relaie, en temps réel, ce que l'organisateur envoie depuis son
+  ordinateur. L'ordinateur de l'organisateur ne diffuse rien lui-même : il envoie l'état
+  du loto au Raspberry, protégé par une clé de diffusion.
+
+  Il n'y a rien à installer sur les téléphones : les joueurs ouvrent simplement un lien.
+
+Contenu de ce dossier
+  OpenLoto.html           le logiciel (servi aux téléphones)
+  openloto-server.js      le serveur (Node.js, aucune bibliothèque à installer)
+  openloto.service        le fichier qui lance le serveur automatiquement au démarrage
+  openloto.env.example    modèle du fichier de réglages (la clé de diffusion)
+  LISEZMOI.txt            ce fichier
+
+Ce qu'il vous faut
+  - Un Raspberry Pi avec Raspberry Pi OS (ou un autre Linux Debian/Ubuntu), connecté au
+    réseau (câble ou wifi) et à internet pour l'installation.
+  - Un accès au Raspberry : clavier + écran, ou à distance par SSH.
+  - Les joueurs et l'ordinateur de l'organisateur sur le même réseau (le wifi de la salle,
+    ou votre propre routeur wifi, qui fonctionne très bien sans internet).
+
+
+1. INSTALLATION (une seule fois)
+--------------------------------
+
+  a) Copiez ce dossier sur le Raspberry (clé USB, ou depuis Windows avec WinSCP, ou en
+     ligne de commande : scp -r serveur-raspberry pi@ADRESSE_DU_RASPBERRY:~/ ).
+     Dans la suite, on suppose qu'il est dans votre dossier personnel et s'appelle
+     « serveur-raspberry ». Adaptez le nom si besoin.
+
+  b) Ouvrez un terminal sur le Raspberry et placez-vous dans ce dossier :
+
+         cd ~/serveur-raspberry
+
+  c) Installez Node.js :
+
+         sudo apt update
+         sudo apt install -y nodejs
+
+  d) Créez un utilisateur dédié et le dossier du service :
+
+         sudo useradd --system --no-create-home --shell /usr/sbin/nologin openloto
+         sudo mkdir -p /opt/openloto
+
+  e) Copiez les fichiers :
+
+         sudo cp OpenLoto.html openloto-server.js /opt/openloto/
+         sudo cp openloto.env.example /opt/openloto/openloto.env
+         sudo cp openloto.service /etc/systemd/system/openloto.service
+
+  f) Choisissez votre clé de diffusion. C'est le mot de passe qui autorise votre ordinateur
+     à envoyer le loto au Raspberry. Générez-en une :
+
+         openssl rand -hex 24
+
+     Copiez le résultat, puis ouvrez le fichier de réglages :
+
+         sudo nano /opt/openloto/openloto.env
+
+     Remplacez « remplacez-moi » par votre clé, de façon à obtenir une ligne comme :
+
+         OPENLOTO_KEY=0123456789abcdef0123456789abcdef0123456789abcdef
+
+     Enregistrez (Ctrl+O, Entrée) puis quittez (Ctrl+X).
+     Gardez cette clé : vous la saisirez dans OpenLoto. Ne la publiez jamais.
+
+  g) Réglez les droits, puis démarrez le service :
+
+         sudo chown -R root:openloto /opt/openloto
+         sudo chmod 640 /opt/openloto/openloto.env
+         sudo systemctl daemon-reload
+         sudo systemctl enable --now openloto
+
+     « enable » le fait redémarrer tout seul à chaque allumage du Raspberry.
+
+
+2. VÉRIFIER QUE ÇA MARCHE
+-------------------------
+
+  Le service est-il en marche ?
+
+         sudo systemctl status openloto
+
+  Vous devez lire « active (running) » (quittez avec la touche Q).
+
+  Quelle est l'adresse du Raspberry sur le réseau ?
+
+         hostname -I
+
+  Notez la première adresse (par exemple 192.168.1.50). Depuis un téléphone ou un
+  ordinateur du même réseau, ouvrez http://192.168.1.50:8123 (avec votre adresse) : la page
+  OpenLoto doit s'afficher (« En attente du déroulé du loto… » tant que rien n'est diffusé).
+
+  Conseil : réservez cette adresse au Raspberry dans votre routeur (« bail DHCP statique »),
+  sinon elle peut changer au prochain démarrage.
+
+
+3. CÔTÉ ORGANISATEUR
+--------------------
+
+  Dans OpenLoto, sur l'ordinateur de l'organisateur :
+  Réglages > Config réseau (téléphones)
+    - Adresse du serveur : http://192.168.1.50:8123   (votre adresse, avec le port 8123)
+    - Clé de diffusion   : la même que dans openloto.env
+
+  Cliquez sur « Tester la connexion ». Le lien à donner aux joueurs s'affiche avec son
+  QR code : affiche à imprimer, image, ou affichage sur l'écran public.
+
+  Important : ouvrez OpenLoto depuis le fichier téléchargé sur votre ordinateur, pas depuis
+  une adresse internet en https. Un navigateur refuse d'envoyer des données d'une page
+  https vers une adresse http de votre réseau local.
+
+  Les joueurs doivent rester connectés au wifi de la salle. Sur un wifi sans internet, le
+  téléphone affiche « Pas d'accès à internet » : c'est normal, il faut rester connecté.
+
+
+4. METTRE À JOUR OPENLOTO
+-------------------------
+
+  Quand une nouvelle version d'OpenLoto sort :
+
+         sudo cp OpenLoto.html /opt/openloto/OpenLoto.html
+         sudo systemctl restart openloto
+
+  Le redémarrage est nécessaire : le serveur garde le fichier en mémoire. Les téléphones
+  chargent la nouvelle version à leur prochaine connexion.
+  Si le fichier du serveur lui-même (openloto-server.js) change, recopiez-le de la même
+  façon dans /opt/openloto/ avant de redémarrer.
+
+
+5. RÉGLAGES FACULTATIFS
+-----------------------
+
+  Changer la clé : modifiez /opt/openloto/openloto.env, puis « sudo systemctl restart
+  openloto », et mettez la nouvelle clé dans OpenLoto. Vous pouvez en prendre une nouvelle
+  à chaque loto.
+
+  Changer le port (8123 par défaut) :
+
+         sudo nano /etc/systemd/system/openloto.service
+
+  Modifiez la ligne « Environment=PORT=8123 », puis :
+
+         sudo systemctl daemon-reload
+         sudo systemctl restart openloto
+
+  Pensez à reporter le nouveau port dans l'adresse saisie dans OpenLoto et dans le lien
+  donné aux joueurs.
+
+  Nombre maximum de téléphones : 300 par défaut. Pour changer, ajoutez dans openloto.env
+  une ligne, par exemple :  MAX_CLIENTS=500   (puis redémarrez). Le service est limité à
+  256 Mo de mémoire dans openloto.service : dans nos essais, 300 téléphones demandaient
+  une vingtaine de Mo, donc il y a de la marge. Si vous visez beaucoup plus, testez avant
+  le jour J.
+
+  Jouer depuis la 4G ou la 5G, ou depuis un autre réseau : il faut rediriger le port 8123
+  vers le Raspberry dans votre box, et utiliser votre adresse publique. Cela expose le
+  serveur sur internet : ne publiez jamais votre clé de diffusion.
+
+
+6. EN CAS DE PROBLÈME
+---------------------
+
+  Voir ce que fait le serveur :           sudo journalctl -u openloto -f   (Ctrl+C pour quitter)
+  Arrêter / démarrer / redémarrer :       sudo systemctl stop|start|restart openloto
+
+  « Clé refusée » dans OpenLoto
+      La clé saisie ne correspond pas à celle de openloto.env. Vérifiez qu'il n'y a ni
+      espace en trop, ni faute, et que vous avez redémarré le service après modification.
+
+  « Introuvable » ou la page ne s'affiche pas
+      Vérifiez que OpenLoto.html est bien dans /opt/openloto/ (ls -l /opt/openloto) et que
+      le service tourne (systemctl status openloto).
+
+  « Trop de connexions »
+      Le plafond de téléphones est atteint : voir MAX_CLIENTS plus haut.
+
+  Les téléphones ne se connectent pas
+      - Sont-ils sur le même wifi que le Raspberry ? Beaucoup de wifi publics ou « invités »
+        interdisent aux appareils de se parler entre eux (isolation des clients) : utilisez
+        alors votre propre routeur wifi.
+      - Testez l'adresse http://ADRESSE:8123 depuis un ordinateur du même réseau.
+      - Vérifiez l'adresse du Raspberry avec « hostname -I » : elle a peut-être changé.
+
+  Le service ne démarre pas
+      Lisez les dernières lignes de « sudo journalctl -u openloto -n 30 » : elles indiquent
+      le plus souvent un fichier manquant ou un droit mal réglé (reprenez l'étape g).

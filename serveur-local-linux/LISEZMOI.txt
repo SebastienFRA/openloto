@@ -20,7 +20,7 @@ Utilisation
   5. Laissez le terminal ouvert pendant tout le loto (Ctrl+C pour arrêter le serveur).
 
 Le serveur diffuse le fichier « OpenLoto….html » le plus récent, trouvé dans son dossier
-ou dans le dossier au-dessus (ici : le OpenLoto.html du dossier OpenLoto).
+ou dans le dossier au-dessus (ici : le OpenLoto.html placé à côté du serveur).
 
 Limites
   - Le wifi doit permettre aux appareils de communiquer entre eux. Beaucoup de wifi
