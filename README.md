@@ -275,7 +275,7 @@ Si le service ouvre puis que les dons ne suffisent plus à couvrir les frais, il
 - **Faites-le savoir** dans l'onglet **Issues** du dépôt, ou par e-mail à **[openloto@duck.com](mailto:openloto@duck.com)** : nombre de lotos par an, nombre de joueurs, ce qui vous bloque aujourd'hui. C'est ce qui permettra d'évaluer les besoins.
 - **Soutenir le projet** : voir la section [Soutenir OpenLoto](#soutenir-openloto) ci-dessous.
 
-> Dans OpenLoto, un petit encart **« Diffuser sans Raspberry ? »** (colonne de droite du direct, et page de configuration) présente ce projet ; le bouton **« En savoir plus »** en donne le détail.
+> Dans OpenLoto, un petit encart **« Diffuser sans Raspberry ? »** (dans la colonne de droite du direct, et dans la colonne de gauche de la page de configuration) présente ce projet ; le bouton **« En savoir plus »** en donne le détail.
 
 ---
 
