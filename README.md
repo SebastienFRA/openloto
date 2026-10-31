@@ -155,7 +155,7 @@ Tout est enregistré dans le navigateur de l'ordinateur. Pensez à **exporter la
 | Matériel | un Raspberry Pi ou un serveur Node.js | rien de plus que le PC de l'organisateur | rien |
 | Installation | une fois, sur le Pi | aucune (un programme à lancer) | aucune |
 | Connexion des joueurs | 4G/5G (ou wifi) via internet | **le même wifi** que le PC | 4G/5G via internet |
-| Internet dans la salle | non (pour le PC) | non | **oui** pour le PC (un partage de connexion suffit) |
+| Internet pour le PC | non si le Raspberry est dans la salle (même réseau) ; **oui** s'il est ailleurs | non | **oui** (un partage de connexion suffit) |
 | Dépend du wifi de la salle | non | **oui** (voir ci-dessous) | non |
 | Disponibilité | dès maintenant | dès maintenant | si les dons le permettent ([voir plus bas](#projet--un-serveur-openloto-gratuit)) |
 
