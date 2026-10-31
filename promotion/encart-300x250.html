@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>OpenLoto</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font:14px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:#0f5c63}
+a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;width:100%;max-width:300px;height:250px;padding:16px;color:#fff;text-decoration:none;background:linear-gradient(160deg,#0b4a50,#147a83);overflow:hidden}
+a:focus-visible{outline:3px solid #f5a300;outline-offset:-3px}
+.logo{width:200px}
+b{font-size:17px}
+.sub{opacity:.92;font-size:13px}
+.boules{display:flex;gap:7px}
+.b{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font:800 14px ui-rounded,"Arial Rounded MT Bold",system-ui,sans-serif;color:#2b1d00;background:radial-gradient(circle at 36% 30%,#ffd98a,#f5a300 55%,#b86a00);box-shadow:0 2px 4px rgba(0,0,0,.3);opacity:0;transform:translateY(-20px) scale(.6);animation:pop 10s infinite}
+.b:nth-child(2){animation-delay:.6s}.b:nth-child(3){animation-delay:1.2s}.b:nth-child(4){animation-delay:1.8s}
+@keyframes pop{0%{opacity:0;transform:translateY(-20px) scale(.6)}6%{opacity:1;transform:translateY(0) scale(1.1)}9%{transform:scale(1)}85%{opacity:1}95%,100%{opacity:0}}
+.cta{background:#f5a300;color:#2b1d00;font-weight:800;padding:9px 20px;border-radius:10px}
+@media (prefers-reduced-motion:reduce){.b{animation:none;opacity:1;transform:none}}
+</style></head><body>
+<a href="https://openloto.org/" target="_blank" rel="noopener" aria-label="OpenLoto : logiciel de loto gratuit pour les associations">
+  <img class="logo" src="https://openloto.org/docs/logo/openloto-logo-blanc.svg" alt="OpenLoto">
+  <b>Le loto de votre association, en direct</b>
+  <span class="sub">Gratuit, libre, sans installation ni publicité</span>
+  <span class="boules" aria-hidden="true"><i class="b">7</i><i class="b">23</i><i class="b">48</i><i class="b">90</i></span>
+  <span class="cta">Découvrir OpenLoto</span>
+</a>
+</body></html>
